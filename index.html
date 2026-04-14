@@ -1606,6 +1606,7 @@
     <li><a href="#services">Services</a></li>
     <li><a href="#properties">Properties</a></li>
     <li><a href="#landlords">For Landlords</a></li>
+    <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important;transition:background 0.2s,border-color 0.2s!important" onmouseover="this.style.background='rgba(13,27,42,0.06)'" onmouseout="this.style.background=''">Student Login</a></li>
     <li><a href="#" class="nav-btn" onclick="openModal()">Get Started</a></li>
   </ul>
   <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
@@ -1619,6 +1620,7 @@
   <a href="#services" onclick="closeMenu()">Services</a>
   <a href="#properties" onclick="closeMenu()">Properties</a>
   <a href="#landlords" onclick="closeMenu()">For Landlords</a>
+  <a href="/login" onclick="closeMenu()">Student Login</a>
   <a href="#" class="mobile-cta" onclick="closeMenu(); openModal()">Get Started</a>
 </div>
 
@@ -2145,7 +2147,11 @@
           </div>
           <h3>Application Received</h3>
           <p>Thank you for applying to We Link. Our team will review your details and be in touch within 48 hours via WhatsApp and email.</p>
-          <button class="btn-primary" onclick="closeModal()">Back to Home</button>
+          <p id="successPortalMsg" style="display:none;font-size:0.82rem;color:var(--text-light);margin-top:-8px;margin-bottom:4px">Create your student portal account to track your application, upload documents, and access property listings.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch">
+            <a id="successPortalBtn" href="/register" style="display:none;background:var(--navy);color:#fff;text-align:center;padding:13px 24px;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;border-radius:2px">Create Student Account →</a>
+            <button class="btn-primary" onclick="closeModal()" style="background:transparent;color:var(--navy);border:1px solid rgba(13,27,42,0.25)">Back to Home</button>
+          </div>
         </div>
       </div>
 
@@ -2476,6 +2482,46 @@ window.submitForm = async function() {
     ]);
   } catch(e) { console.error('Submit error:', e); }
 
+  // Send confirmation email via Resend
+  if (email) {
+    const isLandlord = (window.userType === 'landlord');
+    const firstName = fname || 'there';
+    const emailHtml = isLandlord ? `
+      <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0d1b2a;color:#f0ede8;padding:40px 36px">
+        <div style="font-size:1.3rem;letter-spacing:0.12em;margin-bottom:24px">We Link</div>
+        <h2 style="font-size:1.1rem;font-weight:400;letter-spacing:0.04em;margin-bottom:16px">Enquiry Received</h2>
+        <p style="font-size:0.88rem;line-height:1.75;color:rgba(240,237,232,0.75)">Hi ${firstName},</p>
+        <p style="font-size:0.88rem;line-height:1.75;color:rgba(240,237,232,0.75)">Thank you for reaching out to We Link. We've received your landlord enquiry and a member of our team will be in touch within 48 hours.</p>
+        <p style="font-size:0.88rem;line-height:1.75;color:rgba(240,237,232,0.75)">If you have any urgent questions, feel free to reply to this email.</p>
+        <p style="margin-top:32px;font-size:0.78rem;color:rgba(240,237,232,0.4)">We Link · welink-uk.com</p>
+      </div>` : `
+      <div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#0d1b2a;color:#f0ede8;padding:40px 36px">
+        <div style="font-size:1.3rem;letter-spacing:0.12em;margin-bottom:24px">We Link</div>
+        <h2 style="font-size:1.1rem;font-weight:400;letter-spacing:0.04em;margin-bottom:16px">Application Received</h2>
+        <p style="font-size:0.88rem;line-height:1.75;color:rgba(240,237,232,0.75)">Hi ${firstName},</p>
+        <p style="font-size:0.88rem;line-height:1.75;color:rgba(240,237,232,0.75)">Thank you for applying to We Link. We've received your application and our team will review your details and be in touch within <strong style="color:#f0ede8">48 hours</strong> via WhatsApp and email.</p>
+        <div style="margin:28px 0;padding:20px 24px;border:1px solid rgba(255,255,255,0.12)">
+          <p style="font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(240,237,232,0.5);margin-bottom:10px">Next Step</p>
+          <p style="font-size:0.88rem;line-height:1.7;color:rgba(240,237,232,0.75)">Create your student portal account to upload your documents, track your application, and access property listings.</p>
+          <a href="https://welink-uk.com/register" style="display:inline-block;margin-top:14px;background:#f0ede8;color:#0d1b2a;padding:11px 24px;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none">Create Account →</a>
+        </div>
+        <p style="margin-top:32px;font-size:0.78rem;color:rgba(240,237,232,0.4)">We Link · welink-uk.com</p>
+      </div>`;
+
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer re_GuFzmW7h_KMNjggPhaoHPQiBFeSfKRck1', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'We Link <noreply@welink-uk.com>',
+          to: [email],
+          subject: isLandlord ? 'We Link — Landlord Enquiry Received' : 'We Link — Application Received',
+          html: emailHtml
+        })
+      });
+    } catch(e) { console.error('Email error:', e); }
+  }
+
   if (btn) { btn.textContent = 'Submit Application'; btn.disabled = false; }
 
   // Advance to success screen
@@ -2488,5 +2534,12 @@ window.submitForm = async function() {
   if (title) title.textContent = "You're all set";
   const sub = document.getElementById('modalSub');
   if (sub) sub.textContent = "We'll be in touch within 48 hours";
+
+  // Show portal CTA for students only
+  const isStudent = (window.userType !== 'landlord');
+  const portalMsg = document.getElementById('successPortalMsg');
+  const portalBtn = document.getElementById('successPortalBtn');
+  if (portalMsg) portalMsg.style.display = isStudent ? 'block' : 'none';
+  if (portalBtn) portalBtn.style.display = isStudent ? 'block' : 'none';
 };
 </script>
