@@ -1,1 +1,6 @@
-/admin  /dashboard.html  200
+/admin          /dashboard.html   200
+/login          /register.html    200
+/register       /register.html    200
+/onboarding     /onboarding.html  200
+/portal         /portal.html      200
+/student        /portal.html      200

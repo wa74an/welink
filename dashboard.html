@@ -915,6 +915,10 @@
         <input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter') doLogin()"/>
       </div>
       <div class="login-error" id="loginError">Incorrect username or password</div>
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer;margin-bottom:4px;user-select:none">
+        <input type="checkbox" id="rememberAdmin" checked style="accent-color:#4cbb8a;width:15px;height:15px;cursor:pointer"/>
+        <span style="font-size:0.75rem;color:rgba(255,255,255,0.5);letter-spacing:0.06em">Keep me signed in for 30 days</span>
+      </label>
       <button class="login-btn" onclick="doLogin()">Sign In →</button>
     </div>
     <div class="login-footer">We Link · Admin Access Only</div>
@@ -963,6 +967,16 @@
       <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="white" stroke-width="1.5"/><line x1="5" y1="5" x2="11" y2="5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="11" x2="8" y2="11" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
       <span>Applications</span>
       <span class="nav-badge red" id="appsBadge">2</span>
+    </a>
+
+    <a class="nav-item" onclick="showView('students', this)">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5l6 3 6-3-6-3z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M2 8l6 3 6-3" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11l6 3 6-3" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Students</span>
+      <span class="nav-badge" id="studentsBadge" style="display:none"></span>
+    </a>
+    <a class="nav-item" onclick="showView('terms', this)">
+      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="12" height="14" rx="1.5" stroke="white" stroke-width="1.4"/><line x1="5" y1="5" x2="11" y2="5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="11" x2="9" y2="11" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <span>Terms</span>
     </a>
 
     <div class="nav-section-label">Settings</div>
@@ -1215,8 +1229,122 @@
       </div>
     </div>
 
+    <!-- ===== STUDENTS ===== -->
+    <div class="view" id="view-students">
+      <div class="section-card">
+        <div class="section-card-header">
+          <h3>Student Profiles</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="studentSearch" placeholder="Search name or email…"
+              oninput="filterStudents()"
+              style="background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);padding:6px 12px;font-family:inherit;font-size:0.78rem;outline:none;width:200px"/>
+            <select id="studentFilter" onchange="filterStudents()"
+              style="background:var(--navy-light);border:1px solid var(--border);color:var(--text);padding:6px 10px;font-family:inherit;font-size:0.78rem;outline:none;cursor:pointer">
+              <option value="all">All Students</option>
+              <option value="complete">Completed</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table" style="min-width:700px">
+            <thead><tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Parent Phone</th>
+              <th>Documents</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="studentsTable"></tbody>
+          </table>
+        </div>
+        <div id="studentsEmpty" style="display:none;padding:32px;text-align:center;color:var(--text-light);font-size:0.82rem">No students found.</div>
+        <div id="studentsLoading" style="padding:32px;text-align:center;color:var(--text-light);font-size:0.82rem">Loading students…</div>
+      </div>
+    </div>
+
+    <!-- ===== TERMS & CONDITIONS ===== -->
+    <div class="view" id="view-terms">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+        <div class="section-card" style="flex:1;min-width:300px">
+          <div class="section-card-header">
+            <h3>Terms & Conditions</h3>
+            <button class="btn-sm primary" onclick="openTermsEditor(null)">+ New Version</button>
+          </div>
+          <div id="termsAdminList" style="padding:0 0 8px">
+            <div style="padding:24px;text-align:center;color:var(--text-light);font-size:0.82rem" id="termsLoading">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </main>
+
+<!-- ===== STUDENT DETAIL MODAL ===== -->
+<div class="modal-overlay" id="modal-studentDetail" onclick="if(event.target===this)closeModal('studentDetail')">
+  <div class="admin-modal" style="max-width:600px">
+    <div class="admin-modal-header">
+      <h3 id="studentDetailName">Student Profile</h3>
+      <button class="modal-x" onclick="closeModal('studentDetail')">✕</button>
+    </div>
+    <div class="admin-modal-body" style="padding:0">
+
+      <!-- Profile info -->
+      <div style="padding:20px 28px;border-bottom:1px solid var(--border)">
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-bottom:12px">Profile Details</div>
+        <div id="studentDetailInfo" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px"></div>
+      </div>
+
+      <!-- Documents -->
+      <div style="padding:20px 28px">
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-bottom:14px">Submitted Documents</div>
+        <div id="studentDetailDocs"></div>
+      </div>
+    </div>
+    <div class="admin-modal-footer" style="justify-content:flex-end">
+      <button class="btn-sm" onclick="closeModal('studentDetail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TERMS EDITOR MODAL ===== -->
+<div class="modal-overlay" id="modal-termsEditor" onclick="if(event.target===this)closeModal('termsEditor')">
+  <div class="admin-modal" style="max-width:680px">
+    <div class="admin-modal-header">
+      <h3 id="termsEditorTitle">New Terms & Conditions</h3>
+      <button class="modal-x" onclick="closeModal('termsEditor')">✕</button>
+    </div>
+    <div class="admin-modal-body">
+      <div id="termsEditorAlert" style="display:none;padding:10px 14px;font-size:0.8rem;margin-bottom:16px;border:1px solid rgba(224,92,92,0.3);background:rgba(224,92,92,0.1);color:#f0a0a0"></div>
+      <input type="hidden" id="termsEditorId"/>
+      <div class="form-group">
+        <label>Version Label <span style="color:var(--text-light);font-weight:300;font-size:0.72rem">(e.g. v1.0, v1.2)</span></label>
+        <input type="text" id="termsEditorVersion" placeholder="v1.0"/>
+      </div>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="termsEditorTitleField" placeholder="Terms & Conditions"/>
+      </div>
+      <div class="form-group">
+        <label>Content <span style="color:var(--text-light);font-weight:300;font-size:0.72rem">(HTML supported)</span></label>
+        <textarea id="termsEditorContent"
+          style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);padding:12px 14px;font-family:monospace;font-size:0.8rem;resize:vertical;min-height:260px;outline:none;line-height:1.6"
+          placeholder="Enter terms content here. You can use HTML tags like &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;…"></textarea>
+      </div>
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;margin-top:4px">
+        <input type="checkbox" id="termsEditorActive" style="accent-color:#4cbb8a;width:15px;height:15px;cursor:pointer"/>
+        <span style="font-size:0.78rem;color:var(--text-light)">Set as active version (shown to all new students)</span>
+      </label>
+    </div>
+    <div class="admin-modal-footer">
+      <button class="btn-sm" onclick="closeModal('termsEditor')">Cancel</button>
+      <button class="btn-sm primary" onclick="saveTerm()">Save Version</button>
+    </div>
+  </div>
+</div>
 
 <!-- ADD PROPERTY MODAL -->
 <div class="modal-overlay" id="modal-addProperty">
@@ -1652,12 +1780,14 @@ function showView(name, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   if (el) el.classList.add('active');
-  const titles = { overview:'Dashboard', properties:'Properties', clients:'Clients', applications:'Applications', settings:'Settings' };
-  const actions = { overview:'Add Property', properties:'Add Property', clients:'Add Client', applications:'', settings:'' };
+  const titles = { overview:'Dashboard', properties:'Properties', clients:'Clients', applications:'Applications', settings:'Settings', students:'Students', terms:'Terms & Conditions' };
+  const actions = { overview:'Add Property', properties:'Add Property', clients:'Add Client', applications:'', settings:'', students:'', terms:'' };
   document.getElementById('topbarTitle').textContent = titles[name] || name;
   const btn = document.getElementById('topbarAction');
   if (actions[name]) { btn.style.display='flex'; btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="white" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> ${actions[name]}`; }
   else btn.style.display = 'none';
+  if (name === 'students') loadStudents();
+  if (name === 'terms') loadTermsAdmin();
   closeSidebar();
 }
 
@@ -2067,11 +2197,42 @@ function resetImgUpload() {
   document.getElementById('imgPlaceholder').style.display = 'block';
 }
 
-// ===== LOGIN =====
+// ===== LOGIN — PERSISTENT SESSION =====
+const ADMIN_SESSION_KEY = 'wl_admin_session';
+
+function saveAdminSession(remember) {
+  const session = {
+    user: 'admin',
+    ts: Date.now(),
+    expiry: remember ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null
+  };
+  localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
+  if (!remember) sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+}
+
+function checkAdminSession() {
+  const raw = localStorage.getItem(ADMIN_SESSION_KEY);
+  if (!raw) return false;
+  try {
+    const s = JSON.parse(raw);
+    // Persistent (remember me): check expiry
+    if (s.expiry) return Date.now() < s.expiry;
+    // Session-only: valid only if sessionStorage marker exists
+    return !!sessionStorage.getItem(ADMIN_SESSION_KEY);
+  } catch { return false; }
+}
+
+function clearAdminSession() {
+  localStorage.removeItem(ADMIN_SESSION_KEY);
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+}
+
 function doLogin() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
+  const remember = document.getElementById('rememberAdmin').checked;
   if (user === 'admin' && pass === 'welink2025') {
+    saveAdminSession(remember);
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('loginError').classList.remove('show');
     loadAll();
@@ -2084,15 +2245,309 @@ function doLogin() {
 }
 
 function logout() {
+  clearAdminSession();
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
 }
 
+// ===== STUDENTS =====
+let allStudents = [];
+
+async function loadStudents() {
+  document.getElementById('studentsLoading').style.display = 'block';
+  document.getElementById('studentsEmpty').style.display = 'none';
+  document.getElementById('studentsTable').innerHTML = '';
+  try {
+    // Load profiles
+    const profiles = await sb('student_profiles?select=*&order=created_at.desc') || [];
+    // Load documents grouped by student
+    const docs = await sb('student_documents?select=student_id,doc_type') || [];
+    const docMap = {};
+    docs.forEach(d => {
+      if (!docMap[d.student_id]) docMap[d.student_id] = [];
+      docMap[d.student_id].push(d.doc_type);
+    });
+    // Load auth users via the profiles (email comes from auth, store email in session)
+    // We fetch email from audit_logs or use placeholder — profiles don't store email directly
+    // Instead, enrich with signup events from audit_logs
+    const logs = await sb('audit_logs?event_type=eq.onboarding_complete&select=student_id,created_at') || [];
+    const logMap = {};
+    logs.forEach(l => { logMap[l.student_id] = l.created_at; });
+
+    allStudents = profiles.map(p => ({
+      ...p,
+      docs: docMap[p.id] || [],
+      completed_at: logMap[p.id] || null
+    }));
+
+    renderStudentsTable(allStudents);
+    // Update badge
+    const pending = allStudents.filter(s => !s.onboarding_completed).length;
+    const badge = document.getElementById('studentsBadge');
+    if (pending > 0) { badge.textContent = pending; badge.style.display = ''; }
+    else badge.style.display = 'none';
+  } catch(e) {
+    console.error('loadStudents:', e);
+    document.getElementById('studentsLoading').textContent = 'Failed to load students.';
+  }
+}
+
+function renderStudentsTable(students) {
+  document.getElementById('studentsLoading').style.display = 'none';
+  const tbody = document.getElementById('studentsTable');
+  tbody.innerHTML = '';
+  if (!students.length) {
+    document.getElementById('studentsEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('studentsEmpty').style.display = 'none';
+  const reqDocs = ['passport','student_civil_id','parent_civil_id'];
+  students.forEach(s => {
+    const docsUploaded = s.docs.length;
+    const docsRequired = reqDocs.filter(d => s.docs.includes(d)).length;
+    const joined = s.created_at ? new Date(s.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '—';
+    const statusBadge = s.onboarding_completed
+      ? `<span style="font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border:1px solid rgba(76,187,138,0.3);background:rgba(76,187,138,0.1);color:#4cbb8a">Complete</span>`
+      : `<span style="font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border:1px solid rgba(240,180,41,0.3);background:rgba(184,122,0,0.15);color:#f0b429">Pending</span>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escH(s.full_name || '—')}</td>
+      <td style="color:var(--text-light);font-size:0.8rem">${escH(s.id.substring(0,8)+'…')}</td>
+      <td style="font-size:0.8rem">${escH(s.parent_phone || '—')}</td>
+      <td style="font-size:0.8rem">${docsUploaded} file${docsUploaded !== 1 ? 's' : ''} · ${docsRequired}/3 required</td>
+      <td>${statusBadge}</td>
+      <td style="color:var(--text-light);font-size:0.78rem">${joined}</td>
+      <td><button class="btn-sm" onclick="viewStudent('${escH(s.id)}')">View</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterStudents() {
+  const q = document.getElementById('studentSearch').value.toLowerCase();
+  const f = document.getElementById('studentFilter').value;
+  const filtered = allStudents.filter(s => {
+    const nameMatch = (s.full_name || '').toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
+    if (!nameMatch) return false;
+    if (f === 'complete') return s.onboarding_completed;
+    if (f === 'pending') return !s.onboarding_completed;
+    return true;
+  });
+  renderStudentsTable(filtered);
+}
+
+async function viewStudent(id) {
+  const s = allStudents.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('studentDetailName').textContent = s.full_name || 'Student Profile';
+
+  // Profile info
+  const fmt = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  const infoFields = [
+    ['Full Name', s.full_name || '—'],
+    ['Student ID', s.id.substring(0,16)+'…'],
+    ["Parent's Phone", s.parent_phone || '—'],
+    ['Onboarding', s.onboarding_completed ? 'Completed' : 'Pending'],
+    ['Terms Agreed', fmt(s.terms_accepted_at)],
+    ['Joined', fmt(s.created_at)],
+  ];
+  document.getElementById('studentDetailInfo').innerHTML = infoFields.map(([l,v]) => `
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);margin-bottom:3px">${escH(l)}</div>
+      <div style="font-size:0.82rem">${escH(v)}</div>
+    </div>`).join('');
+
+  // Documents
+  const docsContainer = document.getElementById('studentDetailDocs');
+  docsContainer.innerHTML = '<div style="color:var(--text-light);font-size:0.8rem">Loading documents…</div>';
+  openModal('studentDetail');
+
+  try {
+    const docs = await sb(`student_documents?student_id=eq.${id}&select=*&order=uploaded_at.asc`) || [];
+    if (!docs.length) {
+      docsContainer.innerHTML = '<div style="color:var(--text-light);font-size:0.82rem;padding:8px 0">No documents submitted.</div>';
+      return;
+    }
+    const docLabels = { passport:'Passport', student_civil_id:'Student Civil ID', parent_civil_id:"Parent's Civil ID", scholarship_letter:'Scholarship Letter' };
+    docsContainer.innerHTML = docs.map(d => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:12px">
+        <div style="min-width:0;flex:1">
+          <div style="font-size:0.78rem;color:var(--text)">${escH(docLabels[d.doc_type] || d.doc_type)}</div>
+          <div style="font-size:0.7rem;color:var(--text-light);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escH(d.file_name)}</div>
+        </div>
+        <div style="display:flex;gap:7px;flex-shrink:0">
+          <button class="btn-sm" onclick="downloadDoc('${escH(d.file_path)}','${escH(d.file_name)}')">Download</button>
+        </div>
+      </div>`).join('');
+
+    // Audit log
+    await sb('audit_logs', 'POST', { event_type:'doc_accessed', student_id: id, details:{ by:'admin', doc_count: docs.length } });
+  } catch(e) {
+    console.error('viewStudent docs:', e);
+    docsContainer.innerHTML = '<div style="color:var(--text-light);font-size:0.82rem">Could not load documents.</div>';
+  }
+}
+
+async function downloadDoc(filePath, fileName) {
+  try {
+    // Generate a signed URL (60 min expiry)
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/student-documents/${filePath}`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expiresIn: 3600 })
+    });
+    if (!res.ok) throw new Error('Could not generate signed URL');
+    const data = await res.json();
+    const signedUrl = `${SUPABASE_URL}/storage/v1${data.signedURL}`;
+    const a = document.createElement('a');
+    a.href = signedUrl;
+    a.download = fileName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch(e) {
+    console.error('downloadDoc:', e);
+    showToast('Could not generate download link. Check storage bucket permissions.');
+  }
+}
+
+// ===== TERMS & CONDITIONS =====
+let allTerms = [];
+
+async function loadTermsAdmin() {
+  document.getElementById('termsLoading').style.display = 'block';
+  try {
+    allTerms = await sb('terms_conditions?select=*&order=created_at.desc') || [];
+    renderTermsList();
+  } catch(e) {
+    document.getElementById('termsLoading').textContent = 'Failed to load terms.';
+  }
+}
+
+function renderTermsList() {
+  document.getElementById('termsLoading').style.display = 'none';
+  const container = document.getElementById('termsAdminList');
+  if (!allTerms.length) {
+    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-light);font-size:0.82rem">No terms versions yet. Click "New Version" to create one.</div>';
+    return;
+  }
+  container.innerHTML = allTerms.map(t => `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);gap:16px">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span style="font-size:0.85rem">${escH(t.title)}</span>
+          ${t.is_active ? `<span style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(76,187,138,0.3);background:rgba(76,187,138,0.1);color:#4cbb8a">Active</span>` : ''}
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-light);letter-spacing:0.06em">
+          Version ${escH(t.version)} &nbsp;·&nbsp; ${new Date(t.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+          ${t.updated_at !== t.created_at ? ' &nbsp;·&nbsp; Updated ' + new Date(t.updated_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:7px;flex-shrink:0;align-items:center">
+        ${!t.is_active ? `<button class="btn-sm" onclick="setActiveTerm('${t.id}')" title="Set as active">Activate</button>` : ''}
+        <button class="btn-sm" onclick="openTermsEditor('${t.id}')">Edit</button>
+      </div>
+    </div>`).join('');
+}
+
+function openTermsEditor(id) {
+  const existing = id ? allTerms.find(t => t.id === id) : null;
+  document.getElementById('termsEditorTitle').textContent = existing ? 'Edit Terms & Conditions' : 'New Terms & Conditions';
+  document.getElementById('termsEditorId').value = existing ? existing.id : '';
+  document.getElementById('termsEditorVersion').value = existing ? existing.version : '';
+  document.getElementById('termsEditorTitleField').value = existing ? existing.title : 'Terms & Conditions';
+  document.getElementById('termsEditorContent').value = existing ? existing.content : '';
+  document.getElementById('termsEditorActive').checked = existing ? existing.is_active : false;
+  document.getElementById('termsEditorAlert').style.display = 'none';
+  openModal('termsEditor');
+}
+
+async function saveTerm() {
+  const id      = document.getElementById('termsEditorId').value;
+  const version = document.getElementById('termsEditorVersion').value.trim();
+  const title   = document.getElementById('termsEditorTitleField').value.trim();
+  const content = document.getElementById('termsEditorContent').value.trim();
+  const active  = document.getElementById('termsEditorActive').checked;
+  const alertEl = document.getElementById('termsEditorAlert');
+
+  if (!version || !title || !content) {
+    alertEl.textContent = 'Please fill in all fields.';
+    alertEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    const now = new Date().toISOString();
+    if (active) {
+      // Deactivate all other versions first
+      await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?is_active=eq.true`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ is_active: false })
+      });
+    }
+
+    if (id) {
+      // Update existing
+      await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ version, title, content, is_active: active, updated_at: now })
+      });
+    } else {
+      // Insert new
+      await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ version, title, content, is_active: active, created_at: now, updated_at: now })
+      });
+    }
+
+    closeModal('termsEditor');
+    showToast(id ? 'Terms updated successfully' : 'New terms version created');
+    loadTermsAdmin();
+  } catch(e) {
+    alertEl.textContent = 'Save failed. Please try again.';
+    alertEl.style.display = 'block';
+  }
+}
+
+async function setActiveTerm(id) {
+  try {
+    // Deactivate all
+    await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?is_active=eq.true`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ is_active: false })
+    });
+    // Activate selected
+    await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ is_active: true, updated_at: new Date().toISOString() })
+    });
+    showToast('Active terms version updated');
+    loadTermsAdmin();
+  } catch(e) {
+    showToast('Failed to update active terms.');
+  }
+}
+
+// ===== XSS-SAFE HELPER =====
+function escH(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // ===== INIT =====
 setTimeout(() => {
-  const u = document.getElementById('loginUser');
-  if (u) u.focus();
+  if (checkAdminSession()) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    loadAll();
+  } else {
+    const u = document.getElementById('loginUser');
+    if (u) u.focus();
+  }
 }, 100);
 </script>
 </body>

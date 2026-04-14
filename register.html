@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0d1b2a"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>We Link — Student Portal</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAADP0lEQVR4nNVXT0hUQRz+zdtnSFEdwgLdRFODUDIwKArLUkLpYgdNFKE6lKgRGCJ4MahuHsJDh+rgwYN06A8hJKlRHdJDUq5ESBhKXVp3pUOu+97M7+uwu6ObT31vV4i+03sz837fN7/5zTfzBADQP4SRzscASCmVlgCRagYAkBBCPxORfveClDKglCIhBIGYhodHSAhBQghiZu/B4BG2bQMAQqEwKs82gWg3Ghrasby8DACQ8X63cJ0BACSlItM0aXIyQMXFZ4ghaXx8jAJTX+hI6TmanZ0jn2mSlB7qwo1KpRhKKQBAf/9jmL796Oi4pfuj0SgaG1uxY3sBhoZGY5mQEsy8aexNBUgp9XNbeze2ZeRiYOCJ7guFw7q/t/c+BGXj9u17q8Sr1AXYdox8YSGE8pO18OeU4dPHaR14IRRGU9N12LathY6MvsOunQdxofYKIpFIPM76deEogJk1+cTEJPZmHUZV5UUsLv4CAFhWLGDwZwhVVc2wLCuJaG7uO0pLK1FUdAIzM7MbitgwAw8fDMBn5KCz845uk1LptQ0GQ6ipuawFAIAtY0QMRnPzDWRm5uPps5d6YkByXSQJYGYoxbCsKFpaupCRkYvBwecAgHB4EbPf5gCsrGswGEJ19SUtICFsZuYrln7H0t/X9whCZKOnpxcAr6mJJAGJtF+72oWsrBIEpj9rwhcvXqGtrRvAqiX4S4CUseD19a2Y/BDQZG/fvEdmZh7u3ulL4gH+8gGfL/ZaV3eeAlNjVFJ8iKJRiwzDiG9Zd7aBuCEahkGWZVP5qeMUCLymiopjuj0Bc/WHCS+vrConIiJmJtNMGuIZpukjZqbCwjwqLMyLC1g5MxynxMwEIElpOjAMg5jZ8axwnN5WEbuJufVMHvH/C/B+BUlRgBDCdW3ExrmT5lqALSVFIpE17U73uaVIhJilq7ibbvLEnj1aVkL79u4hohXDWm9sx80rdKAgl4iIhNh4jpsKSJiT359Dfn9OUtt6YytOn1jVtnF8T1cyJyNxIkgYmRu49tnEzXct2VoiL0aW1jYUJCjD9KX0P6BjwG2uHKCUpPn5H5Sfv59SnUtaArYCaTuhUw14wf+fgXTxBybGJRFi0ZjtAAAAAElFTkSuQmCC"/>
+<style>
+  @font-face {
+    font-family: 'Assemblage';
+    font-weight: 400;
+    font-style: normal;
+    src: local('Assemblage'), local('Assemblage-Regular'),
+         url('https://fonts.cdnfonts.com/s/assemblage/Assemblage-Regular.woff2') format('woff2');
+    font-display: swap;
+  }
+  :root {
+    --navy: #0d1b2a;
+    --navy-light: #1a2e44;
+    --navy-mid: #162438;
+    --white: #ffffff;
+    --text: #f0ede8;
+    --text-light: rgba(255,255,255,0.5);
+    --text-mid: rgba(255,255,255,0.7);
+    --border: rgba(255,255,255,0.12);
+    --border-focus: rgba(255,255,255,0.4);
+    --green: #4cbb8a;
+    --green-dim: rgba(76,187,138,0.15);
+    --red: #e05c5c;
+    --red-dim: rgba(224,92,92,0.15);
+    --amber: #f0b429;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Assemblage', Georgia, serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  input, button { font-size: 16px !important; -webkit-appearance: none; border-radius: 0; }
+
+  /* ---- Card ---- */
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    padding: 40px 36px;
+  }
+  @media (max-width: 480px) {
+    .auth-card { padding: 32px 24px; }
+  }
+
+  /* ---- Logo ---- */
+  .auth-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .auth-logo svg { width: 28px; height: 24px; }
+  .auth-logo-text { font-size: 1.3rem; letter-spacing: 0.12em; }
+  .auth-logo-sub { font-size: 0.65rem; letter-spacing: 0.18em; color: var(--text-light); text-transform: uppercase; }
+
+  /* ---- Tabs ---- */
+  .auth-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--text-light);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s, border-color 0.2s;
+    user-select: none;
+  }
+  .auth-tab.active { color: var(--text); border-bottom-color: var(--text); }
+  .auth-tab:hover:not(.active) { color: var(--text-mid); }
+
+  /* ---- Forms ---- */
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  .form-group input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 0.9rem !important;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--border-focus); }
+  .form-group input::placeholder { color: var(--text-light); }
+
+  /* ---- Checkbox ---- */
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--green);
+  }
+  .checkbox-row span {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    line-height: 1.5;
+  }
+
+  /* ---- Buttons ---- */
+  .btn-primary {
+    width: 100%;
+    background: var(--text);
+    color: var(--navy);
+    border: none;
+    padding: 13px 24px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 16px;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ---- Alerts ---- */
+  .alert {
+    padding: 11px 14px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .alert.show { display: block; }
+  .alert-error { background: var(--red-dim); border: 1px solid rgba(224,92,92,0.3); color: #f0a0a0; }
+  .alert-success { background: var(--green-dim); border: 1px solid rgba(76,187,138,0.3); color: #7dd9b0; }
+  .alert-info { background: rgba(91,155,213,0.12); border: 1px solid rgba(91,155,213,0.3); color: #8fbfe8; }
+
+  /* ---- Verification Screen ---- */
+  .verify-screen {
+    display: none;
+    text-align: center;
+    padding: 8px 0;
+  }
+  .verify-screen.show { display: block; }
+  .verify-icon {
+    width: 52px; height: 52px;
+    background: var(--green-dim);
+    border: 1px solid rgba(76,187,138,0.25);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .verify-icon svg { width: 24px; height: 24px; }
+  .verify-screen h3 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .verify-screen p {
+    font-size: 0.83rem;
+    color: var(--text-light);
+    line-height: 1.7;
+    max-width: 300px;
+    margin: 0 auto 20px;
+  }
+  .resend-link {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    background: none; border: none;
+    font-family: inherit;
+    padding: 0;
+  }
+  .resend-link:hover { color: var(--text); }
+
+  /* ---- Divider ---- */
+  .divider {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    margin: 4px 0 0;
+  }
+  .divider a {
+    color: var(--text-mid);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .divider a:hover { color: var(--text); }
+
+  /* ---- Back to site ---- */
+  .back-link {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--text-light);
+  }
+  .back-link a {
+    color: var(--text-light);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+  }
+  .back-link a:hover { color: var(--text); }
+
+  /* ---- Loading spinner ---- */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(13,27,42,0.3);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="auth-card">
+
+  <!-- Logo -->
+  <div class="auth-logo">
+    <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="auth-logo-text">We Link</div>
+      <div class="auth-logo-sub">Student Portal</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="auth-tabs">
+    <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</div>
+    <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</div>
+  </div>
+
+  <!-- ===== LOGIN PANEL ===== -->
+  <div class="auth-panel active" id="panelLogin">
+    <div class="alert alert-error" id="loginError"></div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') doLogin()"/>
+    </div>
+    <label class="checkbox-row">
+      <input type="checkbox" id="rememberMe" checked/>
+      <span>Keep me signed in for 30 days</span>
+    </label>
+    <button class="btn-primary" id="loginBtn" onclick="doLogin()">Sign In</button>
+    <div class="divider">
+      Forgot your password? <a onclick="switchTab('reset')">Reset it</a>
+    </div>
+  </div>
+
+  <!-- ===== REGISTER PANEL ===== -->
+  <div class="auth-panel" id="panelRegister">
+    <div class="alert alert-error" id="registerError"></div>
+    <div class="alert alert-info" id="registerInfo"></div>
+    <div class="verify-screen" id="verifyScreen">
+      <div class="verify-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8l9 6 9-6" stroke="#4cbb8a" stroke-width="1.8" stroke-linecap="round"/>
+          <rect x="2" y="5" width="20" height="14" rx="1" stroke="#4cbb8a" stroke-width="1.8" fill="none"/>
+        </svg>
+      </div>
+      <h3>Check Your Email</h3>
+      <p>We've sent a verification link to <strong id="verifyEmail"></strong>. Click the link to activate your account, then return here to sign in.</p>
+      <button class="resend-link" onclick="resendVerification()">Resend verification email</button>
+    </div>
+    <div id="registerForm">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="your@university.ac.uk" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPass" placeholder="Minimum 8 characters" autocomplete="new-password"/>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="regPassConfirm" placeholder="Repeat your password" autocomplete="new-password"
+               onkeydown="if(event.key==='Enter') doRegister()"/>
+      </div>
+      <button class="btn-primary" id="registerBtn" onclick="doRegister()">Create Account</button>
+      <div class="divider">Already have an account? <a onclick="switchTab('login')">Sign in</a></div>
+    </div>
+  </div>
+
+  <!-- ===== RESET PASSWORD PANEL ===== -->
+  <div class="auth-panel" id="panelReset">
+    <div class="alert alert-error" id="resetError"></div>
+    <div class="alert alert-success" id="resetSuccess"></div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="resetEmail" placeholder="your@email.com" autocomplete="email"
+             onkeydown="if(event.key==='Enter') doReset()"/>
+    </div>
+    <button class="btn-primary" id="resetBtn" onclick="doReset()">Send Reset Link</button>
+    <div class="divider"><a onclick="switchTab('login')">← Back to sign in</a></div>
+  </div>
+
+</div>
+
+<!-- Back to site -->
+<div class="back-link">
+  <a href="/"><svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Back to We Link</a>
+</div>
+
+<script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+const SB_URL  = 'https://hegstrjpfompikkwxmpl.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
+
+// ============================================================
+// SESSION HELPERS
+// ============================================================
+function saveSession(data, remember) {
+  const session = {
+    access_token:  data.access_token,
+    refresh_token: data.refresh_token,
+    user_id:       data.user.id,
+    email:         data.user.email,
+    expires_at:    Date.now() + (data.expires_in || 3600) * 1000,
+    persist:       remember,
+    remember_until: remember ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null
+  };
+  const storage = remember ? localStorage : sessionStorage;
+  // Write to both so tokens are found regardless of page
+  localStorage.setItem('wl_session', JSON.stringify(session));
+  sessionStorage.setItem('wl_session', JSON.stringify(session));
+}
+
+function getSession() {
+  const raw = localStorage.getItem('wl_session') || sessionStorage.getItem('wl_session');
+  if (!raw) return null;
+  try {
+    const s = JSON.parse(raw);
+    // If "remember me" was off, respect session-only (still valid until expires_at or remember_until)
+    if (!s.persist && !sessionStorage.getItem('wl_session')) return null;
+    if (s.remember_until && Date.now() > s.remember_until) {
+      clearSession();
+      return null;
+    }
+    return s;
+  } catch { return null; }
+}
+
+function clearSession() {
+  localStorage.removeItem('wl_session');
+  sessionStorage.removeItem('wl_session');
+}
+
+// ============================================================
+// ON PAGE LOAD: handle email confirmation redirect + session check
+// ============================================================
+window.addEventListener('load', async () => {
+  // Handle Supabase email confirmation hash: #access_token=...&type=signup
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.slice(1));
+    const type = params.get('type');
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+    if (access_token && (type === 'signup' || type === 'recovery')) {
+      // Fetch user info
+      try {
+        const res = await fetch(`${SB_URL}/auth/v1/user`, {
+          headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${access_token}` }
+        });
+        if (res.ok) {
+          const user = await res.json();
+          const sessionData = { access_token, refresh_token, user, expires_in: 3600 };
+          saveSession(sessionData, true);
+          if (type === 'signup') {
+            window.location.replace('/onboarding.html');
+          } else {
+            // recovery — could show password reset, for now redirect to portal
+            window.location.replace('/portal.html');
+          }
+          return;
+        }
+      } catch(e) { console.error(e); }
+    }
+  }
+
+  // If already have a valid session → check onboarding status
+  const session = getSession();
+  if (session) {
+    await redirectBasedOnStatus(session);
+  }
+});
+
+async function redirectBasedOnStatus(session) {
+  try {
+    // Try to refresh token if close to expiry
+    if (Date.now() > session.expires_at - 60000) {
+      await refreshSession(session.refresh_token);
+    }
+    const fresh = getSession();
+    if (!fresh) return;
+
+    // Check onboarding_completed
+    const res = await fetch(`${SB_URL}/rest/v1/student_profiles?id=eq.${fresh.user_id}&select=onboarding_completed`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${fresh.access_token}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.length > 0 && data[0].onboarding_completed) {
+        window.location.replace('/portal.html');
+      } else {
+        window.location.replace('/onboarding.html');
+      }
+    } else {
+      window.location.replace('/onboarding.html');
+    }
+  } catch(e) {
+    console.error('Session check failed:', e);
+  }
+}
+
+async function refreshSession(refresh_token) {
+  try {
+    const res = await fetch(`${SB_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      saveSession(data, true);
+    }
+  } catch(e) { clearSession(); }
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+let lastEmail = '';
+
+function switchTab(tab) {
+  ['login','register','reset'].forEach(t => {
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.remove('active');
+    document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.remove('active');
+  });
+
+  const tabMap = { login: 'Login', register: 'Register', reset: 'Reset' };
+  const panelMap = { login: 'Login', register: 'Register', reset: 'Reset' };
+
+  document.getElementById('tabLogin')?.classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister')?.classList.toggle('active', tab === 'register');
+  document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('panelReset').classList.toggle('active', tab === 'reset');
+
+  clearAlerts();
+}
+
+function clearAlerts() {
+  document.querySelectorAll('.alert').forEach(a => a.classList.remove('show'));
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function setLoading(btnId, loading, text) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? `<span class="spinner"></span>${text}` : text;
+}
+
+// ============================================================
+// SIGN IN
+// ============================================================
+async function doLogin() {
+  clearAlerts();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const remember = document.getElementById('rememberMe').checked;
+
+  if (!email || !pass) { showAlert('loginError', 'Please enter your email and password.'); return; }
+
+  setLoading('loginBtn', true, 'Signing in...');
+
+  try {
+    const res = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      const msg = data.error_description || data.msg || 'Invalid email or password.';
+      showAlert('loginError', msg.includes('Email not confirmed')
+        ? 'Please verify your email address before signing in. Check your inbox.'
+        : msg);
+      setLoading('loginBtn', false, 'Sign In');
+      return;
+    }
+
+    saveSession(data, remember);
+    await redirectBasedOnStatus(getSession());
+
+  } catch(e) {
+    showAlert('loginError', 'Connection error. Please try again.');
+    setLoading('loginBtn', false, 'Sign In');
+  }
+}
+
+// ============================================================
+// REGISTER
+// ============================================================
+async function doRegister() {
+  clearAlerts();
+  const email   = document.getElementById('regEmail').value.trim();
+  const pass    = document.getElementById('regPass').value;
+  const confirm = document.getElementById('regPassConfirm').value;
+
+  if (!email) { showAlert('registerError', 'Please enter your email address.'); return; }
+  if (pass.length < 8) { showAlert('registerError', 'Password must be at least 8 characters.'); return; }
+  if (pass !== confirm) { showAlert('registerError', 'Passwords do not match.'); return; }
+
+  setLoading('registerBtn', true, 'Creating account...');
+
+  try {
+    const redirectTo = window.location.origin + '/register.html';
+    const res = await fetch(`${SB_URL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass, options: { emailRedirectTo: redirectTo } })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      const msg = data.msg || data.error_description || 'Registration failed. Please try again.';
+      showAlert('registerError', msg.toLowerCase().includes('already registered')
+        ? 'An account with this email already exists. Try signing in instead.'
+        : msg);
+      setLoading('registerBtn', false, 'Create Account');
+      return;
+    }
+
+    // Show verification screen
+    lastEmail = email;
+    document.getElementById('verifyEmail').textContent = email;
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('verifyScreen').classList.add('show');
+
+  } catch(e) {
+    showAlert('registerError', 'Connection error. Please try again.');
+    setLoading('registerBtn', false, 'Create Account');
+  }
+}
+
+async function resendVerification() {
+  if (!lastEmail) return;
+  try {
+    await fetch(`${SB_URL}/auth/v1/resend`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'signup', email: lastEmail })
+    });
+    showAlert('registerInfo', 'Verification email resent. Please check your inbox.');
+  } catch(e) { console.error(e); }
+}
+
+// ============================================================
+// RESET PASSWORD
+// ============================================================
+async function doReset() {
+  clearAlerts();
+  const email = document.getElementById('resetEmail').value.trim();
+  if (!email) { showAlert('resetError', 'Please enter your email address.'); return; }
+
+  setLoading('resetBtn', true, 'Sending link...');
+
+  try {
+    const redirectTo = window.location.origin + '/register.html';
+    const res = await fetch(`${SB_URL}/auth/v1/recover`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, options: { redirectTo } })
+    });
+
+    showAlert('resetSuccess', 'If that email is registered, you\'ll receive a reset link shortly.');
+    setLoading('resetBtn', false, 'Send Reset Link');
+  } catch(e) {
+    showAlert('resetError', 'Connection error. Please try again.');
+    setLoading('resetBtn', false, 'Send Reset Link');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0d1b2a"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>We Link — Complete Your Profile</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAADP0lEQVR4nNVXT0hUQRz+zdtnSFEdwgLdRFODUDIwKArLUkLpYgdNFKE6lKgRGCJ4MahuHsJDh+rgwYN06A8hJKlRHdJDUq5ESBhKXVp3pUOu+97M7+uwu6ObT31vV4i+03sz837fN7/5zTfzBADQP4SRzscASCmVlgCRagYAkBBCPxORfveClDKglCIhBIGYhodHSAhBQghiZu/B4BG2bQMAQqEwKs82gWg3Ghrasby8DACQ8X63cJ0BACSlItM0aXIyQMXFZ4ghaXx8jAJTX+hI6TmanZ0jn2mSlB7qwo1KpRhKKQBAf/9jmL796Oi4pfuj0SgaG1uxY3sBhoZGY5mQEsy8aexNBUgp9XNbeze2ZeRiYOCJ7guFw7q/t/c+BGXj9u17q8Sr1AXYdox8YSGE8pO18OeU4dPHaR14IRRGU9N12LathY6MvsOunQdxofYKIpFIPM76deEogJk1+cTEJPZmHUZV5UUsLv4CAFhWLGDwZwhVVc2wLCuJaG7uO0pLK1FUdAIzM7MbitgwAw8fDMBn5KCz845uk1LptQ0GQ6ipuawFAIAtY0QMRnPzDWRm5uPps5d6YkByXSQJYGYoxbCsKFpaupCRkYvBwecAgHB4EbPf5gCsrGswGEJ19SUtICFsZuYrln7H0t/X9whCZKOnpxcAr6mJJAGJtF+72oWsrBIEpj9rwhcvXqGtrRvAqiX4S4CUseD19a2Y/BDQZG/fvEdmZh7u3ulL4gH+8gGfL/ZaV3eeAlNjVFJ8iKJRiwzDiG9Zd7aBuCEahkGWZVP5qeMUCLymiopjuj0Bc/WHCS+vrConIiJmJtNMGuIZpukjZqbCwjwqLMyLC1g5MxynxMwEIElpOjAMg5jZ8axwnN5WEbuJufVMHvH/C/B+BUlRgBDCdW3ExrmT5lqALSVFIpE17U73uaVIhJilq7ibbvLEnj1aVkL79u4hohXDWm9sx80rdKAgl4iIhNh4jpsKSJiT359Dfn9OUtt6YytOn1jVtnF8T1cyJyNxIkgYmRu49tnEzXct2VoiL0aW1jYUJCjD9KX0P6BjwG2uHKCUpPn5H5Sfv59SnUtaArYCaTuhUw14wf+fgXTxBybGJRFi0ZjtAAAAAElFTkSuQmCC"/>
+<style>
+  @font-face {
+    font-family: 'Assemblage';
+    font-weight: 400;
+    src: local('Assemblage'), local('Assemblage-Regular'),
+         url('https://fonts.cdnfonts.com/s/assemblage/Assemblage-Regular.woff2') format('woff2');
+    font-display: swap;
+  }
+  :root {
+    --navy:      #0d1b2a;
+    --navy-light:#1a2e44;
+    --navy-mid:  #162438;
+    --text:      #f0ede8;
+    --text-light:rgba(255,255,255,0.5);
+    --text-mid:  rgba(255,255,255,0.7);
+    --border:    rgba(255,255,255,0.12);
+    --border-focus:rgba(255,255,255,0.4);
+    --green:     #4cbb8a;
+    --green-dim: rgba(76,187,138,0.15);
+    --green-bd:  rgba(76,187,138,0.3);
+    --red:       #e05c5c;
+    --red-dim:   rgba(224,92,92,0.15);
+    --red-bd:    rgba(224,92,92,0.3);
+    --amber:     #f0b429;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Assemblage', Georgia, serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  input, button, textarea, select { font-size: 16px !important; -webkit-appearance: none; border-radius: 0; }
+
+  /* ---- Layout ---- */
+  .page-wrap {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  @media (max-width: 600px) { .page-wrap { padding: 28px 16px 60px; } }
+
+  /* ---- Header ---- */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .logo-row { display: flex; align-items: center; gap: 10px; }
+  .logo-row svg { width: 26px; height: 22px; }
+  .logo-text { font-size: 1.15rem; letter-spacing: 0.12em; }
+  .logout-btn {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+  .logout-btn:hover { color: var(--text); }
+
+  /* ---- Progress tracker ---- */
+  .progress-track {
+    display: flex;
+    align-items: center;
+    margin-bottom: 36px;
+    gap: 0;
+  }
+  .step-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    position: relative;
+  }
+  .step-circle {
+    width: 32px; height: 32px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: var(--text-light);
+    background: var(--navy);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+  }
+  .step-circle.active {
+    border-color: var(--text);
+    color: var(--text);
+    background: var(--navy-mid);
+  }
+  .step-circle.done {
+    border-color: var(--green);
+    background: var(--green-dim);
+    color: var(--green);
+  }
+  .step-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .step-label.active { color: var(--text); }
+  .step-label.done { color: var(--green); }
+  .step-connector {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 22px;
+    transition: background 0.3s;
+    max-width: 80px;
+  }
+  .step-connector.done { background: var(--green); }
+
+  /* ---- Card ---- */
+  .card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    padding: 32px 32px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 480px) { .card { padding: 24px 20px; } }
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .card-sub {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  /* ---- Form fields ---- */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  .form-group label .optional {
+    color: rgba(255,255,255,0.3);
+    font-size: 0.65rem;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-left: 6px;
+  }
+  .form-group input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 0.9rem !important;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--border-focus); }
+  .form-group input::placeholder { color: var(--text-light); }
+  .field-hint {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+
+  /* ---- File Upload ---- */
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.02);
+  }
+  .upload-zone.uploaded {
+    border-color: var(--green-bd);
+    background: var(--green-dim);
+  }
+  .upload-zone.error-zone { border-color: var(--red-bd); }
+  .upload-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0;
+    cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-icon { margin-bottom: 8px; color: var(--text-light); }
+  .upload-zone.uploaded .upload-icon { color: var(--green); }
+  .upload-label {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    line-height: 1.5;
+  }
+  .upload-zone.uploaded .upload-label { color: var(--text); }
+  .upload-filename {
+    font-size: 0.75rem;
+    color: var(--green);
+    margin-top: 4px;
+    word-break: break-all;
+  }
+  .upload-types {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.3);
+    margin-top: 3px;
+  }
+
+  /* ---- Terms box ---- */
+  .terms-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    height: 280px;
+    overflow-y: auto;
+    padding: 20px;
+    margin-bottom: 16px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--text-mid);
+  }
+  .terms-box h3 {
+    font-size: 0.88rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin: 18px 0 8px;
+    color: var(--text);
+  }
+  .terms-box h3:first-child { margin-top: 0; }
+  .terms-box ul {
+    padding-left: 18px;
+    margin: 6px 0;
+  }
+  .terms-box ul li { margin-bottom: 4px; }
+  .terms-box p { margin-bottom: 8px; }
+  .terms-box strong { color: var(--text); font-weight: 400; }
+  .terms-scroll-hint {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .terms-scroll-hint.scrolled-hint { display: none; }
+
+  /* Agree checkbox */
+  .agree-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 4px;
+  }
+  .agree-row input[type="checkbox"] {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    cursor: pointer;
+    accent-color: var(--green);
+  }
+  .agree-row span {
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    line-height: 1.55;
+  }
+
+  /* ---- Alerts ---- */
+  .alert {
+    padding: 11px 14px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .alert.show { display: block; }
+  .alert-error { background: var(--red-dim); border: 1px solid var(--red-bd); color: #f0a0a0; }
+  .alert-success { background: var(--green-dim); border: 1px solid var(--green-bd); color: #7dd9b0; }
+
+  /* ---- Buttons ---- */
+  .btn-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    gap: 12px;
+  }
+  .btn-primary {
+    background: var(--text);
+    color: var(--navy);
+    border: none;
+    padding: 13px 28px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: none;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+
+  /* ---- Spinner ---- */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(13,27,42,0.3);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- Steps visibility ---- */
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  /* ---- Success screen ---- */
+  .success-screen {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-bd);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .success-icon svg { width: 28px; height: 28px; }
+  .success-screen h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .success-screen p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.75;
+    max-width: 340px;
+    margin: 0 auto 28px;
+  }
+
+  /* ---- Loading overlay ---- */
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(13,27,42,0.85);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-overlay .spinner {
+    width: 28px; height: 28px;
+    border-color: rgba(255,255,255,0.2);
+    border-top-color: var(--text);
+  }
+  .loading-overlay p {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <span class="spinner"></span>
+  <p id="loadingMsg">Loading your profile…</p>
+</div>
+
+<div class="page-wrap">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="logo-row">
+      <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div class="logo-text">We Link</div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Sign out</button>
+  </div>
+
+  <!-- Progress tracker -->
+  <div class="progress-track">
+    <div class="step-node">
+      <div class="step-circle active" id="sc1">1</div>
+      <div class="step-label active" id="sl1">Personal Info</div>
+    </div>
+    <div class="step-connector" id="conn1"></div>
+    <div class="step-node">
+      <div class="step-circle" id="sc2">2</div>
+      <div class="step-label" id="sl2">Documents</div>
+    </div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="step-node">
+      <div class="step-circle" id="sc3">3</div>
+      <div class="step-label" id="sl3">Agreement</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 1 — Personal Information
+       ============================================================ -->
+  <div class="step-panel active" id="step1">
+    <div class="card">
+      <div class="card-title">Personal Information</div>
+      <div class="card-sub">Please provide your details exactly as they appear on your official documents.</div>
+
+      <div class="alert alert-error" id="err1"></div>
+
+      <div class="form-group">
+        <label>Full Legal Name</label>
+        <input type="text" id="fullName" placeholder="e.g. Mohammed Al-Rashid" autocomplete="name"/>
+        <div class="field-hint">As it appears on your passport</div>
+      </div>
+      <div class="form-group">
+        <label>Parent / Guardian Phone Number</label>
+        <input type="tel" id="parentPhone" placeholder="+965 9999 9999" autocomplete="tel"/>
+        <div class="field-hint">International format — include country code (e.g. +965 for Kuwait)</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <span style="font-size:0.72rem;color:var(--text-light)">Step 1 of 3</span>
+      <button class="btn-primary" onclick="nextStep1()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 2 — Document Uploads
+       ============================================================ -->
+  <div class="step-panel" id="step2">
+    <div class="card">
+      <div class="card-title">Document Uploads</div>
+      <div class="card-sub">Upload clear copies of each document. Accepted formats: PDF, JPG, PNG (max 10 MB each). All files are stored securely with encrypted cloud storage.</div>
+
+      <div class="alert alert-error" id="err2"></div>
+
+      <!-- Passport -->
+      <div class="form-group">
+        <label>Passport</label>
+        <div class="upload-zone" id="zone-passport" onclick="triggerPick('passport')" ondragover="onDrag(event,'passport')" ondragleave="onDragLeave('passport')" ondrop="onDrop(event,'passport')">
+          <input type="file" id="file-passport" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile('passport', this)"/>
+          <div class="upload-icon">
+            <svg id="icon-passport" viewBox="0 0 24 24" fill="none" width="22" height="22"><rect x="4" y="2" width="16" height="20" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><line x1="8" y1="7" x2="16" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="15" x2="13" y2="15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="upload-label" id="lbl-passport">Click to upload or drag & drop</div>
+          <div class="upload-filename" id="fn-passport"></div>
+          <div class="upload-types">PDF · JPG · PNG · Max 10 MB</div>
+        </div>
+      </div>
+
+      <!-- Student Civil ID -->
+      <div class="form-group">
+        <label>Student Civil ID</label>
+        <div class="upload-zone" id="zone-student_civil_id" onclick="triggerPick('student_civil_id')" ondragover="onDrag(event,'student_civil_id')" ondragleave="onDragLeave('student_civil_id')" ondrop="onDrop(event,'student_civil_id')">
+          <input type="file" id="file-student_civil_id" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile('student_civil_id', this)"/>
+          <div class="upload-icon">
+            <svg id="icon-student_civil_id" viewBox="0 0 24 24" fill="none" width="22" height="22"><rect x="2" y="5" width="20" height="14" rx="1.5" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8" cy="12" r="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/><line x1="13" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="13" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+          <div class="upload-label" id="lbl-student_civil_id">Click to upload or drag & drop</div>
+          <div class="upload-filename" id="fn-student_civil_id"></div>
+          <div class="upload-types">PDF · JPG · PNG · Max 10 MB</div>
+        </div>
+      </div>
+
+      <!-- Parent Civil ID -->
+      <div class="form-group">
+        <label>Parent's Civil ID</label>
+        <div class="upload-zone" id="zone-parent_civil_id" onclick="triggerPick('parent_civil_id')" ondragover="onDrag(event,'parent_civil_id')" ondragleave="onDragLeave('parent_civil_id')" ondrop="onDrop(event,'parent_civil_id')">
+          <input type="file" id="file-parent_civil_id" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile('parent_civil_id', this)"/>
+          <div class="upload-icon">
+            <svg id="icon-parent_civil_id" viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="7" r="3.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>
+          </div>
+          <div class="upload-label" id="lbl-parent_civil_id">Click to upload or drag & drop</div>
+          <div class="upload-filename" id="fn-parent_civil_id"></div>
+          <div class="upload-types">PDF · JPG · PNG · Max 10 MB</div>
+        </div>
+      </div>
+
+      <!-- Scholarship Letter (optional) -->
+      <div class="form-group">
+        <label>Scholarship Letter <span class="optional">Optional — only upload if available</span></label>
+        <div class="upload-zone" id="zone-scholarship_letter" onclick="triggerPick('scholarship_letter')" ondragover="onDrag(event,'scholarship_letter')" ondragleave="onDragLeave('scholarship_letter')" ondrop="onDrop(event,'scholarship_letter')">
+          <input type="file" id="file-scholarship_letter" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile('scholarship_letter', this)"/>
+          <div class="upload-icon">
+            <svg id="icon-scholarship_letter" viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3L3 8l9 5 9-5-9-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" fill="none"/><path d="M3 13l9 5 9-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </div>
+          <div class="upload-label" id="lbl-scholarship_letter">Click to upload or drag & drop</div>
+          <div class="upload-filename" id="fn-scholarship_letter"></div>
+          <div class="upload-types">PDF · JPG · PNG · Max 10 MB</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(1)">← Back</button>
+      <span style="font-size:0.72rem;color:var(--text-light)">Step 2 of 3</span>
+      <button class="btn-primary" onclick="nextStep2()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STEP 3 — Terms & Conditions
+       ============================================================ -->
+  <div class="step-panel" id="step3">
+    <div class="card">
+      <div class="card-title">Terms & Conditions</div>
+      <div class="card-sub">Please read the agreement carefully before proceeding.</div>
+
+      <div class="alert alert-error" id="err3"></div>
+
+      <div class="terms-scroll-hint" id="scrollHint">
+        <svg viewBox="0 0 16 16" fill="none" width="12" height="12"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Scroll to read the full agreement
+      </div>
+
+      <div class="terms-box" id="termsBox" onscroll="onTermsScroll()">
+        <p style="color:var(--text-light);font-size:0.8rem">Loading terms and conditions…</p>
+      </div>
+
+      <label class="agree-row" id="agreeRow">
+        <input type="checkbox" id="agreeCheck" onchange="onAgreeChange()"/>
+        <span>I agree to the Terms & Conditions and confirm that all information and documents I have provided are accurate and genuine.</span>
+      </label>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goToStep(2)">← Back</button>
+      <span style="font-size:0.72rem;color:var(--text-light)">Step 3 of 3</span>
+      <button class="btn-primary" id="submitBtn" onclick="submitOnboarding()" disabled>Submit →</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SUCCESS SCREEN
+       ============================================================ -->
+  <div class="step-panel" id="stepDone">
+    <div class="card">
+      <div class="success-screen">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12l5 5L19 7" stroke="#4cbb8a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Profile Complete</h2>
+        <p>Your documents have been submitted successfully. Our team will review your profile and be in touch shortly. You now have full access to the We Link platform.</p>
+        <button class="btn-primary" onclick="window.location.href='/portal.html'">Access Your Portal →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const SB_URL = 'https://hegstrjpfompikkwxmpl.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
+
+const ALLOWED_TYPES = ['application/pdf','image/jpeg','image/png'];
+const ALLOWED_EXTS  = ['.pdf','.jpg','.jpeg','.png'];
+const MAX_BYTES     = 10 * 1024 * 1024; // 10 MB
+
+// ============================================================
+// SESSION
+// ============================================================
+function getSession() {
+  const raw = localStorage.getItem('wl_session') || sessionStorage.getItem('wl_session');
+  if (!raw) return null;
+  try {
+    const s = JSON.parse(raw);
+    if (s.remember_until && Date.now() > s.remember_until) { clearSession(); return null; }
+    return s;
+  } catch { return null; }
+}
+function clearSession() {
+  localStorage.removeItem('wl_session');
+  sessionStorage.removeItem('wl_session');
+}
+
+let session = null;
+let currentStep = 1;
+let selectedFiles = {}; // { passport: File, student_civil_id: File, ... }
+let activeTermsVersionId = null;
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', async () => {
+  session = getSession();
+  if (!session) { window.location.replace('/register.html'); return; }
+
+  // Try refresh if near expiry
+  if (Date.now() > session.expires_at - 60000) {
+    await refreshToken();
+    session = getSession();
+    if (!session) { window.location.replace('/register.html'); return; }
+  }
+
+  setOverlay(true, 'Loading your profile…');
+
+  // Check if already completed
+  try {
+    const res = await sbFetch(`student_profiles?id=eq.${session.user_id}&select=*`);
+    if (res && res.length > 0) {
+      const profile = res[0];
+      if (profile.onboarding_completed) {
+        window.location.replace('/portal.html');
+        return;
+      }
+      // Resume from saved step
+      if (profile.onboarding_step >= 1) {
+        document.getElementById('fullName').value = profile.full_name || '';
+        document.getElementById('parentPhone').value = profile.parent_phone || '';
+      }
+      const resumeStep = Math.max(1, profile.onboarding_step || 1);
+      goToStep(resumeStep, false);
+    }
+  } catch(e) { console.error(e); }
+
+  // Load T&C for step 3
+  await loadTerms();
+  setOverlay(false);
+});
+
+async function refreshToken() {
+  try {
+    const s = getSession();
+    if (!s?.refresh_token) return;
+    const res = await fetch(`${SB_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: s.refresh_token })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const updated = { ...s, access_token: data.access_token, refresh_token: data.refresh_token, expires_at: Date.now() + (data.expires_in || 3600) * 1000 };
+      localStorage.setItem('wl_session', JSON.stringify(updated));
+      sessionStorage.setItem('wl_session', JSON.stringify(updated));
+    } else { clearSession(); }
+  } catch { clearSession(); }
+}
+
+// ============================================================
+// SUPABASE HELPERS
+// ============================================================
+function authHeaders(extra) {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': `Bearer ${session.access_token}`,
+    'Content-Type': 'application/json',
+    ...extra
+  };
+}
+
+async function sbFetch(path, method='GET', body=null) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    method,
+    headers: authHeaders({ 'Prefer': 'return=representation' }),
+    body: body ? JSON.stringify(body) : null
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(t); }
+  return method === 'DELETE' ? true : res.json();
+}
+
+async function uploadFile(docType, file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${session.user_id}/${docType}/${Date.now()}.${ext}`;
+  const res = await fetch(`${SB_URL}/storage/v1/object/student-documents/${path}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${session.access_token}`,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(t); }
+  return path;
+}
+
+async function loadTerms() {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/terms_conditions?is_active=eq.true&order=created_at.desc&limit=1&select=*`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+    });
+    const data = await res.json();
+    if (data && data.length > 0) {
+      activeTermsVersionId = data[0].id;
+      document.getElementById('termsBox').innerHTML = data[0].content;
+    } else {
+      document.getElementById('termsBox').innerHTML = '<p>No terms available. Please contact We Link at admin@welink.co.uk.</p>';
+    }
+  } catch(e) {
+    document.getElementById('termsBox').innerHTML = '<p>Could not load terms. Please refresh the page.</p>';
+  }
+}
+
+// ============================================================
+// STEP NAVIGATION
+// ============================================================
+function setOverlay(show, msg) {
+  document.getElementById('loadingOverlay').classList.toggle('show', show);
+  if (msg) document.getElementById('loadingMsg').textContent = msg;
+}
+
+function goToStep(n, animate=true) {
+  [1,2,3,'Done'].forEach(s => {
+    const id = 'step' + (s === 'Done' ? 'Done' : s);
+    document.getElementById(id)?.classList.remove('active');
+  });
+  const target = n === 'done' ? 'stepDone' : 'step' + n;
+  document.getElementById(target)?.classList.add('active');
+  currentStep = n;
+  updateProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress(step) {
+  const isDone = step === 'done';
+  const n = isDone ? 4 : step;
+  for (let i = 1; i <= 3; i++) {
+    const circle = document.getElementById('sc' + i);
+    const label  = document.getElementById('sl' + i);
+    circle.classList.remove('active','done');
+    label.classList.remove('active','done');
+    if (isDone || i < n) { circle.classList.add('done'); label.classList.add('done'); circle.innerHTML = '✓'; }
+    else if (i === n) { circle.classList.add('active'); label.classList.add('active'); }
+  }
+  for (let i = 1; i <= 2; i++) {
+    const conn = document.getElementById('conn' + i);
+    conn.classList.toggle('done', isDone || i < n);
+  }
+}
+
+// ============================================================
+// STEP 1 — Personal Info
+// ============================================================
+function nextStep1() {
+  const name  = document.getElementById('fullName').value.trim();
+  const phone = document.getElementById('parentPhone').value.trim();
+  document.getElementById('err1').classList.remove('show');
+
+  if (!name || name.length < 2) {
+    showErr('err1', 'Please enter your full legal name.'); return;
+  }
+  const phoneRegex = /^\+[1-9]\d{6,14}$/;
+  if (!phone) {
+    showErr('err1', 'Please enter your parent\'s phone number.'); return;
+  }
+  if (!phoneRegex.test(phone.replace(/\s/g,''))) {
+    showErr('err1', 'Phone number must be in international format (e.g. +965 9999 9999).'); return;
+  }
+
+  // Save progress to DB
+  saveStep1(name, phone);
+  goToStep(2);
+}
+
+async function saveStep1(name, phone) {
+  try {
+    // Upsert profile row
+    await fetch(`${SB_URL}/rest/v1/student_profiles`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal,resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: session.user_id,
+        full_name: name,
+        parent_phone: phone,
+        onboarding_step: 1,
+        updated_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { console.error('save step 1:', e); }
+}
+
+// ============================================================
+// STEP 2 — Document Uploads
+// ============================================================
+function triggerPick(docType) {
+  document.getElementById('file-' + docType).click();
+}
+
+function onDrag(e, docType) {
+  e.preventDefault();
+  document.getElementById('zone-' + docType).classList.add('drag-over');
+}
+function onDragLeave(docType) {
+  document.getElementById('zone-' + docType).classList.remove('drag-over');
+}
+function onDrop(e, docType) {
+  e.preventDefault();
+  onDragLeave(docType);
+  const file = e.dataTransfer.files[0];
+  if (file) validateAndSetFile(docType, file);
+}
+
+function handleFile(docType, input) {
+  if (input.files && input.files[0]) {
+    validateAndSetFile(docType, input.files[0]);
+  }
+}
+
+function validateAndSetFile(docType, file) {
+  const zone = document.getElementById('zone-' + docType);
+  const fn   = document.getElementById('fn-' + docType);
+  const lbl  = document.getElementById('lbl-' + docType);
+  const icon = document.getElementById('icon-' + docType);
+
+  zone.classList.remove('uploaded','error-zone');
+  document.getElementById('err2').classList.remove('show');
+
+  // Type check
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  if (!ALLOWED_TYPES.includes(file.type) && !ALLOWED_EXTS.includes(ext)) {
+    zone.classList.add('error-zone');
+    fn.textContent = 'Invalid file type. Use PDF, JPG, or PNG.';
+    fn.style.color = 'var(--red)';
+    delete selectedFiles[docType];
+    return;
+  }
+
+  // Size check
+  if (file.size > MAX_BYTES) {
+    zone.classList.add('error-zone');
+    fn.textContent = 'File is too large. Maximum size is 10 MB.';
+    fn.style.color = 'var(--red)';
+    delete selectedFiles[docType];
+    return;
+  }
+
+  selectedFiles[docType] = file;
+  zone.classList.add('uploaded');
+  lbl.textContent = 'File selected';
+  fn.textContent = file.name + ' (' + (file.size / 1024 < 1024
+    ? (file.size / 1024).toFixed(0) + ' KB'
+    : (file.size / 1048576).toFixed(1) + ' MB') + ')';
+  fn.style.color = 'var(--green)';
+  // Swap icon to check
+  icon.innerHTML = '<path d="M5 12l5 5L19 7" stroke="#4cbb8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+}
+
+function nextStep2() {
+  document.getElementById('err2').classList.remove('show');
+  const required = ['passport','student_civil_id','parent_civil_id'];
+  for (const doc of required) {
+    if (!selectedFiles[doc]) {
+      const names = { passport: 'Passport', student_civil_id: 'Student Civil ID', parent_civil_id: "Parent's Civil ID" };
+      showErr('err2', `Please upload your ${names[doc]} before continuing.`);
+      document.getElementById('zone-' + doc).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+  goToStep(3);
+}
+
+// ============================================================
+// STEP 3 — Terms
+// ============================================================
+function onTermsScroll() {
+  const box = document.getElementById('termsBox');
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+  if (nearBottom) {
+    document.getElementById('scrollHint').classList.add('scrolled-hint');
+  }
+}
+
+function onAgreeChange() {
+  const checked = document.getElementById('agreeCheck').checked;
+  document.getElementById('submitBtn').disabled = !checked;
+}
+
+// ============================================================
+// FINAL SUBMISSION
+// ============================================================
+async function submitOnboarding() {
+  document.getElementById('err3').classList.remove('show');
+
+  if (!document.getElementById('agreeCheck').checked) {
+    showErr('err3', 'You must agree to the Terms & Conditions to continue.'); return;
+  }
+
+  setOverlay(true, 'Uploading your documents…');
+
+  try {
+    // Upload all selected files
+    const uploadResults = {};
+    for (const [docType, file] of Object.entries(selectedFiles)) {
+      setOverlay(true, `Uploading ${docType.replace(/_/g,' ')}…`);
+      const path = await uploadFile(docType, file);
+      uploadResults[docType] = { path, name: file.name, size: file.size, mime: file.type };
+    }
+
+    setOverlay(true, 'Saving your profile…');
+
+    // Save document metadata to DB
+    const now = new Date().toISOString();
+    const docRows = Object.entries(uploadResults).map(([docType, info]) => ({
+      student_id: session.user_id,
+      doc_type: docType,
+      file_path: info.path,
+      file_name: info.name,
+      file_size: info.size,
+      mime_type: info.mime,
+      uploaded_at: now
+    }));
+
+    // Delete old doc records for this student, then insert fresh
+    await fetch(`${SB_URL}/rest/v1/student_documents?student_id=eq.${session.user_id}`, {
+      method: 'DELETE',
+      headers: authHeaders({})
+    });
+
+    await fetch(`${SB_URL}/rest/v1/student_documents`, {
+      method: 'POST',
+      headers: authHeaders({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify(docRows)
+    });
+
+    // Mark onboarding complete
+    await fetch(`${SB_URL}/rest/v1/student_profiles?id=eq.${session.user_id}`, {
+      method: 'PATCH',
+      headers: authHeaders({}),
+      body: JSON.stringify({
+        onboarding_step: 3,
+        onboarding_completed: true,
+        terms_accepted_at: now,
+        terms_version_id: activeTermsVersionId,
+        updated_at: now
+      })
+    });
+
+    // Write audit log
+    await fetch(`${SB_URL}/rest/v1/audit_logs`, {
+      method: 'POST',
+      headers: authHeaders({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({
+        student_id: session.user_id,
+        event_type: 'onboarding_complete',
+        details: { docs: Object.keys(uploadResults), terms_version_id: activeTermsVersionId }
+      })
+    });
+
+    setOverlay(false);
+    goToStep('done');
+
+  } catch(e) {
+    console.error('Submission error:', e);
+    setOverlay(false);
+    showErr('err3', 'An error occurred while uploading. Please try again.');
+  }
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function doLogout() {
+  clearSession();
+  window.location.replace('/register.html');
+}
+</script>
+</body>
+</html>
