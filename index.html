@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="theme-color" content="#0d1b2a"/>
+  <meta name="format-detection" content="telephone=no"/>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAADP0lEQVR4nNVXT0hUQRz+zdtnSFEdwgLdRFODUDIwKArLUkLpYgdNFKE6lKgRGCJ4MahuHsJDh+rgwYN06A8hJKlRHdJDUq5ESBhKXVp3pUOu+97M7+uwu6ObT31vV4i+03sz837fN7/5zTfzBADQP4SRzscASCmVlgCRagYAkBBCPxORfveClDKglCIhBIGYhodHSAhBQghiZu/B4BG2bQMAQqEwKs82gWg3Ghrasby8DACQ8X63cJ0BACSlItM0aXIyQMXFZ4ghaXx8jAJTX+hI6TmanZ0jn2mSlB7qwo1KpRhKKQBAf/9jmL796Oi4pfuj0SgaG1uxY3sBhoZGY5mQEsy8aexNBUgp9XNbeze2ZeRiYOCJ7guFw7q/t/c+BGXj9u17q8Sr1AXYdox8YSGE8pO18OeU4dPHaR14IRRGU9N12LathY6MvsOunQdxofYKIpFIPM76deEogJk1+cTEJPZmHUZV5UUsLv4CAFhWLGDwZwhVVc2wLCuJaG7uO0pLK1FUdAIzM7MbitgwAw8fDMBn5KCz845uk1LptQ0GQ6ipuawFAIAtY0QMRnPzDWRm5uPps5d6YkByXSQJYGYoxbCsKFpaupCRkYvBwecAgHB4EbPf5gCsrGswGEJ19SUtICFsZuYrln7H0t/X9whCZKOnpxcAr6mJJAGJtF+72oWsrBIEpj9rwhcvXqGtrRvAqiX4S4CUseD19a2Y/BDQZG/fvEdmZh7u3ulL4gH+8gGfL/ZaV3eeAlNjVFJ8iKJRiwzDiG9Zd7aBuCEahkGWZVP5qeMUCLymiopjuj0Bc/WHCS+vrConIiJmJtNMGuIZpukjZqbCwjwqLMyLC1g5MxynxMwEIElpOjAMg5jZ8axwnN5WEbuJufVMHvH/C/B+BUlRgBDCdW3ExrmT5lqALSVFIpE17U73uaVIhJilq7ibbvLEnj1aVkL79u4hohXDWm9sx80rdKAgl4iIhNh4jpsKSJiT359Dfn9OUtt6YytOn1jVtnF8T1cyJyNxIkgYmRu49tnEzXct2VoiL0aW1jYUJCjD9KX0P6BjwG2uHKCUpPn5H5Sfv59SnUtaArYCaTuhUw14wf+fgXTxBybGJRFi0ZjtAAAAAElFTkSuQmCC"/>
+  <link rel="apple-touch-icon" href="data:image/png;base64,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"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>We Link — Linking Tenants & Landlords</title>
+<style>
+  @font-face {
+    font-family: 'Assemblage';
+    font-weight: 300;
+    font-style: normal;
+    src: local('Assemblage Light'), local('Assemblage-Light'),
+         url('https://fonts.cdnfonts.com/s/assemblage/Assemblage-Light.woff2') format('woff2'),
+         url('https://fonts.cdnfonts.com/s/assemblage/Assemblage-Light.woff') format('woff');
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Assemblage';
+    font-weight: 400;
+    font-style: normal;
+    src: local('Assemblage'), local('Assemblage-Regular'),
+         url('https://fonts.cdnfonts.com/s/assemblage/Assemblage-Regular.woff2') format('woff2'),
+         url('https://fonts.cdnfonts.com/s/assemblage/Assemblage-Regular.woff') format('woff');
+    font-display: swap;
+  }
+
+  /* ====== iOS FIXES ====== */
+  /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  /* Smooth scrolling momentum on iOS */
+  .modal, .sidebar, .content, body {
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Prevent tap highlight flash */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Fix 100vh on iOS Safari (accounts for browser chrome) */
+  .login-screen, .modal-overlay {
+    min-height: -webkit-fill-available;
+  }
+  /* Prevent text size adjust on rotation */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  /* Fix button appearance on iOS */
+  button, input[type="submit"] {
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
+
+  /* ====== FLOATING SOCIAL BAR ====== */
+  .social-float {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 300;
+  }
+
+  .social-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+
+  .social-btn:active { transform: scale(0.94); }
+
+  .social-btn.whatsapp { background: #25d366; }
+  .social-btn.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+
+  .social-btn svg { width: 22px; height: 22px; }
+
+  .social-tooltip {
+    position: absolute;
+    right: 58px;
+    background: var(--navy);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .social-btn:hover .social-tooltip { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .social-float { bottom: 20px; right: 16px; }
+    .social-btn { width: 44px; height: 44px; }
+  }
+
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-light: #1a2e44;
+    --navy-mid: #162438;
+    --white: #ffffff;
+    --off-white: #f7f6f4;
+    --warm-gray: #e8e5e0;
+    --mid-gray: #9a9590;
+    --text: #1a1a1a;
+    --text-light: #5a5a5a;
+    --border: #e0ddd8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    background: var(--white);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ====== NAV ====== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 60px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    transition: padding 0.3s;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .nav-logo svg { width: 36px; height: 36px; }
+
+  .nav-logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--navy);
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  nav ul a {
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--navy); }
+
+  .nav-btn {
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    padding: 10px 26px;
+    border-radius: 2px;
+    font-weight: 500 !important;
+    transition: background 0.2s !important;
+  }
+  .nav-btn:hover { background: var(--navy-light) !important; }
+
+  /* ====== HERO ====== */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+  }
+
+  .hero-left {
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px 80px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: -100px;
+    width: 400px; height: 400px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 280px; height: 280px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--navy);
+    display: inline-block;
+  }
+
+  .hero-left h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--navy);
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-left h1 em {
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .hero-left p {
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.7;
+    max-width: 400px;
+    margin-bottom: 44px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 2px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 16px 36px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--navy-light); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 2px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 16px 36px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: var(--navy); color: var(--white); }
+
+  .hero-right {
+    background: var(--navy);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle grid pattern */
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .hero-logo-large {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-logo-large svg {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 28px;
+  }
+
+  .hero-logo-large .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--white);
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .hero-logo-large .brand-tagline {
+    font-size: 0.78rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .hero-stats {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.08);
+    margin-top: 60px;
+    width: 100%;
+    max-width: 320px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .hero-stat {
+    background: var(--navy);
+    padding: 24px 20px;
+    text-align: center;
+  }
+
+  .hero-stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--white);
+    display: block;
+  }
+
+  .hero-stat-label {
+    font-size: 0.68rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== HOW IT WORKS ====== */
+  .how {
+    padding: 120px 80px;
+    background: var(--white);
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--navy);
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--navy);
+    margin-bottom: 64px;
+    line-height: 1.2;
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+  }
+
+  .how-col h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .how-steps { display: flex; flex-direction: column; gap: 28px; }
+
+  .how-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--navy);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content h4 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .step-content p {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  /* ====== SERVICES ====== */
+  .services {
+    background: var(--off-white);
+    padding: 120px 80px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 0;
+    background: var(--border);
+  }
+
+  .service-card {
+    background: var(--white);
+    padding: 48px 36px;
+    transition: background 0.3s;
+  }
+
+  .service-card:hover { background: var(--navy); }
+  .service-card:hover .service-icon svg path,
+  .service-card:hover .service-icon svg rect,
+  .service-card:hover .service-icon svg polyline { stroke: var(--white); }
+  .service-card:hover h3 { color: var(--white); }
+  .service-card:hover p { color: rgba(255,255,255,0.6); }
+
+  .service-icon {
+    margin-bottom: 28px;
+    width: 44px; height: 44px;
+  }
+
+  .service-icon svg { width: 44px; height: 44px; }
+
+  .service-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 12px;
+    transition: color 0.3s;
+  }
+
+  .service-card p {
+    font-size: 0.84rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.7;
+    transition: color 0.3s;
+  }
+
+  /* ====== CTA BAND ====== */
+  .cta-band {
+    background: var(--navy);
+    padding: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .cta-band h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--white);
+    max-width: 500px;
+    line-height: 1.2;
+  }
+
+  .cta-band h2 em { font-style: italic; }
+
+  .btn-white {
+    background: var(--white);
+    color: var(--navy);
+    border: none;
+    border-radius: 2px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 18px 40px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .btn-white:hover { opacity: 0.9; }
+
+  /* ====== ONBOARDING MODAL ====== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,27,42,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--white);
+    width: 90%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 4px;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+    position: relative;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    background: var(--navy);
+    padding: 36px 40px 32px;
+    position: relative;
+  }
+
+  .modal-header .modal-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .modal-header .modal-logo svg { width: 28px; height: 28px; }
+
+  .modal-header .modal-logo span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--white);
+  }
+
+  .modal-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .modal-header p {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 1.4rem;
+    cursor: pointer;
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--white);
+    transition: width 0.4s ease;
+  }
+
+  /* Steps */
+  .modal-body { padding: 40px; }
+
+  .form-step { display: none; }
+  .form-step.active { display: block; }
+
+  .step-indicator {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    margin-bottom: 8px;
+  }
+
+  .form-step h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 28px;
+  }
+
+  .type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .type-card {
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .type-card:hover { border-color: var(--navy); }
+  .type-card.selected { border-color: var(--navy); background: var(--off-white); }
+
+  .type-card svg { width: 32px; height: 32px; margin-bottom: 12px; }
+
+  .type-card h4 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .type-card p {
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.4;
+  }
+
+  .form-group { margin-bottom: 20px; }
+
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text);
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--navy); }
+
+  .form-group textarea { resize: vertical; min-height: 90px; }
+  .form-group select { cursor: pointer; }
+  .form-group select option { background: var(--white); }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--mid-gray);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .btn-back:hover { color: var(--navy); }
+
+  .btn-next {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 2px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-next:hover { background: var(--navy-light); }
+
+  /* Success step */
+  .success-step {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .success-icon {
+    width: 64px; height: 64px;
+    border: 2px solid var(--navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+  }
+
+  .success-icon svg { width: 28px; height: 28px; }
+
+  .success-step h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  .success-step p {
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.7;
+    max-width: 340px;
+    margin: 0 auto 32px;
+  }
+
+  /* ====== LANDLORD SECTION ====== */
+  .landlord {
+    padding: 120px 80px;
+    background: var(--white);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+
+  .landlord-text .section-label { margin-bottom: 16px; }
+
+  .landlord-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--navy);
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+
+  .landlord-text h2 em { font-style: italic; }
+
+  .landlord-text p {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.8;
+    margin-bottom: 36px;
+  }
+
+  .landlord-perks { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+
+  .perk {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .perk-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--navy);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  .perk p {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .landlord-visual {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 48px 40px;
+  }
+
+  .listing-preview {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .listing-preview:hover { border-color: var(--navy); }
+
+  .listing-img {
+    height: 120px;
+    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+
+  .listing-info { padding: 16px 18px; }
+
+  .listing-loc {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .listing-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .listing-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .listing-price {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .listing-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--navy);
+    color: var(--white);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  /* ====== FOOTER ====== */
+  footer {
+    background: var(--navy);
+    padding: 60px 80px 40px;
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 32px;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .footer-logo svg { width: 32px; height: 32px; }
+
+  .footer-logo span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--white);
+  }
+
+  .footer-tagline {
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .footer-links { display: flex; gap: 60px; }
+
+  .footer-col h4 {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+  }
+
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .footer-col ul li a {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .footer-col ul li a:hover { color: var(--white); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy {
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-countries {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .country-pill {
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.07);
+    padding: 4px 12px;
+    border-radius: 30px;
+  }
+
+
+  /* ====== IMAGE CAROUSEL ====== */
+  .prop-carousel {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    background: var(--navy);
+  }
+
+  .carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    will-change: transform;
+  }
+
+  .carousel-slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .carousel-slide-emoji {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+  }
+
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(13,27,42,0.55);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: background 0.2s, transform 0.15s;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .carousel-btn:hover { background: rgba(13,27,42,0.9); }
+  .carousel-btn:active { transform: translateY(-50%) scale(0.92); }
+  .carousel-btn.prev { left: 10px; }
+  .carousel-btn.next { right: 10px; }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+
+  .carousel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 4px;
+    box-sizing: content-box;
+  }
+
+  .carousel-dot.active {
+    background: white;
+    transform: scale(1.25);
+  }
+
+  .prop-verified {
+    position: absolute;
+    top: 12px; left: 12px;
+    z-index: 5;
+  }
+
+  .prop-type-tag {
+    position: absolute;
+    top: 12px; right: 12px;
+    z-index: 5;
+  }
+
+  /* ====== PROPERTIES SECTION ====== */
+  .properties {
+    padding: 120px 80px;
+    background: var(--off-white);
+  }
+
+  .properties-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .properties-header-left .section-label { margin-bottom: 12px; }
+
+  .properties-header-left h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--navy);
+    line-height: 1.15;
+  }
+
+  .properties-header-left h2 em { font-style: italic; }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    align-items: center;
+  }
+
+  .filter-pill {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.76rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--text-light);
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-pill:hover { border-color: var(--navy); color: var(--navy); }
+  .filter-pill.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+
+  .filter-select-bar {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.76rem;
+    font-weight: 400;
+    color: var(--text-light);
+    padding: 8px 20px;
+    outline: none;
+    cursor: pointer;
+    margin-left: auto;
+  }
+
+  /* Properties grid */
+  .props-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .prop-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .prop-card:hover {
+    border-color: var(--navy);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(13,27,42,0.08);
+  }
+
+  .prop-card.hidden { display: none; }
+
+  .prop-thumb {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+  }
+
+  .prop-thumb-bg {
+    position: absolute;
+    inset: 0;
+  }
+
+  .prop-thumb-emoji {
+    position: relative;
+    z-index: 1;
+  }
+
+  .prop-verified {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+
+  .prop-type-tag {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(255,255,255,0.92);
+    color: var(--navy);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+
+  .prop-body { padding: 20px 22px 22px; }
+
+  .prop-city {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .prop-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .prop-details {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .prop-detail {
+    font-size: 0.76rem;
+    font-weight: 300;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .prop-detail-icon { font-size: 0.85rem; }
+
+  .prop-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .prop-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--navy);
+  }
+
+  .prop-price span {
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: var(--text-light);
+  }
+
+  .prop-btn {
+    background: transparent;
+    border: 1px solid var(--navy);
+    border-radius: 2px;
+    font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .prop-btn:hover { background: var(--navy); color: var(--white); }
+
+  .props-empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-weight: 300;
+    display: none;
+  }
+
+  .load-more-wrap {
+    text-align: center;
+    margin-top: 48px;
+  }
+
+  /* ====== MOBILE MENU ====== */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--navy);
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 69px; left: 0; right: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 28px 32px;
+    z-index: 199;
+    flex-direction: column;
+    gap: 0;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    text-decoration: none;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    display: block;
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu .mobile-cta {
+    margin-top: 20px;
+    background: var(--navy);
+    color: var(--white) !important;
+    text-align: center;
+    padding: 16px !important;
+    border-radius: 2px;
+    border: none !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.1em;
+  }
+
+  /* ====== RESPONSIVE BREAKPOINTS ====== */
+  @media (max-width: 1024px) {
+    nav { padding: 20px 28px; }
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-left { padding: 60px 28px 48px; }
+    .hero-left h1 { font-size: 2.8rem; }
+    .hero-right { padding: 48px 28px 60px; min-height: 400px; }
+    .hero-stats { max-width: 100%; }
+    .how { padding: 80px 28px; }
+    .how-grid { grid-template-columns: 1fr; gap: 48px; }
+    .services { padding: 80px 28px; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .cta-band { padding: 60px 28px; flex-direction: column; text-align: center; gap: 28px; }
+    .properties { padding: 80px 28px; }
+    .props-grid { grid-template-columns: 1fr 1fr; }
+    .landlord { padding: 80px 28px; gap: 48px; }
+    footer { padding: 48px 28px 32px; }
+    .footer-top { flex-direction: column; gap: 36px; }
+    .footer-links { flex-wrap: wrap; gap: 32px; }
+  }
+
+  @media (max-width: 768px) {
+    nav ul { display: none; }
+    .hamburger { display: flex; }
+
+    .hero-left h1 { font-size: 2.2rem; }
+    .hero-left p { font-size: 0.9rem; }
+    .hero-actions { flex-direction: column; }
+    .hero-actions .btn-primary,
+    .hero-actions .btn-outline { text-align: center; width: 100%; }
+    .hero-right { padding: 40px 24px 48px; }
+    .hero-logo-large svg { width: 80px; height: 80px; }
+    .hero-logo-large .brand-name { font-size: 2rem; }
+    .hero-stats { grid-template-columns: 1fr 1fr; }
+
+    .section-title { font-size: 2rem; }
+
+    .services-grid { grid-template-columns: 1fr; gap: 2px; }
+
+    .cta-band h2 { font-size: 1.8rem; }
+    .btn-white { width: 100%; }
+
+    .properties-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .properties-header-left h2 { font-size: 2rem; }
+    .filter-bar { gap: 8px; }
+    .filter-select-bar { margin-left: 0; width: 100%; margin-top: 8px; }
+    .props-grid { grid-template-columns: 1fr; }
+
+    .landlord { grid-template-columns: 1fr; }
+    .landlord-text h2 { font-size: 2rem; }
+    .landlord-visual { padding: 28px 20px; }
+
+    .footer-links { flex-direction: column; gap: 28px; }
+    .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    .footer-countries { flex-wrap: wrap; justify-content: center; }
+
+    /* Modal mobile */
+    .modal { width: 96%; max-height: 95vh; }
+    .modal-header { padding: 28px 24px 24px; }
+    .modal-body { padding: 28px 24px; }
+    .type-selector { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-left { padding: 48px 20px 40px; }
+    .hero-left h1 { font-size: 1.9rem; }
+    .hero-right { padding: 32px 20px 40px; }
+    .how { padding: 60px 20px; }
+    .services { padding: 60px 20px; }
+    .properties { padding: 60px 20px; }
+    .cta-band { padding: 48px 20px; }
+    .landlord { padding: 60px 20px; }
+    footer { padding: 40px 20px 28px; }
+    .hero-stat-num { font-size: 1.4rem; }
+  }
+
+  /* ====== iOS FIXES ====== */
+  /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  /* Smooth scrolling momentum on iOS */
+  .modal, .sidebar, .content, body {
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Prevent tap highlight flash */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Fix 100vh on iOS Safari (accounts for browser chrome) */
+  .login-screen, .modal-overlay {
+    min-height: -webkit-fill-available;
+  }
+  /* Prevent text size adjust on rotation */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  /* Fix button appearance on iOS */
+  button, input[type="submit"] {
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="2,28 30,4 58,28" stroke="#0d1b2a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <line x1="18" y1="28" x2="18" y2="50" stroke="#0d1b2a" stroke-width="3" stroke-linecap="round"/>
+      <line x1="30" y1="18" x2="30" y2="50" stroke="#0d1b2a" stroke-width="3" stroke-linecap="round"/>
+      <line x1="42" y1="28" x2="42" y2="50" stroke="#0d1b2a" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-logo-text">We Link</span>
+  </a>
+  <ul>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#properties">Properties</a></li>
+    <li><a href="#landlords">For Landlords</a></li>
+    <li><a href="#" class="nav-btn" onclick="openModal()">Get Started</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how" onclick="closeMenu()">How It Works</a>
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#properties" onclick="closeMenu()">Properties</a>
+  <a href="#landlords" onclick="closeMenu()">For Landlords</a>
+  <a href="#" class="mobile-cta" onclick="closeMenu(); openModal()">Get Started</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">For GCC Students in the UK</div>
+    <h1>Looking for a<br/><em>guarantor?</em><br/>We link you.</h1>
+    <p>We Link connects GCC students with trusted UK guarantors and verified apartments — removing the biggest barrier to renting in Britain.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openModal('student')">Find a Guarantor</button>
+      <button class="btn-outline" onclick="openModal('landlord')">List a Property</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-logo-large">
+      <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">We Link</span>
+      <span class="brand-tagline">Linking Tenants & Landlords</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">75K+</span>
+        <span class="hero-stat-label">GCC Students in UK</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">48h</span>
+        <span class="hero-stat-label">Avg. Approval Time</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">6</span>
+        <span class="hero-stat-label">GCC Countries Served</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">100%</span>
+        <span class="hero-stat-label">Verified Listings</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-label">The Process</div>
+  <h2 class="section-title">Simple from day one.</h2>
+  <div class="how-grid">
+    <div class="how-col">
+      <h3>For Students</h3>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>Apply Online</h4>
+            <p>Complete a short application in under 10 minutes. Tell us your university, budget, and move-in date.</p>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>Get Approved</h4>
+            <p>We verify your details and approve your guarantor request within 48 hours. No UK credit history needed.</p>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>Browse Listings</h4>
+            <p>Access our curated network of GCC-friendly apartments, all pre-vetted and We Link verified.</p>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>Move In</h4>
+            <p>We handle the guarantor paperwork. You sign your lease and move in with full peace of mind.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="how-col">
+      <h3>For Landlords</h3>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>List Your Property</h4>
+            <p>Submit your property details. We verify and publish your listing to our active student network.</p>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>Receive Qualified Tenants</h4>
+            <p>We send you pre-screened GCC student applicants — known for reliability and often paying rent upfront.</p>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>We Link Acts as Guarantor</h4>
+            <p>We provide the UK-based guarantor you require, removing all friction from the tenancy agreement.</p>
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>Rent with Confidence</h4>
+            <p>Enjoy consistent, reliable tenancies backed by our guarantee. No chasing, no uncertainty.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-label">What We Offer</div>
+  <h2 class="section-title">Everything you need<br/>to rent in the UK.</h2>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="10" width="32" height="26" rx="2" stroke="#0d1b2a" stroke-width="2" fill="none"/>
+          <path d="M6 18h32" stroke="#0d1b2a" stroke-width="2"/>
+          <path d="M14 8v4M30 8v4" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Guarantor Services</h3>
+      <p>We act as your UK-based guarantor, accepted by landlords and letting agents across England, Scotland, and Wales.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 34l8-8 6 6 8-10 6 6" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="4" y="6" width="36" height="32" rx="2" stroke="#0d1b2a" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <h3>Verified Listings</h3>
+      <p>Browse apartments hand-picked for GCC students — filtered by city, budget, and proximity to your university.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="16" r="8" stroke="#0d1b2a" stroke-width="2" fill="none"/>
+          <path d="M8 38c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Concierge Support</h3>
+      <p>Dedicated support team fluent in Arabic and English. We guide you through every step of the rental process.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <h2>Ready to find your<br/><em>perfect place?</em></h2>
+  <button class="btn-white" onclick="openModal('student')">Start Your Application</button>
+</div>
+
+<!-- PROPERTIES -->
+<section class="properties" id="properties">
+  <div class="properties-header">
+    <div class="properties-header-left">
+      <div class="section-label">Available Now</div>
+      <h2>Browse <em>verified</em><br/>properties.</h2>
+    </div>
+    <p style="font-size:0.85rem;font-weight:300;color:var(--text-light);max-width:300px;line-height:1.7;">All listings are hand-verified by We Link and open to GCC students with our guarantor service.</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <button class="filter-pill active" data-city="all" onclick="filterProps('all', this)">All Cities</button>
+    <button class="filter-pill" data-city="newcastle" onclick="filterProps('newcastle', this)">Newcastle</button>
+    <button class="filter-pill" data-city="manchester" onclick="filterProps('manchester', this)">Manchester</button>
+    <button class="filter-pill" data-city="london" onclick="filterProps('london', this)">London</button>
+    <button class="filter-pill" data-city="birmingham" onclick="filterProps('birmingham', this)">Birmingham</button>
+    <button class="filter-pill" data-city="edinburgh" onclick="filterProps('edinburgh', this)">Edinburgh</button>
+    <select class="filter-select-bar" onchange="sortProps(this.value)">
+      <option value="default">Sort: Featured</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+  </div>
+
+  <!-- Grid — populated from Supabase -->
+  <div class="props-grid" id="propsGrid">
+    <div class="props-loading" id="propsLoading" style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-light);font-size:0.88rem;font-weight:300;letter-spacing:0.04em">
+      Loading properties...
+    </div>
+    <div class="props-empty" id="propsEmpty" style="display:none">No properties found for this filter.</div>
+  </div>
+
+  <div class="load-more-wrap">
+    <button class="btn-outline" onclick="openModal('student')">Request a Custom Search →</button>
+  </div>
+</section>
+
+<!-- LANDLORDS -->
+<section class="landlord" id="landlords">
+  <div class="landlord-text">
+    <div class="section-label">For Landlords</div>
+    <h2>Reliable tenants.<br/><em>Guaranteed.</em></h2>
+    <p>GCC students are among the most dependable tenants in the UK market — culturally family-backed, financially supported, and often eager to pay several months upfront.</p>
+    <div class="landlord-perks">
+      <div class="perk"><div class="perk-dot"></div><p>We Link acts as the UK guarantor — full legal protection for you</p></div>
+      <div class="perk"><div class="perk-dot"></div><p>Access to a growing pool of pre-screened, verified students</p></div>
+      <div class="perk"><div class="perk-dot"></div><p>Free listing submission — we only charge on successful placement</p></div>
+      <div class="perk"><div class="perk-dot"></div><p>Dedicated landlord dashboard to track applications and tenancies</p></div>
+    </div>
+    <button class="btn-primary" onclick="openModal('landlord')">List Your Property</button>
+  </div>
+  <div class="landlord-visual">
+    <div class="listing-preview">
+      <div class="listing-img">🏠</div>
+      <div class="listing-info">
+        <div class="listing-loc">Manchester, M14</div>
+        <div class="listing-name">Fallowfield Studio Apartment</div>
+        <div class="listing-meta">
+          <span class="listing-price">£950 / month</span>
+          <span class="listing-badge">We Link Verified</span>
+        </div>
+      </div>
+    </div>
+    <div class="listing-preview">
+      <div class="listing-img">🏡</div>
+      <div class="listing-info">
+        <div class="listing-loc">Newcastle, NE2</div>
+        <div class="listing-name">Jesmond 2-Bed Flat</div>
+        <div class="listing-meta">
+          <span class="listing-price">£1,200 / month</span>
+          <span class="listing-badge">We Link Verified</span>
+        </div>
+      </div>
+    </div>
+    <div class="listing-preview">
+      <div class="listing-img">🏢</div>
+      <div class="listing-info">
+        <div class="listing-loc">London, SW7</div>
+        <div class="listing-name">South Kensington 1-Bed</div>
+        <div class="listing-meta">
+          <span class="listing-price">£2,100 / month</span>
+          <span class="listing-badge">We Link Verified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">
+        <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span>We Link</span>
+      </div>
+      <div class="footer-tagline">Linking Tenants & Landlords</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Students</h4>
+        <ul>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Guarantor Service</a></li>
+          <li><a href="#">Browse Listings</a></li>
+          <li><a href="#">Apply Now</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Landlords</h4>
+        <ul>
+          <li><a href="#">List a Property</a></li>
+          <li><a href="#">Our Guarantee</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 We Link. All rights reserved.</div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <a href="https://wa.me/message/YZY354NHZTVML1" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4);transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#25d366'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.428a.75.75 0 0 0 .916.916l5.566-1.475A11.952 11.952 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.667-.523-5.188-1.435l-.372-.22-3.305.875.876-3.305-.22-.372A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/welink_group/" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4);transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#e1306c'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      </a>
+    </div>
+    <div class="footer-countries">
+      <span class="country-pill">🇰🇼 Kuwait</span>
+      <span class="country-pill">🇸🇦 Saudi Arabia</span>
+      <span class="country-pill">🇦🇪 UAE</span>
+      <span class="country-pill">🇶🇦 Qatar</span>
+      <span class="country-pill">🇧🇭 Bahrain</span>
+      <span class="country-pill">🇴🇲 Oman</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ONBOARDING MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-logo">
+        <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span>We Link</span>
+      </div>
+      <h2 id="modalTitle">Get Started</h2>
+      <p id="modalSub">Tell us a little about yourself</p>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:25%"></div>
+    </div>
+    <div class="modal-body">
+
+      <!-- Step 1: Type -->
+      <div class="form-step active" id="step1">
+        <div class="step-indicator">Step 1 of 4</div>
+        <h3>Who are you?</h3>
+        <div class="type-selector">
+          <div class="type-card" id="typeStudent" onclick="selectType('student')">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="10" r="5" stroke="#0d1b2a" stroke-width="1.8" fill="none"/>
+              <path d="M6 28c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="#0d1b2a" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <h4>GCC Student</h4>
+            <p>I need a guarantor and/or apartment in the UK</p>
+          </div>
+          <div class="type-card" id="typeLandlord" onclick="selectType('landlord')">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 14L16 4l12 10" stroke="#0d1b2a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <rect x="10" y="18" width="12" height="10" stroke="#0d1b2a" stroke-width="1.8" fill="none"/>
+            </svg>
+            <h4>Landlord</h4>
+            <p>I want to list my property for GCC students</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <span></span>
+          <button class="btn-next" onclick="nextStep()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Personal Info -->
+      <div class="form-step" id="step2">
+        <div class="step-indicator">Step 2 of 4</div>
+        <h3 id="step2Title">Your Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="f-fname" placeholder="e.g. Mohammed"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="f-lname" placeholder="e.g. Al-Rashid"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="f-email" placeholder="your@email.com"/>
+        </div>
+        <div class="form-group">
+          <label>Phone / WhatsApp</label>
+          <input type="tel" id="f-phone" placeholder="+965 XXXX XXXX"/>
+        </div>
+        <div class="form-group">
+          <label>Nationality</label>
+          <select id="f-nationality">
+            <option value="">Select your country</option>
+            <option>Kuwaiti</option>
+            <option>Saudi Arabian</option>
+            <option>Emirati</option>
+            <option>Qatari</option>
+            <option>Bahraini</option>
+            <option>Omani</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-back" onclick="prevStep()">← Back</button>
+          <button class="btn-next" onclick="nextStep()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Specifics -->
+      <div class="form-step" id="step3">
+        <div class="step-indicator">Step 3 of 4</div>
+        <h3 id="step3Title">Your Requirements</h3>
+
+        <!-- Student fields -->
+        <div id="studentFields">
+          <div class="form-group">
+            <label>University</label>
+            <select id="f-uni">
+              <option value="">Select your university</option>
+              <option>University of Newcastle</option>
+              <option>University of Manchester</option>
+              <option>University of Birmingham</option>
+              <option>University of Nottingham</option>
+              <option>King's College London</option>
+              <option>Imperial College London</option>
+              <option>University of Edinburgh</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Monthly Budget</label>
+              <select id="f-budget">
+                <option>Up to £800</option>
+                <option>£800 – £1,200</option>
+                <option>£1,200 – £1,800</option>
+                <option>£1,800+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Move-in Date</label>
+              <input type="month" id="f-movein"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Preferred Property Type</label>
+            <select id="f-proptype">
+              <option>Studio</option>
+              <option>1-Bedroom Flat</option>
+              <option>2-Bedroom Flat</option>
+              <option>Shared House</option>
+              <option>No Preference</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Landlord fields -->
+        <div id="landlordFields" style="display:none">
+          <div class="form-group">
+            <label>Property Location</label>
+            <input type="text" placeholder="e.g. Newcastle, NE2 3AE"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Monthly Rent</label>
+              <input type="text" placeholder="e.g. £1,200"/>
+            </div>
+            <div class="form-group">
+              <label>Property Type</label>
+              <select>
+                <option>Studio</option>
+                <option>1-Bedroom</option>
+                <option>2-Bedroom</option>
+                <option>3+ Bedrooms</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Additional Notes</label>
+            <textarea placeholder="Furnishing, bills included, available from..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-back" onclick="prevStep()">← Back</button>
+          <button class="btn-next" onclick="nextStep()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Confirm -->
+      <div class="form-step" id="step4">
+        <div class="step-indicator">Step 4 of 4</div>
+        <h3>Almost there.</h3>
+        <div class="form-group">
+          <label>How did you hear about We Link?</label>
+          <select id="f-source">
+            <option value="">Select one</option>
+            <option>Kuwait/GCC Student Society</option>
+            <option>Instagram / Social Media</option>
+            <option>Friend or Family</option>
+            <option>University</option>
+            <option>Google Search</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Anything else we should know?</label>
+          <textarea id="f-notes" placeholder="Optional — any special requirements or questions for our team..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-back" onclick="prevStep()">← Back</button>
+          <button class="btn-next" onclick="submitForm()">Submit Application →</button>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="form-step" id="stepSuccess">
+        <div class="success-step">
+          <div class="success-icon">
+            <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="5,14 11,20 23,8" stroke="#0d1b2a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Application Received</h3>
+          <p>Thank you for applying to We Link. Our team will review your details and be in touch within 48 hours via WhatsApp and email.</p>
+          <button class="btn-primary" onclick="closeModal()">Back to Home</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  let totalSteps = 4;
+  let userType = '';
+
+  function toggleMenu() {
+    const h = document.getElementById('hamburger');
+    const m = document.getElementById('mobileMenu');
+    h.classList.toggle('open');
+    m.classList.toggle('open');
+  }
+
+  function closeMenu() {
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+
+  function openModal(type) {
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (type === 'student') selectType('student');
+    if (type === 'landlord') selectType('landlord');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function selectType(type) {
+    userType = type;
+    document.getElementById('typeStudent').classList.toggle('selected', type === 'student');
+    document.getElementById('typeLandlord').classList.toggle('selected', type === 'landlord');
+  }
+
+  function goToStep(step) {
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    if (step > totalSteps) {
+      document.getElementById('stepSuccess').classList.add('active');
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('modalTitle').textContent = 'You\'re all set';
+      document.getElementById('modalSub').textContent = 'We\'ll be in touch within 48 hours';
+      return;
+    }
+    document.getElementById('step' + step).classList.add('active');
+    document.getElementById('progressFill').style.width = ((step / totalSteps) * 100) + '%';
+    currentStep = step;
+
+    // Update step 3 fields based on type
+    if (step === 3) {
+      document.getElementById('studentFields').style.display = userType === 'student' ? 'block' : 'none';
+      document.getElementById('landlordFields').style.display = userType === 'landlord' ? 'block' : 'none';
+      document.getElementById('step3Title').textContent = userType === 'landlord' ? 'Property Details' : 'Your Requirements';
+    }
+  }
+
+  function nextStep() {
+    if (currentStep === 1 && !userType) {
+      alert('Please select whether you are a student or a landlord.');
+      return;
+    }
+    goToStep(currentStep + 1);
+  }
+
+  function prevStep() {
+    if (currentStep > 1) goToStep(currentStep - 1);
+  }
+
+
+  // ===== SUPABASE =====
+  const SB_URL = 'https://hegstrjpfompikkwxmpl.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
+
+  let allProperties = [];
+  let activeCity = 'all';
+  let activeSort = 'default';
+
+  const gradients = [
+    'linear-gradient(135deg,#1a2e44,#0d1b2a)',
+    'linear-gradient(135deg,#162438,#1a2e44)',
+    'linear-gradient(135deg,#0d2233,#163044)',
+    'linear-gradient(135deg,#1a3344,#0d2233)',
+    'linear-gradient(135deg,#0a1520,#162438)',
+    'linear-gradient(135deg,#162030,#0d1b2a)',
+    'linear-gradient(135deg,#1a2a3a,#0d1b2a)',
+    'linear-gradient(135deg,#0f2030,#1a3040)',
+    'linear-gradient(135deg,#0d1f30,#162030)',
+  ];
+
+  async function loadProperties() {
+    try {
+      const res = await fetch(`${SB_URL}/rest/v1/properties?status=eq.Available&order=created_at.desc&select=*`, {
+        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+      });
+      allProperties = await res.json();
+      renderGrid();
+    } catch(e) {
+      document.getElementById('propsLoading').textContent = 'Could not load properties — please refresh.';
+    }
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('propsGrid');
+    const loading = document.getElementById('propsLoading');
+    const empty = document.getElementById('propsEmpty');
+
+    let filtered = allProperties.filter(p =>
+      activeCity === 'all' || p.city.toLowerCase() === activeCity
+    );
+
+    if (activeSort === 'low') filtered.sort((a,b) => a.rent - b.rent);
+    if (activeSort === 'high') filtered.sort((a,b) => b.rent - a.rent);
+
+    // Remove existing cards
+    grid.querySelectorAll('.prop-card').forEach(c => c.remove());
+    loading.style.display = 'none';
+
+    if (!filtered.length) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    filtered.forEach((p, i) => {
+      const grad = gradients[i % gradients.length];
+      const bedsLabel = p.beds === 0 ? 'Studio' : `${p.beds} Bed${p.beds > 1 ? 's' : ''}`;
+      const card = document.createElement('div');
+      card.className = 'prop-card';
+      card.dataset.city = p.city.toLowerCase();
+      card.dataset.price = p.rent;
+      card.style.animationDelay = (i * 0.06) + 's';
+      // Build image slides array
+      const images = [];
+      if (p.image_url) {
+        // Support comma-separated multiple images stored in image_url
+        p.image_url.split(',').map(u => u.trim()).filter(Boolean).forEach(u => images.push(u));
+      }
+      if (!images.length) images.push(null); // fallback to emoji
+
+      const cardId = 'card-' + p.id + '-' + i;
+      const slidesHtml = images.map((img, si) => `
+        <div class="carousel-slide">
+          ${img
+            ? `<img src="${img}" alt="${p.name}" loading="lazy"/>`
+            : `<div class="carousel-slide-emoji" style="background:${grad}">${p.emoji || '🏠'}</div>`
+          }
+        </div>
+      `).join('');
+
+      const dotsHtml = images.length > 1
+        ? `<div class="carousel-dots" id="dots-${cardId}">${images.map((_,di) => `<div class="carousel-dot ${di===0?'active':''}" onclick="goSlide('${cardId}',${di},event)"></div>`).join('')}</div>`
+        : '';
+
+      const arrowsHtml = images.length > 1 ? `
+        <button class="carousel-btn prev" onclick="prevSlide('${cardId}',${images.length},event)">&#8249;</button>
+        <button class="carousel-btn next" onclick="nextSlide('${cardId}',${images.length},event)">&#8250;</button>
+      ` : '';
+
+      card.innerHTML = `
+        <div class="prop-carousel" id="${cardId}" ${images.length > 1 ? `ontouchstart="carouselTouchStart('${cardId}',${images.length},event)" ontouchend="carouselTouchEnd('${cardId}',${images.length},event)"` : ''}>
+          <div class="carousel-track" id="track-${cardId}">${slidesHtml}</div>
+          ${arrowsHtml}
+          ${dotsHtml}
+          <div class="prop-verified">We Link Verified</div>
+          <div class="prop-type-tag">${p.type}</div>
+        </div>
+        <div class="prop-body">
+          <div class="prop-city">${p.city}${p.postcode ? ' · ' + p.postcode : ''}</div>
+          <div class="prop-name">${p.name}</div>
+          <div class="prop-details">
+            <div class="prop-detail"><span class="prop-detail-icon">🛏</span> ${bedsLabel}</div>
+            <div class="prop-detail"><span class="prop-detail-icon">🛁</span> ${p.baths} Bath</div>
+            ${p.notes ? `<div class="prop-detail" style="width:100%;margin-top:2px;font-size:0.72rem;opacity:0.7">${p.notes.split(',')[0]}</div>` : ''}
+          </div>
+          <div class="prop-footer">
+            <div class="prop-price">£${p.rent.toLocaleString()} <span>/ month</span></div>
+            <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+          </div>
+        </div>
+      `;
+      grid.insertBefore(card, empty);
+    });
+
+    // Update city filter pills to only show cities with available props
+    updateFilterPills();
+  }
+
+  function updateFilterPills() {
+    const cities = [...new Set(allProperties.map(p => p.city.toLowerCase()))];
+    document.querySelectorAll('.filter-pill[data-city]').forEach(pill => {
+      const city = pill.dataset.city;
+      pill.style.display = cities.includes(city) || city === 'all' ? '' : 'none';
+    });
+  }
+
+  function filterProps(city, btn) {
+    activeCity = city;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid();
+  }
+
+  function sortProps(order) {
+    activeSort = order;
+    renderGrid();
+  }
+
+
+  // ===== CAROUSEL =====
+  const carouselState = {};
+
+  function getState(id) {
+    if (!carouselState[id]) carouselState[id] = { current: 0, total: 1, touchStartX: 0 };
+    return carouselState[id];
+  }
+
+  function goSlide(id, idx, e) {
+    if (e) e.stopPropagation();
+    const state = getState(id);
+    state.current = idx;
+    const track = document.getElementById('track-' + id);
+    if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+    const dots = document.querySelectorAll(`#dots-${id} .carousel-dot`);
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+
+  function nextSlide(id, total, e) {
+    if (e) e.stopPropagation();
+    const state = getState(id);
+    state.total = total;
+    state.current = (state.current + 1) % total;
+    goSlide(id, state.current, null);
+  }
+
+  function prevSlide(id, total, e) {
+    if (e) e.stopPropagation();
+    const state = getState(id);
+    state.total = total;
+    state.current = (state.current - 1 + total) % total;
+    goSlide(id, state.current, null);
+  }
+
+  // Touch swipe support
+  function carouselTouchStart(id, total, e) {
+    const state = getState(id);
+    state.total = total;
+    state.touchStartX = e.touches[0].clientX;
+  }
+
+  function carouselTouchEnd(id, total, e) {
+    const state = getState(id);
+    const diff = state.touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) nextSlide(id, total, null);
+      else prevSlide(id, total, null);
+    }
+  }
+
+  // Load on page ready
+  loadProperties();
+
+</script>
+<script>
+// ===== FORM SUBMISSION TO SUPABASE =====
+// Override submitForm defined earlier
+window.submitForm = async function() {
+  const btn = document.querySelector('#step4 .btn-next');
+  if (btn) { btn.textContent = 'Submitting...'; btn.disabled = true; }
+
+  const g = id => (document.getElementById(id)?.value || '').trim();
+  const fname = g('f-fname'), lname = g('f-lname');
+  const email = g('f-email'), phone = g('f-phone');
+  const nationality = g('f-nationality'), uni = g('f-uni');
+  const budget = g('f-budget'), notes = g('f-notes');
+  const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+
+  const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
+  const BASE = 'https://hegstrjpfompikkwxmpl.supabase.co/rest/v1/';
+  const hdrs = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'};
+
+  const movein = g('f-movein');
+  const proptype = g('f-proptype');
+
+  const clientData = {
+    fname: fname || 'Unknown', lname,
+    nationality: nationality || '',
+    email, phone, uni, budget,
+    movein: movein || null,
+    proptype: proptype || null,
+    status: 'Pending',
+    joined: today.slice(3)
+  };
+
+  const utype = window.userType || 'student';
+  const appData = {
+    client: ((fname+' '+lname).trim()) || email || 'New Applicant',
+    property: utype === 'landlord' ? 'Landlord Enquiry' : (uni ? 'Student - '+uni : 'Student Enquiry'),
+    type: utype === 'landlord' ? 'Landlord' : 'Student',
+    date: today,
+    status: 'Pending'
+  };
+
+  try {
+    await Promise.all([
+      fetch(BASE+'clients', {method:'POST', headers:hdrs, body:JSON.stringify(clientData)}),
+      fetch(BASE+'applications', {method:'POST', headers:hdrs, body:JSON.stringify(appData)})
+    ]);
+  } catch(e) { console.error('Submit error:', e); }
+
+  if (btn) { btn.textContent = 'Submit Application'; btn.disabled = false; }
+
+  // Advance to success screen
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  const success = document.getElementById('stepSuccess');
+  if (success) success.classList.add('active');
+  const fill = document.getElementById('progressFill');
+  if (fill) fill.style.width = '100%';
+  const title = document.getElementById('modalTitle');
+  if (title) title.textContent = "You're all set";
+  const sub = document.getElementById('modalSub');
+  if (sub) sub.textContent = "We'll be in touch within 48 hours";
+};
+</script>
