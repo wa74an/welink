@@ -475,6 +475,11 @@
         <div class="field-hint">As it appears on your passport</div>
       </div>
       <div class="form-group">
+        <label>Your Phone Number</label>
+        <input type="tel" id="studentPhone" placeholder="+965 9999 9999" autocomplete="tel"/>
+        <div class="field-hint">International format — include country code (e.g. +965 for Kuwait)</div>
+      </div>
+      <div class="form-group">
         <label>Parent / Guardian Phone Number</label>
         <input type="tel" id="parentPhone" placeholder="+965 9999 9999" autocomplete="tel"/>
         <div class="field-hint">International format — include country code (e.g. +965 for Kuwait)</div>
@@ -671,6 +676,7 @@ window.addEventListener('load', async () => {
       // Resume from saved step
       if (profile.onboarding_step >= 1) {
         document.getElementById('fullName').value = profile.full_name || '';
+        document.getElementById('studentPhone').value = profile.student_phone || '';
         document.getElementById('parentPhone').value = profile.parent_phone || '';
       }
       const resumeStep = Math.max(1, profile.onboarding_step || 1);
@@ -798,27 +804,34 @@ function updateProgress(step) {
 // STEP 1 — Personal Info
 // ============================================================
 function nextStep1() {
-  const name  = document.getElementById('fullName').value.trim();
-  const phone = document.getElementById('parentPhone').value.trim();
+  const name        = document.getElementById('fullName').value.trim();
+  const studentPhone = document.getElementById('studentPhone').value.trim();
+  const phone       = document.getElementById('parentPhone').value.trim();
   document.getElementById('err1').classList.remove('show');
 
   if (!name || name.length < 2) {
     showErr('err1', 'Please enter your full legal name.'); return;
   }
   const phoneRegex = /^\+[1-9]\d{6,14}$/;
+  if (!studentPhone) {
+    showErr('err1', 'Please enter your phone number.'); return;
+  }
+  if (!phoneRegex.test(studentPhone.replace(/\s/g,''))) {
+    showErr('err1', 'Your phone number must be in international format (e.g. +965 9999 9999).'); return;
+  }
   if (!phone) {
     showErr('err1', 'Please enter your parent\'s phone number.'); return;
   }
   if (!phoneRegex.test(phone.replace(/\s/g,''))) {
-    showErr('err1', 'Phone number must be in international format (e.g. +965 9999 9999).'); return;
+    showErr('err1', 'Parent phone must be in international format (e.g. +965 9999 9999).'); return;
   }
 
   // Save progress to DB
-  saveStep1(name, phone);
+  saveStep1(name, studentPhone, phone);
   goToStep(2);
 }
 
-async function saveStep1(name, phone) {
+async function saveStep1(name, studentPhone, phone) {
   try {
     // Upsert profile row
     await fetch(`${SB_URL}/rest/v1/student_profiles`, {
@@ -832,6 +845,7 @@ async function saveStep1(name, phone) {
       body: JSON.stringify({
         id: session.user_id,
         full_name: name,
+        student_phone: studentPhone,
         parent_phone: phone,
         onboarding_step: 1,
         updated_at: new Date().toISOString()

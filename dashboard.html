@@ -2263,6 +2263,15 @@ async function loadStudents() {
   try {
     // Load profiles
     const profiles = await sb('student_profiles?select=*&order=created_at.desc') || [];
+
+    // Load emails from Supabase Auth admin API (service role required)
+    const authRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users?per_page=1000`, {
+      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}` }
+    });
+    const authData = authRes.ok ? await authRes.json() : { users: [] };
+    const emailMap = {};
+    (authData.users || []).forEach(u => { emailMap[u.id] = u.email; });
+
     // Load documents grouped by student
     const docs = await sb('student_documents?select=student_id,doc_type') || [];
     const docMap = {};
@@ -2270,17 +2279,11 @@ async function loadStudents() {
       if (!docMap[d.student_id]) docMap[d.student_id] = [];
       docMap[d.student_id].push(d.doc_type);
     });
-    // Load auth users via the profiles (email comes from auth, store email in session)
-    // We fetch email from audit_logs or use placeholder — profiles don't store email directly
-    // Instead, enrich with signup events from audit_logs
-    const logs = await sb('audit_logs?event_type=eq.onboarding_complete&select=student_id,created_at') || [];
-    const logMap = {};
-    logs.forEach(l => { logMap[l.student_id] = l.created_at; });
 
     allStudents = profiles.map(p => ({
       ...p,
-      docs: docMap[p.id] || [],
-      completed_at: logMap[p.id] || null
+      email: emailMap[p.id] || '—',
+      docs: docMap[p.id] || []
     }));
 
     renderStudentsTable(allStudents);
@@ -2315,7 +2318,7 @@ function renderStudentsTable(students) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${escH(s.full_name || '—')}</td>
-      <td style="color:var(--text-light);font-size:0.8rem">${escH(s.id.substring(0,8)+'…')}</td>
+      <td style="color:var(--text-light);font-size:0.8rem">${escH(s.email || '—')}</td>
       <td style="font-size:0.8rem">${escH(s.parent_phone || '—')}</td>
       <td style="font-size:0.8rem">${docsUploaded} file${docsUploaded !== 1 ? 's' : ''} · ${docsRequired}/3 required</td>
       <td>${statusBadge}</td>
@@ -2329,7 +2332,7 @@ function filterStudents() {
   const q = document.getElementById('studentSearch').value.toLowerCase();
   const f = document.getElementById('studentFilter').value;
   const filtered = allStudents.filter(s => {
-    const nameMatch = (s.full_name || '').toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
+    const nameMatch = (s.full_name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q);
     if (!nameMatch) return false;
     if (f === 'complete') return s.onboarding_completed;
     if (f === 'pending') return !s.onboarding_completed;
@@ -2347,7 +2350,8 @@ async function viewStudent(id) {
   const fmt = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
   const infoFields = [
     ['Full Name', s.full_name || '—'],
-    ['Student ID', s.id.substring(0,16)+'…'],
+    ['Email', s.email || '—'],
+    ['Student Phone', s.student_phone || '—'],
     ["Parent's Phone", s.parent_phone || '—'],
     ['Onboarding', s.onboarding_completed ? 'Completed' : 'Pending'],
     ['Terms Agreed', fmt(s.terms_accepted_at)],
