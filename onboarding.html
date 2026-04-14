@@ -630,7 +630,7 @@ const MAX_BYTES     = 10 * 1024 * 1024; // 10 MB
 // SESSION
 // ============================================================
 function getSession() {
-  const raw = localStorage.getItem('wl_session') || sessionStorage.getItem('wl_session');
+  const raw = sessionStorage.getItem('wl_session') || localStorage.getItem('wl_session');
   if (!raw) return null;
   try {
     const s = JSON.parse(raw);
@@ -985,15 +985,14 @@ async function submitOnboarding() {
       uploaded_at: now
     }));
 
-    // Delete old doc records for this student, then insert fresh
-    await fetch(`${SB_URL}/rest/v1/student_documents?student_id=eq.${session.user_id}`, {
-      method: 'DELETE',
-      headers: authHeaders({})
-    });
-
+    // Upsert document records — safe to retry, no data loss if upload fails midway
+    // Unique constraint on (student_id, doc_type) ensures one record per doc type
     await fetch(`${SB_URL}/rest/v1/student_documents`, {
       method: 'POST',
-      headers: authHeaders({ 'Prefer': 'return=minimal' }),
+      headers: authHeaders({
+        'Prefer': 'return=minimal,resolution=merge-duplicates',
+        'on_conflict': 'student_id,doc_type'
+      }),
       body: JSON.stringify(docRows)
     });
 

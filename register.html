@@ -384,19 +384,23 @@ function saveSession(data, remember) {
     persist:       remember,
     remember_until: remember ? Date.now() + 30 * 24 * 60 * 60 * 1000 : null
   };
-  const storage = remember ? localStorage : sessionStorage;
-  // Write to both so tokens are found regardless of page
-  localStorage.setItem('wl_session', JSON.stringify(session));
-  sessionStorage.setItem('wl_session', JSON.stringify(session));
+  if (remember) {
+    // Persistent — survives browser close
+    localStorage.setItem('wl_session', JSON.stringify(session));
+    sessionStorage.removeItem('wl_session');
+  } else {
+    // Session-only — cleared when tab/browser closes
+    sessionStorage.setItem('wl_session', JSON.stringify(session));
+    localStorage.removeItem('wl_session');
+  }
 }
 
 function getSession() {
-  const raw = localStorage.getItem('wl_session') || sessionStorage.getItem('wl_session');
+  // sessionStorage first (current tab), then localStorage (remembered login)
+  const raw = sessionStorage.getItem('wl_session') || localStorage.getItem('wl_session');
   if (!raw) return null;
   try {
     const s = JSON.parse(raw);
-    // If "remember me" was off, respect session-only (still valid until expires_at or remember_until)
-    if (!s.persist && !sessionStorage.getItem('wl_session')) return null;
     if (s.remember_until && Date.now() > s.remember_until) {
       clearSession();
       return null;

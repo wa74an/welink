@@ -1616,26 +1616,37 @@
 // ===== SUPABASE CONFIG =====
 const SUPABASE_URL = 'https://hegstrjpfompikkwxmpl.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
-// Service role key — bypasses RLS so admin can read all student data
-const SUPABASE_ADMIN_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTIxOTg4OSwiZXhwIjoyMDkwNzk1ODg5fQ.G76bgBIUIF6jHRz7GslHtlQYsjORiDwUZj4CK0TvDnw';
 
+// Admin API proxy — service role key lives only in Netlify env vars, never here
+const ADMIN_API = '/.netlify/functions/admin-api';
+const ADMIN_SECRET = 'wl-adm-f7k9p2r4x8';  // matched in Netlify env ADMIN_SECRET
+
+async function adminApi(action, opts = {}) {
+  const url = `${ADMIN_API}?action=${action}${opts.qs || ''}`;
+  const res = await fetch(url, {
+    method: opts.method || 'GET',
+    headers: { 'x-admin-secret': ADMIN_SECRET, 'Content-Type': 'application/json' },
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  if (!res.ok) { console.error('adminApi error:', action, await res.text()); return null; }
+  if (res.status === 204) return true;
+  return res.json();
+}
+
+// sb() — used for non-sensitive tables (properties, clients, applications)
 async function sb(table, method='GET', body=null, filter='') {
   const url = `${SUPABASE_URL}/rest/v1/${table}${filter}`;
   const res = await fetch(url, {
     method,
     headers: {
-      'apikey': SUPABASE_ADMIN_KEY,
-      'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`,
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     },
     body: body ? JSON.stringify(body) : null
   });
-  if (!res.ok) {
-    const err = await res.text();
-    console.error('Supabase error:', err);
-    return null;
-  }
+  if (!res.ok) { console.error('Supabase error:', await res.text()); return null; }
   return method === 'DELETE' ? true : res.json();
 }
 
@@ -2261,26 +2272,20 @@ async function loadStudents() {
   document.getElementById('studentsEmpty').style.display = 'none';
   document.getElementById('studentsTable').innerHTML = '';
   try {
-    // Load profiles
-    const profiles = await sb('student_profiles?select=*&order=created_at.desc') || [];
-
-    // Load emails from Supabase Auth admin API (service role required)
-    const authRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users?per_page=1000`, {
-      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}` }
-    });
-    const authData = authRes.ok ? await authRes.json() : { users: [] };
+    // Load profiles + emails via serverless function (service role key stays server-side)
+    const studentData = await adminApi('list-students') || { profiles: [], users: [] };
     const emailMap = {};
-    (authData.users || []).forEach(u => { emailMap[u.id] = u.email; });
+    (studentData.users || []).forEach(u => { emailMap[u.id] = u.email; });
 
-    // Load documents grouped by student
-    const docs = await sb('student_documents?select=student_id,doc_type') || [];
+    // Load document types per student
+    const docs = await adminApi('list-docs') || [];
     const docMap = {};
     docs.forEach(d => {
       if (!docMap[d.student_id]) docMap[d.student_id] = [];
       docMap[d.student_id].push(d.doc_type);
     });
 
-    allStudents = profiles.map(p => ({
+    allStudents = (studentData.profiles || []).map(p => ({
       ...p,
       email: emailMap[p.id] || '—',
       docs: docMap[p.id] || []
@@ -2369,7 +2374,7 @@ async function viewStudent(id) {
   openModal('studentDetail');
 
   try {
-    const docs = await sb(`student_documents?student_id=eq.${id}&select=*&order=uploaded_at.asc`) || [];
+    const docs = await adminApi('student-docs', { qs: `&student_id=${encodeURIComponent(id)}` }) || [];
     if (!docs.length) {
       docsContainer.innerHTML = '<div style="color:var(--text-light);font-size:0.82rem;padding:8px 0">No documents submitted.</div>';
       return;
@@ -2387,7 +2392,7 @@ async function viewStudent(id) {
       </div>`).join('');
 
     // Audit log
-    await sb('audit_logs', 'POST', { event_type:'doc_accessed', student_id: id, details:{ by:'admin', doc_count: docs.length } });
+    await adminApi('audit-log', { method: 'POST', body: { event_type:'doc_accessed', student_id: id, details:{ by:'admin', doc_count: docs.length } } });
   } catch(e) {
     console.error('viewStudent docs:', e);
     docsContainer.innerHTML = '<div style="color:var(--text-light);font-size:0.82rem">Could not load documents.</div>';
@@ -2397,13 +2402,8 @@ async function viewStudent(id) {
 async function downloadDoc(filePath, fileName) {
   try {
     // Generate a signed URL (60 min expiry)
-    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/student-documents/${filePath}`, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ expiresIn: 3600 })
-    });
-    if (!res.ok) throw new Error('Could not generate signed URL');
-    const data = await res.json();
+    const data = await adminApi('sign-url', { method: 'POST', body: { path: filePath } });
+    if (!data || !data.signedURL) throw new Error('Could not generate signed URL');
     const signedUrl = `${SUPABASE_URL}/storage/v1${data.signedURL}`;
     const a = document.createElement('a');
     a.href = signedUrl;
@@ -2424,7 +2424,7 @@ let allTerms = [];
 async function loadTermsAdmin() {
   document.getElementById('termsLoading').style.display = 'block';
   try {
-    allTerms = await sb('terms_conditions?select=*&order=created_at.desc') || [];
+    allTerms = await adminApi('list-terms') || [];
     renderTermsList();
   } catch(e) {
     document.getElementById('termsLoading').textContent = 'Failed to load terms.';
@@ -2484,32 +2484,7 @@ async function saveTerm() {
   }
 
   try {
-    const now = new Date().toISOString();
-    if (active) {
-      // Deactivate all other versions first
-      await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?is_active=eq.true`, {
-        method: 'PATCH',
-        headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ is_active: false })
-      });
-    }
-
-    if (id) {
-      // Update existing
-      await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?id=eq.${id}`, {
-        method: 'PATCH',
-        headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ version, title, content, is_active: active, updated_at: now })
-      });
-    } else {
-      // Insert new
-      await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions`, {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ version, title, content, is_active: active, created_at: now, updated_at: now })
-      });
-    }
-
+    await adminApi('save-terms', { method: 'POST', body: { id, version, title, content, active } });
     closeModal('termsEditor');
     showToast(id ? 'Terms updated successfully' : 'New terms version created');
     loadTermsAdmin();
@@ -2521,18 +2496,7 @@ async function saveTerm() {
 
 async function setActiveTerm(id) {
   try {
-    // Deactivate all
-    await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?is_active=eq.true`, {
-      method: 'PATCH',
-      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ is_active: false })
-    });
-    // Activate selected
-    await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?id=eq.${id}`, {
-      method: 'PATCH',
-      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ is_active: true, updated_at: new Date().toISOString() })
-    });
+    await adminApi('save-terms', { method: 'POST', body: { setActive: true, id } });
     showToast('Active terms version updated');
     loadTermsAdmin();
   } catch(e) {
