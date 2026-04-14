@@ -2420,6 +2420,16 @@
 
 </script>
 <script>
+// ===== AUTH HASH REDIRECT =====
+// If Supabase sends a verification link to the homepage (old emails), forward to register.html
+(function() {
+  var h = window.location.hash;
+  if (h && h.includes('access_token')) {
+    window.location.replace('/register.html' + h);
+  }
+})();
+</script>
+<script>
 // ===== FORM SUBMISSION TO SUPABASE =====
 // Override submitForm defined earlier
 window.submitForm = async function() {
