@@ -1616,16 +1616,18 @@
 // ===== SUPABASE CONFIG =====
 const SUPABASE_URL = 'https://hegstrjpfompikkwxmpl.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
+// Service role key — bypasses RLS so admin can read all student data
+const SUPABASE_ADMIN_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTIxOTg4OSwiZXhwIjoyMDkwNzk1ODg5fQ.G76bgBIUIF6jHRz7GslHtlQYsjORiDwUZj4CK0TvDnw';
 
 async function sb(table, method='GET', body=null, filter='') {
   const url = `${SUPABASE_URL}/rest/v1/${table}${filter}`;
   const res = await fetch(url, {
     method,
     headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'apikey': SUPABASE_ADMIN_KEY,
+      'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': method === 'POST' ? 'return=representation' : 'return=representation'
+      'Prefer': 'return=representation'
     },
     body: body ? JSON.stringify(body) : null
   });
@@ -2393,7 +2395,7 @@ async function downloadDoc(filePath, fileName) {
     // Generate a signed URL (60 min expiry)
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/student-documents/${filePath}`, {
       method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ expiresIn: 3600 })
     });
     if (!res.ok) throw new Error('Could not generate signed URL');
@@ -2483,7 +2485,7 @@ async function saveTerm() {
       // Deactivate all other versions first
       await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?is_active=eq.true`, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ is_active: false })
       });
     }
@@ -2492,14 +2494,14 @@ async function saveTerm() {
       // Update existing
       await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?id=eq.${id}`, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ version, title, content, is_active: active, updated_at: now })
       });
     } else {
       // Insert new
       await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions`, {
         method: 'POST',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ version, title, content, is_active: active, created_at: now, updated_at: now })
       });
     }
@@ -2518,13 +2520,13 @@ async function setActiveTerm(id) {
     // Deactivate all
     await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?is_active=eq.true`, {
       method: 'PATCH',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body: JSON.stringify({ is_active: false })
     });
     // Activate selected
     await fetch(`${SUPABASE_URL}/rest/v1/terms_conditions?id=eq.${id}`, {
       method: 'PATCH',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      headers: { 'apikey': SUPABASE_ADMIN_KEY, 'Authorization': `Bearer ${SUPABASE_ADMIN_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body: JSON.stringify({ is_active: true, updated_at: new Date().toISOString() })
     });
     showToast('Active terms version updated');
