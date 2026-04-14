@@ -2582,4 +2582,17 @@ window.submitForm = async function() {
   if (portalBtn) portalBtn.style.display = isStudent ? 'block' : 'none';
 };
 </script>
+<!-- Cookie Banner -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0d1b2a;color:#fff;padding:18px 28px;z-index:99999;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 24px rgba(0,0,0,0.18);font-family:'Cormorant Garamond',Georgia,serif;border-top:1px solid rgba(255,255,255,0.07);">
+  <p style="margin:0;font-size:1rem;line-height:1.5;flex:1;min-width:220px;color:rgba(255,255,255,0.88);">We use cookies to improve your experience on our site. By continuing, you agree to our use of cookies.</p>
+  <div style="display:flex;gap:10px;flex-shrink:0;">
+    <button onclick="acceptCookies()" style="background:#fff;color:#0d1b2a;border:none;padding:10px 26px;border-radius:6px;font-size:0.88rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;font-family:inherit;">Accept</button>
+    <button onclick="declineCookies()" style="background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.18);padding:10px 22px;border-radius:6px;font-size:0.88rem;cursor:pointer;letter-spacing:0.05em;font-family:inherit;">Decline</button>
+  </div>
+</div>
+<script>
+(function(){if(!localStorage.getItem('wl_cookies')){var b=document.getElementById('cookieBanner');b.style.display='flex';}})();
+function acceptCookies(){localStorage.setItem('wl_cookies','accepted');document.getElementById('cookieBanner').style.display='none';}
+function declineCookies(){localStorage.setItem('wl_cookies','declined');document.getElementById('cookieBanner').style.display='none';}
+</script>
 <p style="text-align:center;font-size:0.65rem;letter-spacing:0.12em;color:rgba(13,27,42,0.25);padding:12px 0 20px;text-transform:uppercase">Made by Scaler Studios</p>
