@@ -1816,12 +1816,96 @@
     </select>
   </div>
 
-  <!-- Grid — populated from Supabase -->
+  <!-- Sample listings note -->
+  <div style="text-align:center;margin-bottom:8px">
+    <span style="display:inline-block;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);padding:8px 20px;border:1px solid var(--border);border-radius:2px">Sample listings. Full inventory launching soon.</span>
+  </div>
+
+  <!-- Properties grid — sample cards -->
   <div class="props-grid" id="propsGrid">
-    <div class="props-loading" id="propsLoading" style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-light);font-size:0.88rem;font-weight:300;letter-spacing:0.04em">
-      Loading properties...
+    <!-- Sample card 1 -->
+    <div class="prop-card" data-city="manchester" data-price="950">
+      <div class="prop-carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide">
+            <div class="carousel-slide-emoji" style="background:linear-gradient(135deg,#1a2e44,#0d1b2a);display:flex;align-items:center;justify-content:center;font-size:3rem;height:100%">
+              <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:60px;height:52px;opacity:0.35"><polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="prop-verified">We Link Verified</div>
+        <div class="prop-type-tag">Studio</div>
+      </div>
+      <div class="prop-body">
+        <div class="prop-city">Manchester · M14</div>
+        <div class="prop-name">Fallowfield Studio Apartment</div>
+        <div class="prop-details">
+          <div class="prop-detail"><span class="prop-detail-icon">🛏</span> Studio</div>
+          <div class="prop-detail"><span class="prop-detail-icon">🛁</span> 1 Bath</div>
+          <div class="prop-detail" style="width:100%;margin-top:2px;font-size:0.72rem;opacity:0.7">Bills included, fully furnished</div>
+        </div>
+        <div class="prop-footer">
+          <div class="prop-price">£950 <span>/ month</span></div>
+          <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+        </div>
+      </div>
     </div>
-    <div class="props-empty" id="propsEmpty" style="display:none">No properties found for this filter.</div>
+
+    <!-- Sample card 2 -->
+    <div class="prop-card" data-city="newcastle" data-price="1200">
+      <div class="prop-carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide">
+            <div class="carousel-slide-emoji" style="background:linear-gradient(135deg,#162438,#1a2e44);display:flex;align-items:center;justify-content:center;font-size:3rem;height:100%">
+              <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:60px;height:52px;opacity:0.35"><polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="prop-verified">We Link Verified</div>
+        <div class="prop-type-tag">2 Bed</div>
+      </div>
+      <div class="prop-body">
+        <div class="prop-city">Newcastle · NE2</div>
+        <div class="prop-name">Jesmond 2 Bed Flat</div>
+        <div class="prop-details">
+          <div class="prop-detail"><span class="prop-detail-icon">🛏</span> 2 Beds</div>
+          <div class="prop-detail"><span class="prop-detail-icon">🛁</span> 1 Bath</div>
+          <div class="prop-detail" style="width:100%;margin-top:2px;font-size:0.72rem;opacity:0.7">Near Newcastle University campus</div>
+        </div>
+        <div class="prop-footer">
+          <div class="prop-price">£1,200 <span>/ month</span></div>
+          <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample card 3 -->
+    <div class="prop-card" data-city="london" data-price="2100">
+      <div class="prop-carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide">
+            <div class="carousel-slide-emoji" style="background:linear-gradient(135deg,#0d2233,#163044);display:flex;align-items:center;justify-content:center;font-size:3rem;height:100%">
+              <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:60px;height:52px;opacity:0.35"><polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="prop-verified">We Link Verified</div>
+        <div class="prop-type-tag">1 Bed</div>
+      </div>
+      <div class="prop-body">
+        <div class="prop-city">London · SW7</div>
+        <div class="prop-name">South Kensington 1 Bed</div>
+        <div class="prop-details">
+          <div class="prop-detail"><span class="prop-detail-icon">🛏</span> 1 Bed</div>
+          <div class="prop-detail"><span class="prop-detail-icon">🛁</span> 1 Bath</div>
+          <div class="prop-detail" style="width:100%;margin-top:2px;font-size:0.72rem;opacity:0.7">Minutes from Imperial College London</div>
+        </div>
+        <div class="prop-footer">
+          <div class="prop-price">£2,100 <span>/ month</span></div>
+          <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="load-more-wrap">
@@ -1899,33 +1983,33 @@
       <div class="footer-col">
         <h4>Students</h4>
         <ul>
-          <li><a href="#">How It Works</a></li>
-          <li><a href="#">Guarantor Service</a></li>
-          <li><a href="#">Browse Listings</a></li>
-          <li><a href="#">Apply Now</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#services">Guarantor Service</a></li>
+          <li><a href="#properties">Browse Listings</a></li>
+          <li><a href="#" onclick="openModal('student'); return false;">Apply Now</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Landlords</h4>
         <ul>
-          <li><a href="#">List a Property</a></li>
-          <li><a href="#">Our Guarantee</a></li>
-          <li><a href="#">Pricing</a></li>
-          <li><a href="#">Contact Us</a></li>
+          <li><a href="#" onclick="openModal('landlord'); return false;">List a Property</a></li>
+          <li><a href="#landlords">Our Guarantee</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Company</h4>
         <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms</a></li>
         </ul>
       </div>
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2025 We Link. All rights reserved.</div>
+    <div class="footer-copy">© 2026 We Link. All rights reserved.</div>
     <div style="display:flex;gap:14px;align-items:center">
       <a href="https://wa.me/message/YZY354NHZTVML1" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4);transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#25d366'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.428a.75.75 0 0 0 .916.916l5.566-1.475A11.952 11.952 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.667-.523-5.188-1.435l-.372-.22-3.305.875.876-3.305-.22-.372A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
@@ -2426,8 +2510,7 @@
     }
   }
 
-  // Load on page ready
-  loadProperties();
+  // loadProperties() disabled — showing sample cards until live inventory is ready
 
 </script>
 <script>

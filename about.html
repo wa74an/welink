@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="About We Link — the UK guarantor service built for GCC students."/>
+<title>About — We Link</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"/>
+<style>
+  :root{--navy:#0d1b2a;--navy-light:#1a2e44;--white:#ffffff;--off-white:#f7f6f4;--mid-gray:#9a9590;--text:#1a1a1a;--text-light:#5a5a5a;--border:#e0ddd8;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Cormorant Garamond',Georgia,serif;background:var(--white);color:var(--text);overflow-x:hidden;-webkit-text-size-adjust:100%;}
+  input,select,textarea{font-size:16px!important;}
+  *{-webkit-tap-highlight-color:transparent;}
+  nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:22px 60px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .nav-logo svg{width:36px;height:36px;}
+  .nav-logo-text{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:400;letter-spacing:0.08em;color:var(--navy);}
+  nav ul{list-style:none;display:flex;gap:40px;align-items:center;}
+  nav ul a{font-size:0.78rem;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-light);text-decoration:none;transition:color 0.2s;}
+  nav ul a:hover{color:var(--navy);}
+  .nav-btn{background:var(--navy)!important;color:var(--white)!important;padding:10px 26px;border-radius:2px;font-weight:500!important;}
+  .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+  .hamburger span{display:block;width:22px;height:2px;background:var(--navy);border-radius:2px;}
+  .mobile-menu{display:none;position:fixed;top:80px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);z-index:199;flex-direction:column;padding:20px 28px;}
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-light);text-decoration:none;padding:14px 0;border-bottom:1px solid var(--border);}
+  .mobile-menu a:last-child{border-bottom:none;}
+  .mobile-cta{color:var(--navy)!important;font-weight:500!important;}
+  @media(max-width:768px){nav{padding:18px 24px;}nav ul{display:none;}.hamburger{display:flex;}}
+
+  .page-wrap{padding-top:120px;padding-bottom:100px;max-width:860px;margin:0 auto;padding-left:40px;padding-right:40px;}
+  .page-label{font-size:0.72rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--navy);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+  .page-label::before{content:'';width:30px;height:1px;background:var(--navy);display:inline-block;}
+  h1{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;line-height:1.15;color:var(--navy);margin-bottom:20px;}
+  h1 em{font-style:italic;}
+  .lead{font-size:1.15rem;font-weight:300;color:var(--text-light);line-height:1.8;max-width:640px;margin-bottom:64px;}
+
+  .about-body{max-width:660px;}
+  .about-body p{font-size:1rem;font-weight:300;color:var(--text-light);line-height:1.85;margin-bottom:24px;}
+  .about-body h2{font-size:1.5rem;font-weight:400;color:var(--navy);margin-top:48px;margin-bottom:16px;}
+
+  .values-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:48px 0;}
+  @media(max-width:560px){.values-grid{grid-template-columns:1fr;}}
+  .value-card{background:var(--off-white);padding:32px;}
+  .value-num{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--mid-gray);margin-bottom:12px;}
+  .value-title{font-size:1.1rem;font-weight:400;color:var(--navy);margin-bottom:8px;}
+  .value-desc{font-size:0.85rem;font-weight:300;color:var(--text-light);line-height:1.7;}
+
+  .built-by{margin-top:72px;padding-top:32px;border-top:1px solid var(--border);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(13,27,42,0.25);}
+
+  .cta-row{margin-top:56px;display:flex;gap:16px;flex-wrap:wrap;}
+  .btn-primary{display:inline-block;background:var(--navy);color:var(--white);padding:14px 32px;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;border-radius:2px;}
+  .btn-outline-link{display:inline-block;background:transparent;color:var(--navy);padding:14px 32px;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(13,27,42,0.3);border-radius:2px;}
+
+  footer{background:var(--navy);color:var(--white);padding:60px;}
+  .footer-top{display:flex;justify-content:space-between;gap:40px;margin-bottom:40px;flex-wrap:wrap;}
+  .footer-logo{display:flex;align-items:center;gap:12px;font-size:1.1rem;letter-spacing:0.1em;margin-bottom:10px;}
+  .footer-logo svg{width:28px;height:24px;}
+  .footer-tagline{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+  .footer-links{display:flex;gap:60px;flex-wrap:wrap;}
+  .footer-col h4{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:16px;}
+  .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+  .footer-col ul a{font-size:0.82rem;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.04em;transition:color 0.2s;}
+  .footer-col ul a:hover{color:var(--white);}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;}
+  .footer-legal{font-size:0.72rem;color:rgba(255,255,255,0.3);line-height:1.7;max-width:580px;}
+  .footer-copy{font-size:0.72rem;color:rgba(255,255,255,0.3);letter-spacing:0.06em;margin-top:6px;}
+  .footer-countries{display:flex;gap:10px;flex-wrap:wrap;}
+  .country-pill{font-size:0.7rem;color:rgba(255,255,255,0.5);letter-spacing:0.06em;padding:4px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:2px;}
+  @media(max-width:768px){footer{padding:40px 24px;}.footer-links{gap:32px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <svg viewBox="0 0 60 52" fill="none"><polyline points="2,28 30,4 58,28" stroke="#0d1b2a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="28" x2="18" y2="50" stroke="#0d1b2a" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="18" x2="30" y2="50" stroke="#0d1b2a" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="28" x2="42" y2="50" stroke="#0d1b2a" stroke-width="3" stroke-linecap="round"/></svg>
+    <span class="nav-logo-text">We Link</span>
+  </a>
+  <ul>
+    <li><a href="/#how">How It Works</a></li>
+    <li><a href="/#services">Services</a></li>
+    <li><a href="/#properties">Properties</a></li>
+    <li><a href="/#landlords">For Landlords</a></li>
+    <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important">Student Login</a></li>
+    <li><a href="/" class="nav-btn">Get Started</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/#how" onclick="closeMenu()">How It Works</a>
+  <a href="/#services" onclick="closeMenu()">Services</a>
+  <a href="/#properties" onclick="closeMenu()">Properties</a>
+  <a href="/#landlords" onclick="closeMenu()">For Landlords</a>
+  <a href="/login" onclick="closeMenu()">Student Login</a>
+  <a href="/" class="mobile-cta" onclick="closeMenu()">Get Started</a>
+</div>
+
+<div class="page-wrap">
+  <div class="page-label">About</div>
+  <h1>Bridging the gap<br/>for <em>GCC students.</em></h1>
+  <p class="lead">We Link was built to solve one of the most frustrating obstacles facing Gulf students who choose to study in the United Kingdom — the requirement for a UK based guarantor.</p>
+
+  <div class="about-body">
+    <p>Every year, thousands of students from Kuwait, Saudi Arabia, the UAE, Qatar, Bahrain, and Oman arrive in the UK to study at some of the world's finest universities. Many arrive with strong financial backing and a genuine desire to build their futures here. And yet, they consistently run into the same wall: landlords and letting agents who require a UK based guarantor before they will rent to an international student.</p>
+
+    <p>We Link removes that wall. We act as the UK based guarantor on behalf of our students, giving landlords the assurance they need and giving students access to a wider, better quality range of housing.</p>
+
+    <p>Beyond the guarantor service, we maintain a curated network of verified properties in cities with large GCC student populations, including Newcastle, Manchester, London, Birmingham, and Edinburgh. Every listing on our platform is hand verified by our team before it is published.</p>
+
+    <h2>What we stand for</h2>
+  </div>
+
+  <div class="values-grid">
+    <div class="value-card">
+      <div class="value-num">01</div>
+      <div class="value-title">Transparency</div>
+      <div class="value-desc">No hidden fees. No vague commitments. Every step of the process is explained clearly before you commit to anything.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-num">02</div>
+      <div class="value-title">Reliability</div>
+      <div class="value-desc">We review applications within 48 hours and maintain direct communication with every student and landlord on our platform.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-num">03</div>
+      <div class="value-title">Community</div>
+      <div class="value-desc">We understand the GCC experience in the UK because we are part of it. Our support team speaks Arabic and English.</div>
+    </div>
+    <div class="value-card">
+      <div class="value-num">04</div>
+      <div class="value-title">Integrity</div>
+      <div class="value-desc">We only list properties we would recommend ourselves. We only approve guarantor applications we are confident in.</div>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a href="/" class="btn-primary">Apply as a Student</a>
+    <a href="/contact" class="btn-outline-link">Get in Touch</a>
+  </div>
+
+  <div class="built-by">Built by Scaler Studios</div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">
+        <svg viewBox="0 0 60 52" fill="none"><polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+        <span>We Link</span>
+      </div>
+      <div class="footer-tagline">Linking Tenants &amp; Landlords</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col"><h4>Students</h4><ul><li><a href="/#how">How It Works</a></li><li><a href="/#services">Guarantor Service</a></li><li><a href="/#properties">Browse Listings</a></li><li><a href="/">Apply Now</a></li></ul></div>
+      <div class="footer-col"><h4>Landlords</h4><ul><li><a href="/">List a Property</a></li><li><a href="/#landlords">Our Guarantee</a></li><li><a href="/pricing">Pricing</a></li><li><a href="/contact">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about">About</a></li><li><a href="/privacy">Privacy Policy</a></li><li><a href="/terms">Terms</a></li></ul></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>
+      <div class="footer-legal">We Link is a trading name of [Company Name] Ltd, registered in England and Wales. Company No: [TBD]. ICO Registration: [TBD].</div>
+      <div class="footer-copy">© 2026 We Link. All rights reserved.</div>
+    </div>
+    <div class="footer-countries">
+      <span class="country-pill">🇰🇼 Kuwait</span><span class="country-pill">🇸🇦 Saudi Arabia</span><span class="country-pill">🇦🇪 UAE</span><span class="country-pill">🇶🇦 Qatar</span><span class="country-pill">🇧🇭 Bahrain</span><span class="country-pill">🇴🇲 Oman</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu(){document.getElementById('hamburger').classList.toggle('open');document.getElementById('mobileMenu').classList.toggle('open');}
+  function closeMenu(){document.getElementById('hamburger').classList.remove('open');document.getElementById('mobileMenu').classList.remove('open');}
+</script>
+</body>
+</html>
