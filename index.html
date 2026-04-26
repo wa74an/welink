@@ -2142,15 +2142,15 @@
     </select>
   </div>
 
-  <!-- Sample listings note -->
-  <div style="text-align:center;margin-bottom:8px">
+  <!-- Sample listings note (hidden when live data loads) -->
+  <div id="sampleNote" style="text-align:center;margin-bottom:8px">
     <span style="display:inline-block;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);padding:8px 20px;border:1px solid var(--border);border-radius:2px">Sample listings. Full inventory launching soon.</span>
   </div>
 
   <!-- Properties grid — sample cards -->
   <div class="props-grid" id="propsGrid">
     <!-- Sample card 1 -->
-    <div class="prop-card" data-city="manchester" data-price="950" onclick="openPropModal(0)">
+    <div class="prop-card" data-city="manchester" data-price="950" onclick="openPropModal(sampleProperties[0])">
       <div class="prop-carousel">
         <div class="carousel-track">
           <div class="carousel-slide">
@@ -2172,13 +2172,13 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£950 <span>/ month</span></div>
-          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(0)">View Details</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[0])">View Details</button>
         </div>
       </div>
     </div>
 
     <!-- Sample card 2 -->
-    <div class="prop-card" data-city="newcastle" data-price="1200" onclick="openPropModal(1)">
+    <div class="prop-card" data-city="newcastle" data-price="1200" onclick="openPropModal(sampleProperties[1])">
       <div class="prop-carousel">
         <div class="carousel-track">
           <div class="carousel-slide">
@@ -2200,13 +2200,13 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£1,200 <span>/ month</span></div>
-          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(1)">View Details</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[1])">View Details</button>
         </div>
       </div>
     </div>
 
     <!-- Sample card 3 -->
-    <div class="prop-card" data-city="london" data-price="2100" onclick="openPropModal(2)">
+    <div class="prop-card" data-city="london" data-price="2100" onclick="openPropModal(sampleProperties[2])">
       <div class="prop-carousel">
         <div class="carousel-track">
           <div class="carousel-slide">
@@ -2228,7 +2228,7 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£2,100 <span>/ month</span></div>
-          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(2)">View Details</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[2])">View Details</button>
         </div>
       </div>
     </div>
@@ -2757,6 +2757,7 @@
     const grid = document.getElementById('propsGrid');
     const loading = document.getElementById('propsLoading');
     const empty = document.getElementById('propsEmpty');
+    const sampleNote = document.getElementById('sampleNote');
 
     let filtered = allProperties.filter(p =>
       activeCity === 'all' || p.city.toLowerCase() === activeCity
@@ -2765,15 +2766,17 @@
     if (activeSort === 'low') filtered.sort((a,b) => a.rent - b.rent);
     if (activeSort === 'high') filtered.sort((a,b) => b.rent - a.rent);
 
-    // Remove existing cards
+    // Remove existing cards (including hardcoded sample cards)
     grid.querySelectorAll('.prop-card').forEach(c => c.remove());
     loading.style.display = 'none';
 
     if (!filtered.length) {
       empty.style.display = 'block';
+      if (sampleNote) sampleNote.style.display = 'block';
       return;
     }
     empty.style.display = 'none';
+    if (sampleNote) sampleNote.style.display = 'none';
 
     filtered.forEach((p, i) => {
       const grad = gradients[i % gradients.length];
@@ -2810,6 +2813,7 @@
         <button class="carousel-btn next" onclick="nextSlide('${cardId}',${images.length},event)">&#8250;</button>
       ` : '';
 
+      card.onclick = () => openPropModal(p);
       card.innerHTML = `
         <div class="prop-carousel" id="${cardId}" ${images.length > 1 ? `ontouchstart="carouselTouchStart('${cardId}',${images.length},event)" ontouchend="carouselTouchEnd('${cardId}',${images.length},event)"` : ''}>
           <div class="carousel-track" id="track-${cardId}">${slidesHtml}</div>
@@ -2828,7 +2832,7 @@
           </div>
           <div class="prop-footer">
             <div class="prop-price">£${p.rent.toLocaleString()} <span>/ month</span></div>
-            <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+            <button class="prop-btn" onclick="event.stopPropagation();openPropModal(allProperties.find(x=>x.id===${p.id}))">View Details</button>
           </div>
         </div>
       `;
@@ -2910,7 +2914,7 @@
     }
   }
 
-  // loadProperties() disabled — showing sample cards until live inventory is ready
+  loadProperties(); // load from Supabase — replaces sample cards when live inventory exists
 
 </script>
 <script>
@@ -3081,18 +3085,17 @@ function declineCookies(){localStorage.setItem('wl_cookies','declined');document
 
 <script>
 /* ── Property detail modal ── */
+
+// Sample fallback properties (shown when Supabase returns 0 results).
+// Field names match the Supabase schema: rent, notes, beds (int), baths (int).
 const sampleProperties = [
   {
     name: 'Fallowfield Studio Apartment',
-    city: 'Manchester',
-    postcode: 'M14',
-    type: 'Studio',
-    beds: 'Studio',
-    baths: '1 Bath',
-    price: 950,
-    desc: 'A bright and fully furnished studio apartment in the heart of Fallowfield, one of Manchester\'s most popular student neighbourhoods. Walking distance from both the University of Manchester and Manchester Metropolitan University. All bills included in the rent.',
+    city: 'Manchester', postcode: 'M14', type: 'Studio',
+    beds: 0, baths: 1, rent: 950,
+    notes: 'A bright and fully furnished studio apartment in the heart of Fallowfield, one of Manchester\'s most popular student neighbourhoods. Walking distance from the University of Manchester and MMU. All bills included.',
     features: ['Bills included', 'Fully furnished', 'High-speed Wi-Fi', 'Central heating', 'Double glazing', 'Secure entry system', 'Close to campus', 'Near public transport'],
-    slides: [
+    _slides: [
       { gradient: 'linear-gradient(135deg,#1a2e44,#0d1b2a)' },
       { gradient: 'linear-gradient(135deg,#162236,#1a2e44)' },
       { gradient: 'linear-gradient(135deg,#0d1b2a,#162236)' }
@@ -3100,15 +3103,11 @@ const sampleProperties = [
   },
   {
     name: 'Jesmond 2 Bed Flat',
-    city: 'Newcastle',
-    postcode: 'NE2',
-    type: '2 Bed',
-    beds: '2 Beds',
-    baths: '1 Bath',
-    price: 1200,
-    desc: 'A spacious two-bedroom flat in Jesmond, Newcastle\'s most sought-after residential neighbourhood. Minutes from Newcastle University and a short Metro ride to the city centre. Ideal for two students sharing — each bedroom is furnished with a double bed, wardrobe, and desk.',
-    features: ['Near Newcastle University', 'Jesmond Metro nearby', 'Fully furnished', 'Modern kitchen', 'Private bathroom', 'Managed building', 'Quiet residential street', 'Local amenities on your doorstep'],
-    slides: [
+    city: 'Newcastle', postcode: 'NE2', type: '2-Bedroom',
+    beds: 2, baths: 1, rent: 1200,
+    notes: 'A spacious two-bedroom flat in Jesmond, Newcastle\'s most sought-after residential neighbourhood. Minutes from Newcastle University and a short Metro ride into the city centre. Ideal for two students sharing.',
+    features: ['Near Newcastle University', 'Jesmond Metro nearby', 'Fully furnished', 'Modern kitchen', 'Private bathroom', 'Managed building', 'Quiet residential street', 'Local amenities nearby'],
+    _slides: [
       { gradient: 'linear-gradient(135deg,#162438,#1a2e44)' },
       { gradient: 'linear-gradient(135deg,#1a2e44,#243c58)' },
       { gradient: 'linear-gradient(135deg,#0f1f31,#162438)' }
@@ -3116,15 +3115,11 @@ const sampleProperties = [
   },
   {
     name: 'South Kensington 1 Bed',
-    city: 'London',
-    postcode: 'SW7',
-    type: '1 Bed',
-    beds: '1 Bed',
-    baths: '1 Bath',
-    price: 2100,
-    desc: 'A premium one-bedroom apartment in South Kensington, minutes from Imperial College London and the Natural History Museum. Perfect for postgraduate students who want to be close to campus in one of London\'s most prestigious and well-connected neighbourhoods.',
+    city: 'London', postcode: 'SW7', type: '1-Bedroom',
+    beds: 1, baths: 1, rent: 2100,
+    notes: 'A premium one-bedroom apartment in South Kensington, minutes from Imperial College London and the Natural History Museum. Perfect for postgraduate students in one of London\'s most prestigious and well-connected neighbourhoods.',
     features: ['Minutes from Imperial College', 'South Kensington Tube', 'Premium location', 'Fully furnished', 'Modern appliances', 'Concierge building', 'Close to Hyde Park', 'Easy access across London'],
-    slides: [
+    _slides: [
       { gradient: 'linear-gradient(135deg,#0d2233,#163044)' },
       { gradient: 'linear-gradient(135deg,#163044,#1e3d56)' },
       { gradient: 'linear-gradient(135deg,#091929,#0d2233)' }
@@ -3132,68 +3127,97 @@ const sampleProperties = [
   }
 ];
 
+const _pmGradients = [
+  'linear-gradient(135deg,#1a2e44,#0d1b2a)',
+  'linear-gradient(135deg,#162438,#1a2e44)',
+  'linear-gradient(135deg,#0d2233,#163044)',
+  'linear-gradient(135deg,#1a3344,#0d2233)',
+  'linear-gradient(135deg,#0a1520,#162438)',
+];
+
 let pmCurrentSlide = 0;
 let pmTotalSlides  = 0;
-let pmCurrentProp  = null;
 
-function openPropModal(idx) {
-  const p = sampleProperties[idx];
-  if (!p) return;
-  pmCurrentProp  = p;
+const _pmIcons = {
+  type: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><path d="M2 10l6-6 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="10" width="8" height="5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
+  bed:  `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><rect x="1" y="7" width="14" height="7" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 10h14" stroke="currentColor" stroke-width="1.2"/><path d="M1 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
+  bath: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><path d="M3 8h10a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M4 8V4a2 2 0 0 1 4 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>`
+};
+
+// Accepts either a Supabase property object or a sample property object.
+// Supabase fields: name, city, postcode, type, rent (int), beds (int), baths (int), notes, image_url (comma-sep), emoji
+// Sample fields: same, plus _slides (gradient fallback array), features (array)
+function openPropModal(prop) {
+  if (!prop) return;
+
+  // Normalise fields
+  const price   = prop.rent || prop.price || 0;
+  const desc    = prop.notes || prop.desc || '';
+  const bedsNum = typeof prop.beds === 'number' ? prop.beds : parseInt(prop.beds) || 0;
+  const bathsNum= typeof prop.baths === 'number' ? prop.baths : parseInt(prop.baths) || 1;
+  const bedsLbl = bedsNum === 0 ? 'Studio' : `${bedsNum} ${bedsNum === 1 ? 'Bed' : 'Beds'}`;
+  const bathsLbl= `${bathsNum} ${bathsNum === 1 ? 'Bath' : 'Baths'}`;
+  const features= Array.isArray(prop.features) ? prop.features : [];
+
+  // Build slide objects: [{url:'...'} or {gradient:'...'}]
+  let slides = [];
+  if (prop.image_url) {
+    prop.image_url.split(',').map(u => u.trim()).filter(Boolean).forEach(u => slides.push({ url: u }));
+  }
+  if (!slides.length && prop._slides) slides = prop._slides;
+  if (!slides.length) slides = [{ gradient: _pmGradients[0] }];
+
   pmCurrentSlide = 0;
-  pmTotalSlides  = p.slides.length;
+  pmTotalSlides  = slides.length;
 
   // Gallery
-  const slidesEl = document.getElementById('pmSlides');
-  slidesEl.innerHTML = p.slides.map(s =>
-    `<div class="pm-slide" style="background:${s.gradient}">
-       <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:72px;height:62px;opacity:0.18">
-         <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-         <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
-         <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
-         <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
-       </svg>
-     </div>`
+  const slidePlaceholder = `
+    <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:72px;height:62px;opacity:0.18">
+      <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    </svg>`;
+
+  document.getElementById('pmSlides').innerHTML = slides.map(s =>
+    s.url
+      ? `<div class="pm-slide"><img src="${s.url}" alt="${prop.name}" style="width:100%;height:100%;object-fit:cover"/></div>`
+      : `<div class="pm-slide" style="background:${s.gradient || _pmGradients[0]}">${slidePlaceholder}</div>`
   ).join('');
 
   // Dots
   const dotsEl = document.getElementById('pmDots');
-  dotsEl.innerHTML = p.slides.map((_, i) =>
+  dotsEl.innerHTML = slides.map((_, i) =>
     `<span class="pm-dot${i===0?' active':''}" onclick="pmGoSlide(${i})"></span>`
   ).join('');
-
-  // Arrows (hide if only 1 slide)
   document.getElementById('pmArrowLeft').classList.toggle('hidden', pmTotalSlides <= 1);
   document.getElementById('pmArrowRight').classList.toggle('hidden', pmTotalSlides <= 1);
   dotsEl.style.display = pmTotalSlides <= 1 ? 'none' : 'flex';
-
   pmGoSlide(0);
 
-  // Content
-  document.getElementById('pmLocation').textContent = `${p.city} · ${p.postcode}`;
-  document.getElementById('pmTitle').textContent = p.name;
-  document.getElementById('pmDesc').textContent = p.desc;
-  document.getElementById('pmPrice').textContent = `£${p.price.toLocaleString()}`;
+  // Text content
+  document.getElementById('pmLocation').textContent = `${prop.city}${prop.postcode ? ' · ' + prop.postcode : ''}`;
+  document.getElementById('pmTitle').textContent = prop.name;
+  document.getElementById('pmDesc').textContent = desc;
+  document.getElementById('pmPrice').textContent = `£${price.toLocaleString()}`;
 
   // Meta pills
-  const pillIcons = {
-    type: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><path d="M2 10l6-6 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="10" width="8" height="5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
-    bed:  `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><rect x="1" y="7" width="14" height="7" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 10h14" stroke="currentColor" stroke-width="1.2"/><path d="M1 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
-    bath: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><path d="M3 8h10a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M4 8V4a2 2 0 0 1 4 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>`
-  };
   document.getElementById('pmMeta').innerHTML = `
-    <span class="pm-pill">${pillIcons.type}${p.type}</span>
-    <span class="pm-pill">${pillIcons.bed}${p.beds}</span>
-    <span class="pm-pill">${pillIcons.bath}${p.baths}</span>`;
+    <span class="pm-pill">${_pmIcons.type}${prop.type}</span>
+    <span class="pm-pill">${_pmIcons.bed}${bedsLbl}</span>
+    <span class="pm-pill">${_pmIcons.bath}${bathsLbl}</span>`;
 
-  // Features
-  document.getElementById('pmFeatures').innerHTML = p.features.map(f => `<li>${f}</li>`).join('');
+  // Features — use features array if available, otherwise parse notes
+  const featItems = features.length ? features
+    : desc ? desc.split(/[,\n]/).map(s => s.trim()).filter(s => s.length > 2).slice(0, 8)
+    : ['Contact us for full property details'];
+  document.getElementById('pmFeatures').innerHTML = featItems.map(f => `<li>${f}</li>`).join('');
 
-  // WhatsApp link with pre-filled message
-  const msg = encodeURIComponent(`Hi, I'm interested in the ${p.name} (${p.city} · ${p.postcode}) — could you tell me more?`);
+  // WhatsApp pre-filled
+  const loc = prop.postcode ? `${prop.city} · ${prop.postcode}` : prop.city;
+  const msg = encodeURIComponent(`Hi, I'm interested in ${prop.name} (${loc}) — could you tell me more?`);
   document.getElementById('pmWaLink').href = `https://wa.me/message/YZY354NHZTVML1?text=${msg}`;
 
-  // Open
   document.getElementById('propModalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
