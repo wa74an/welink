@@ -1604,6 +1604,318 @@
     border-radius: 0;
   }
 
+  /* ─── Property detail modal ─── */
+  .prop-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: rgba(13,27,42,0.72);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .prop-modal-overlay.open {
+    display: flex;
+  }
+  .prop-modal-overlay.open ~ .social-float { display: none !important; }
+  .prop-modal {
+    background: #fff;
+    border-radius: 2px;
+    width: 100%;
+    max-width: 980px;
+    max-height: 92vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+    animation: pmSlideUp 0.28s ease;
+  }
+  @keyframes pmSlideUp {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .pm-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    z-index: 10;
+    background: rgba(13,27,42,0.55);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .pm-close:hover { background: rgba(13,27,42,0.85); }
+
+  /* Gallery */
+  .pm-gallery {
+    position: relative;
+    height: 360px;
+    overflow: hidden;
+    background: #0d1b2a;
+  }
+  @media(max-width:600px){ .pm-gallery { height: 220px; } }
+  .pm-slides {
+    display: flex;
+    height: 100%;
+    transition: transform 0.4s ease;
+  }
+  .pm-slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pm-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(13,27,42,0.5);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: background 0.2s;
+  }
+  .pm-arrow:hover { background: rgba(13,27,42,0.85); }
+  .pm-arrow-left  { left: 14px; }
+  .pm-arrow-right { right: 14px; }
+  .pm-arrow.hidden { display: none; }
+  .pm-gallery-badges {
+    position: absolute;
+    bottom: 14px;
+    left: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .pm-verified-badge {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: rgba(13,27,42,0.75);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .pm-slide-counter {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.65);
+    background: rgba(0,0,0,0.4);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  .pm-dots {
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+  }
+  .pm-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .pm-dot.active { background: #fff; }
+
+  /* Body layout */
+  .pm-body {
+    display: flex;
+    gap: 0;
+  }
+  .pm-content {
+    flex: 1;
+    padding: 36px 40px;
+    border-right: 1px solid var(--border);
+  }
+  @media(max-width:700px){
+    .pm-body { flex-direction: column; }
+    .pm-content { border-right: none; border-bottom: 1px solid var(--border); padding: 28px 22px; }
+  }
+  .pm-location {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    margin-bottom: 8px;
+  }
+  .pm-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .pm-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .pm-pill {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    padding: 5px 14px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pm-desc {
+    font-size: 0.92rem;
+    font-weight: 300;
+    color: var(--text-light);
+    line-height: 1.85;
+    margin-bottom: 32px;
+  }
+  .pm-features-heading {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .pm-features {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+  }
+  @media(max-width:480px){ .pm-features { grid-template-columns: 1fr; } }
+  .pm-features li {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pm-features li::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='7' stroke='%230d1b2a' stroke-width='1.2'/%3E%3Cpolyline points='5,8 7,10.5 11,6' stroke='%230d1b2a' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    flex-shrink: 0;
+  }
+
+  /* Sidebar */
+  .pm-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  @media(max-width:700px){ .pm-sidebar { width: 100%; padding: 28px 22px; } }
+  .pm-price-box {
+    background: var(--off-white);
+    padding: 20px;
+    border-radius: 2px;
+    text-align: center;
+  }
+  .pm-price-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    margin-bottom: 6px;
+  }
+  .pm-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .pm-price-sub {
+    font-size: 0.68rem;
+    color: var(--mid-gray);
+    letter-spacing: 0.04em;
+  }
+  .pm-verified-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+  .pm-cta {
+    display: block;
+    width: 100%;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: opacity 0.2s;
+  }
+  .pm-cta:hover { opacity: 0.85; }
+  .pm-wa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: #fff;
+    color: #25d366;
+    border: 1px solid #25d366;
+    padding: 12px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.2s;
+    font-weight: 400;
+  }
+  .pm-wa:hover { background: #f0fff5; }
+  .pm-disclaimer {
+    font-size: 0.68rem;
+    color: var(--mid-gray);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+  }
+
+  /* Card cursor pointer */
+  .prop-card { cursor: pointer; }
+  .prop-card:hover .prop-name { color: var(--navy); text-decoration: underline; text-decoration-color: rgba(13,27,42,0.25); }
+
 </style>
 </head>
 <body>
@@ -1838,7 +2150,7 @@
   <!-- Properties grid — sample cards -->
   <div class="props-grid" id="propsGrid">
     <!-- Sample card 1 -->
-    <div class="prop-card" data-city="manchester" data-price="950">
+    <div class="prop-card" data-city="manchester" data-price="950" onclick="openPropModal(0)">
       <div class="prop-carousel">
         <div class="carousel-track">
           <div class="carousel-slide">
@@ -1860,13 +2172,13 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£950 <span>/ month</span></div>
-          <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(0)">View Details</button>
         </div>
       </div>
     </div>
 
     <!-- Sample card 2 -->
-    <div class="prop-card" data-city="newcastle" data-price="1200">
+    <div class="prop-card" data-city="newcastle" data-price="1200" onclick="openPropModal(1)">
       <div class="prop-carousel">
         <div class="carousel-track">
           <div class="carousel-slide">
@@ -1888,13 +2200,13 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£1,200 <span>/ month</span></div>
-          <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(1)">View Details</button>
         </div>
       </div>
     </div>
 
     <!-- Sample card 3 -->
-    <div class="prop-card" data-city="london" data-price="2100">
+    <div class="prop-card" data-city="london" data-price="2100" onclick="openPropModal(2)">
       <div class="prop-carousel">
         <div class="carousel-track">
           <div class="carousel-slide">
@@ -1916,7 +2228,7 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£2,100 <span>/ month</span></div>
-          <button class="prop-btn" onclick="openModal('student')">Enquire</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(2)">View Details</button>
         </div>
       </div>
     </div>
@@ -2275,6 +2587,55 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- PROPERTY DETAIL MODAL -->
+<div class="prop-modal-overlay" id="propModalOverlay" onclick="handlePropOverlayClick(event)">
+  <div class="prop-modal" id="propModal">
+    <button class="pm-close" onclick="closePropModal()" aria-label="Close">✕</button>
+
+    <!-- Gallery -->
+    <div class="pm-gallery">
+      <div class="pm-slides" id="pmSlides"></div>
+      <button class="pm-arrow pm-arrow-left" id="pmArrowLeft" onclick="pmSlide(-1)">&#8249;</button>
+      <button class="pm-arrow pm-arrow-right" id="pmArrowRight" onclick="pmSlide(1)">&#8250;</button>
+      <div class="pm-gallery-badges">
+        <span class="pm-verified-badge">We Link Verified</span>
+        <span class="pm-slide-counter" id="pmCounter"></span>
+      </div>
+      <div class="pm-dots" id="pmDots"></div>
+    </div>
+
+    <!-- Body -->
+    <div class="pm-body">
+      <div class="pm-content">
+        <div class="pm-location" id="pmLocation"></div>
+        <h2 class="pm-title" id="pmTitle"></h2>
+        <div class="pm-meta" id="pmMeta"></div>
+        <p class="pm-desc" id="pmDesc"></p>
+        <div class="pm-features-heading">Features &amp; Amenities</div>
+        <ul class="pm-features" id="pmFeatures"></ul>
+      </div>
+
+      <div class="pm-sidebar">
+        <div class="pm-price-box">
+          <div class="pm-price-label">Monthly rent</div>
+          <div class="pm-price" id="pmPrice"></div>
+          <div class="pm-price-sub">per month · subject to availability</div>
+        </div>
+        <div class="pm-verified-note">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0"><circle cx="10" cy="10" r="9" stroke="#0d1b2a" stroke-width="1.5"/><polyline points="6,10 9,13 14,7" stroke="#0d1b2a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Verified by We Link team</span>
+        </div>
+        <button class="pm-cta" onclick="closePropModal();openModal('student')">Apply with Guarantor</button>
+        <a class="pm-wa" id="pmWaLink" href="https://wa.me/message/YZY354NHZTVML1" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="#25d366" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.428a.75.75 0 0 0 .916.916l5.566-1.475A11.952 11.952 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.667-.523-5.188-1.435l-.372-.22-3.305.875.876-3.305-.22-.372A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Ask on WhatsApp
+        </a>
+        <div class="pm-disclaimer">Prices are indicative and subject to change. Contact us to confirm current availability and arrange a viewing.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -2716,4 +3077,154 @@ window.submitForm = async function() {
 (function(){if(!localStorage.getItem('wl_cookies')){var b=document.getElementById('cookieBanner');b.style.display='flex';}})();
 function acceptCookies(){localStorage.setItem('wl_cookies','accepted');document.getElementById('cookieBanner').style.display='none';}
 function declineCookies(){localStorage.setItem('wl_cookies','declined');document.getElementById('cookieBanner').style.display='none';}
+</script>
+
+<script>
+/* ── Property detail modal ── */
+const sampleProperties = [
+  {
+    name: 'Fallowfield Studio Apartment',
+    city: 'Manchester',
+    postcode: 'M14',
+    type: 'Studio',
+    beds: 'Studio',
+    baths: '1 Bath',
+    price: 950,
+    desc: 'A bright and fully furnished studio apartment in the heart of Fallowfield, one of Manchester\'s most popular student neighbourhoods. Walking distance from both the University of Manchester and Manchester Metropolitan University. All bills included in the rent.',
+    features: ['Bills included', 'Fully furnished', 'High-speed Wi-Fi', 'Central heating', 'Double glazing', 'Secure entry system', 'Close to campus', 'Near public transport'],
+    slides: [
+      { gradient: 'linear-gradient(135deg,#1a2e44,#0d1b2a)' },
+      { gradient: 'linear-gradient(135deg,#162236,#1a2e44)' },
+      { gradient: 'linear-gradient(135deg,#0d1b2a,#162236)' }
+    ]
+  },
+  {
+    name: 'Jesmond 2 Bed Flat',
+    city: 'Newcastle',
+    postcode: 'NE2',
+    type: '2 Bed',
+    beds: '2 Beds',
+    baths: '1 Bath',
+    price: 1200,
+    desc: 'A spacious two-bedroom flat in Jesmond, Newcastle\'s most sought-after residential neighbourhood. Minutes from Newcastle University and a short Metro ride to the city centre. Ideal for two students sharing — each bedroom is furnished with a double bed, wardrobe, and desk.',
+    features: ['Near Newcastle University', 'Jesmond Metro nearby', 'Fully furnished', 'Modern kitchen', 'Private bathroom', 'Managed building', 'Quiet residential street', 'Local amenities on your doorstep'],
+    slides: [
+      { gradient: 'linear-gradient(135deg,#162438,#1a2e44)' },
+      { gradient: 'linear-gradient(135deg,#1a2e44,#243c58)' },
+      { gradient: 'linear-gradient(135deg,#0f1f31,#162438)' }
+    ]
+  },
+  {
+    name: 'South Kensington 1 Bed',
+    city: 'London',
+    postcode: 'SW7',
+    type: '1 Bed',
+    beds: '1 Bed',
+    baths: '1 Bath',
+    price: 2100,
+    desc: 'A premium one-bedroom apartment in South Kensington, minutes from Imperial College London and the Natural History Museum. Perfect for postgraduate students who want to be close to campus in one of London\'s most prestigious and well-connected neighbourhoods.',
+    features: ['Minutes from Imperial College', 'South Kensington Tube', 'Premium location', 'Fully furnished', 'Modern appliances', 'Concierge building', 'Close to Hyde Park', 'Easy access across London'],
+    slides: [
+      { gradient: 'linear-gradient(135deg,#0d2233,#163044)' },
+      { gradient: 'linear-gradient(135deg,#163044,#1e3d56)' },
+      { gradient: 'linear-gradient(135deg,#091929,#0d2233)' }
+    ]
+  }
+];
+
+let pmCurrentSlide = 0;
+let pmTotalSlides  = 0;
+let pmCurrentProp  = null;
+
+function openPropModal(idx) {
+  const p = sampleProperties[idx];
+  if (!p) return;
+  pmCurrentProp  = p;
+  pmCurrentSlide = 0;
+  pmTotalSlides  = p.slides.length;
+
+  // Gallery
+  const slidesEl = document.getElementById('pmSlides');
+  slidesEl.innerHTML = p.slides.map(s =>
+    `<div class="pm-slide" style="background:${s.gradient}">
+       <svg viewBox="0 0 60 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:72px;height:62px;opacity:0.18">
+         <polyline points="2,28 30,4 58,28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+         <line x1="18" y1="28" x2="18" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+         <line x1="30" y1="18" x2="30" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+         <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
+       </svg>
+     </div>`
+  ).join('');
+
+  // Dots
+  const dotsEl = document.getElementById('pmDots');
+  dotsEl.innerHTML = p.slides.map((_, i) =>
+    `<span class="pm-dot${i===0?' active':''}" onclick="pmGoSlide(${i})"></span>`
+  ).join('');
+
+  // Arrows (hide if only 1 slide)
+  document.getElementById('pmArrowLeft').classList.toggle('hidden', pmTotalSlides <= 1);
+  document.getElementById('pmArrowRight').classList.toggle('hidden', pmTotalSlides <= 1);
+  dotsEl.style.display = pmTotalSlides <= 1 ? 'none' : 'flex';
+
+  pmGoSlide(0);
+
+  // Content
+  document.getElementById('pmLocation').textContent = `${p.city} · ${p.postcode}`;
+  document.getElementById('pmTitle').textContent = p.name;
+  document.getElementById('pmDesc').textContent = p.desc;
+  document.getElementById('pmPrice').textContent = `£${p.price.toLocaleString()}`;
+
+  // Meta pills
+  const pillIcons = {
+    type: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><path d="M2 10l6-6 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="10" width="8" height="5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
+    bed:  `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><rect x="1" y="7" width="14" height="7" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 10h14" stroke="currentColor" stroke-width="1.2"/><path d="M1 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`,
+    bath: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px"><path d="M3 8h10a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M4 8V4a2 2 0 0 1 4 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>`
+  };
+  document.getElementById('pmMeta').innerHTML = `
+    <span class="pm-pill">${pillIcons.type}${p.type}</span>
+    <span class="pm-pill">${pillIcons.bed}${p.beds}</span>
+    <span class="pm-pill">${pillIcons.bath}${p.baths}</span>`;
+
+  // Features
+  document.getElementById('pmFeatures').innerHTML = p.features.map(f => `<li>${f}</li>`).join('');
+
+  // WhatsApp link with pre-filled message
+  const msg = encodeURIComponent(`Hi, I'm interested in the ${p.name} (${p.city} · ${p.postcode}) — could you tell me more?`);
+  document.getElementById('pmWaLink').href = `https://wa.me/message/YZY354NHZTVML1?text=${msg}`;
+
+  // Open
+  document.getElementById('propModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePropModal() {
+  document.getElementById('propModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handlePropOverlayClick(e) {
+  if (e.target === document.getElementById('propModalOverlay')) closePropModal();
+}
+
+function pmGoSlide(idx) {
+  pmCurrentSlide = idx;
+  document.getElementById('pmSlides').style.transform = `translateX(-${idx * 100}%)`;
+  document.getElementById('pmCounter').textContent = `${idx + 1} / ${pmTotalSlides}`;
+  document.querySelectorAll('.pm-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+function pmSlide(dir) {
+  let next = pmCurrentSlide + dir;
+  if (next < 0) next = pmTotalSlides - 1;
+  if (next >= pmTotalSlides) next = 0;
+  pmGoSlide(next);
+}
+
+// Close prop modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('propModalOverlay').classList.contains('open')) closePropModal();
+  }
+});
 </script>
