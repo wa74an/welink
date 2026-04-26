@@ -2746,10 +2746,15 @@
       const res = await fetch(`${SB_URL}/rest/v1/properties?status=eq.Available&order=created_at.desc&select=*`, {
         headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
       });
-      allProperties = await res.json();
-      renderGrid();
+      const data = await res.json();
+      // Only replace sample cards if Supabase actually returned real listings
+      if (Array.isArray(data) && data.length > 0) {
+        allProperties = data;
+        renderGrid();
+      }
+      // If 0 results or error response, leave sample cards in place silently
     } catch(e) {
-      document.getElementById('propsLoading').textContent = 'Could not load properties — please refresh.';
+      // Network error — leave sample cards in place
     }
   }
 
@@ -2768,14 +2773,14 @@
 
     // Remove existing cards (including hardcoded sample cards)
     grid.querySelectorAll('.prop-card').forEach(c => c.remove());
-    loading.style.display = 'none';
+    if (loading) loading.style.display = 'none';
 
     if (!filtered.length) {
-      empty.style.display = 'block';
+      if (empty) empty.style.display = 'block';
       if (sampleNote) sampleNote.style.display = 'block';
       return;
     }
-    empty.style.display = 'none';
+    if (empty) empty.style.display = 'none';
     if (sampleNote) sampleNote.style.display = 'none';
 
     filtered.forEach((p, i) => {
