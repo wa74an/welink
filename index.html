@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -138,7 +138,94 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preconnect" href="https://hegstrjpfompikkwxmpl.supabase.co"/>
 <link rel="dns-prefetch" href="https://hegstrjpfompikkwxmpl.supabase.co"/>
+<!-- Arabic font loaded on-demand by i18n.js -->
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"/>
+<style>
+  /* ====== LANG SWITCHER ====== */
+  /* Sits as a direct child of <nav>, always visible on desktop & mobile */
+  .lang-switcher {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(13,27,42,0.22);
+    border-radius: 2px;
+    overflow: hidden;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    /* ensure it's always in the flow even when ul is hidden */
+    order: 1;
+  }
+  .lang-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 7px 13px;
+    color: var(--text-light);
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    font-weight: inherit;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+  }
+  .lang-btn.active {
+    background: var(--navy);
+    color: #fff;
+  }
+  .lang-btn:hover:not(.active) { background: rgba(13,27,42,0.06); color: var(--navy); }
+  .lang-sep { width: 1px; background: rgba(13,27,42,0.22); align-self: stretch; }
+  /* On mobile, squeeze nav so logo + switcher + hamburger all fit */
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .lang-switcher { margin-right: 10px; }
+  }
+
+  /* ====== RTL overrides ====== */
+  [dir="rtl"] nav { flex-direction: row-reverse; }
+  [dir="rtl"] nav ul { flex-direction: row-reverse; }
+  [dir="rtl"] .mobile-menu { text-align: right; }
+  [dir="rtl"] .hero { flex-direction: row-reverse; }
+  [dir="rtl"] .hero-actions { flex-direction: row-reverse; }
+  [dir="rtl"] .how-grid { flex-direction: row-reverse; }
+  [dir="rtl"] .services-grid { flex-direction: row-reverse; }
+  [dir="rtl"] .landlord { flex-direction: row-reverse; }
+  [dir="rtl"] .footer-top { flex-direction: row-reverse; }
+  [dir="rtl"] .footer-links { flex-direction: row-reverse; }
+  [dir="rtl"] .perk { flex-direction: row-reverse; }
+  [dir="rtl"] .pm-body { flex-direction: column; }
+  [dir="rtl"] .pm-meta { flex-direction: row-reverse; }
+
+  /* ====== VIDEO EMBED ====== */
+  .pm-video-section {
+    margin: 20px 0 0;
+    display: none;
+  }
+  .pm-video-section.visible { display: block; }
+  .pm-video-heading {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+  .pm-video-wrap {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 */
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--navy);
+  }
+  .pm-video-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"/></noscript>
 <style>
   :root {
@@ -1932,13 +2019,19 @@
     <span class="nav-logo-text">We Link</span>
   </a>
   <ul>
-    <li><a href="#how">How It Works</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#properties">Properties</a></li>
-    <li><a href="#landlords">For Landlords</a></li>
-    <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important;transition:background 0.2s,border-color 0.2s!important" onmouseover="this.style.background='rgba(13,27,42,0.06)'" onmouseout="this.style.background=''">Student Login</a></li>
-    <li><a href="#" class="nav-btn" onclick="openModal()">Get Started</a></li>
+    <li><a href="#how" data-i18n="nav_how">How It Works</a></li>
+    <li><a href="#services" data-i18n="nav_services">Services</a></li>
+    <li><a href="#properties" data-i18n="nav_properties">Properties</a></li>
+    <li><a href="#landlords" data-i18n="nav_landlords">For Landlords</a></li>
+    <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important;transition:background 0.2s,border-color 0.2s!important" onmouseover="this.style.background='rgba(13,27,42,0.06)'" onmouseout="this.style.background=''" data-i18n="nav_login">Student Login</a></li>
+    <li><a href="#" class="nav-btn" onclick="openModal()" data-i18n="nav_cta">Get Started</a></li>
   </ul>
+  <!-- Lang switcher lives outside <ul> so it stays visible on mobile too -->
+  <div class="lang-switcher" aria-label="Language switcher">
+    <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" data-lang="ar" onclick="setLang('ar')">AR</button>
+  </div>
   <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -1946,23 +2039,28 @@
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#how" onclick="closeMenu()">How It Works</a>
-  <a href="#services" onclick="closeMenu()">Services</a>
-  <a href="#properties" onclick="closeMenu()">Properties</a>
-  <a href="#landlords" onclick="closeMenu()">For Landlords</a>
-  <a href="/login" onclick="closeMenu()">Student Login</a>
-  <a href="#" class="mobile-cta" onclick="closeMenu(); openModal()">Get Started</a>
+  <a href="#how" onclick="closeMenu()" data-i18n="nav_how">How It Works</a>
+  <a href="#services" onclick="closeMenu()" data-i18n="nav_services">Services</a>
+  <a href="#properties" onclick="closeMenu()" data-i18n="nav_properties">Properties</a>
+  <a href="#landlords" onclick="closeMenu()" data-i18n="nav_landlords">For Landlords</a>
+  <a href="/login" onclick="closeMenu()" data-i18n="nav_login">Student Login</a>
+  <a href="#" class="mobile-cta" onclick="closeMenu(); openModal()" data-i18n="nav_cta">Get Started</a>
+  <div style="display:flex;gap:0;border:1px solid rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;width:fit-content;margin-top:8px">
+    <button style="background:none;border:none;cursor:pointer;padding:8px 16px;color:rgba(255,255,255,0.5);font-family:inherit;font-size:0.75rem;letter-spacing:0.1em" class="lang-btn active" data-lang="en" onclick="setLang('en');closeMenu()">EN</button>
+    <div style="width:1px;background:rgba(255,255,255,0.2)"></div>
+    <button style="background:none;border:none;cursor:pointer;padding:8px 16px;color:rgba(255,255,255,0.5);font-family:inherit;font-size:0.75rem;letter-spacing:0.1em" class="lang-btn" data-lang="ar" onclick="setLang('ar');closeMenu()">AR</button>
+  </div>
 </div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-eyebrow">For GCC Students in the UK</div>
-    <h1>Looking for a<br/><em>guarantor?</em><br/>We link you.</h1>
-    <p>We Link connects GCC students with trusted UK guarantors and verified apartments — removing the biggest barrier to renting in Britain.</p>
+    <div class="hero-eyebrow" data-i18n="hero_eyebrow">For GCC Students in the UK</div>
+    <h1 data-i18n-html="hero_h1">Looking for a<br/><em>guarantor?</em><br/>We link you.</h1>
+    <p data-i18n="hero_p">We Link connects GCC students with trusted UK guarantors and verified apartments — removing the biggest barrier to renting in Britain.</p>
     <div class="hero-actions">
-      <button class="btn-primary" onclick="openModal('student')">Find a Guarantor</button>
-      <button class="btn-outline" onclick="openModal('landlord')">List a Property</button>
+      <button class="btn-primary" onclick="openModal('student')" data-i18n="hero_cta_student">Find a Guarantor</button>
+      <button class="btn-outline" onclick="openModal('landlord')" data-i18n="hero_cta_landlord">List a Property</button>
     </div>
   </div>
   <div class="hero-right">
@@ -1974,24 +2072,24 @@
         <line x1="42" y1="28" x2="42" y2="50" stroke="white" stroke-width="3" stroke-linecap="round"/>
       </svg>
       <span class="brand-name">We Link</span>
-      <span class="brand-tagline">Linking Tenants & Landlords</span>
+      <span class="brand-tagline" data-i18n="footer_tagline">Linking Tenants & Landlords</span>
     </div>
     <div class="hero-stats">
       <div class="hero-stat">
-        <span class="hero-stat-num" style="font-size:1.6rem;line-height:1.2">Thousands of</span>
-        <span class="hero-stat-label">GCC Students in the UK</span>
+        <span class="hero-stat-num" style="font-size:1.6rem;line-height:1.2" data-i18n="hero_stat1_num">Thousands of</span>
+        <span class="hero-stat-label" data-i18n="hero_stat1_label">GCC Students in the UK</span>
       </div>
       <div class="hero-stat">
         <span class="hero-stat-num">48h</span>
-        <span class="hero-stat-label">Target Approval</span>
+        <span class="hero-stat-label" data-i18n="hero_stat2_label">Target Approval</span>
       </div>
       <div class="hero-stat">
         <span class="hero-stat-num">6</span>
-        <span class="hero-stat-label">GCC Countries Served</span>
+        <span class="hero-stat-label" data-i18n="hero_stat3_label">GCC Countries Served</span>
       </div>
       <div class="hero-stat">
-        <span class="hero-stat-num" style="font-size:1.6rem;line-height:1.2">Every Listing</span>
-        <span class="hero-stat-label">Verified by Our Team</span>
+        <span class="hero-stat-num" style="font-size:1.6rem;line-height:1.2" data-i18n="hero_stat4_num">Every Listing</span>
+        <span class="hero-stat-label" data-i18n="hero_stat4_label">Verified by Our Team</span>
       </div>
     </div>
   </div>
@@ -1999,57 +2097,57 @@
 
 <!-- HOW IT WORKS -->
 <section class="how" id="how">
-  <div class="section-label">The Process</div>
-  <h2 class="section-title">Simple from day one.</h2>
+  <div class="section-label" data-i18n="how_label">The Process</div>
+  <h2 class="section-title" data-i18n="how_title">Simple from day one.</h2>
   <div class="how-grid">
     <div class="how-col">
-      <h3>For Students</h3>
+      <h3 data-i18n="how_students">For Students</h3>
       <div class="how-steps">
         <div class="how-step">
           <div class="step-num">01</div>
           <div class="step-content">
-            <h4>Apply Online</h4>
-            <p>Complete a short application in under 10 minutes. Tell us your university, budget, and move-in date.</p>
+            <h4 data-i18n="how_s1_h">Apply Online</h4>
+            <p data-i18n="how_s1_p">Complete a short application in under 10 minutes. Tell us your university, budget, and move-in date.</p>
           </div>
         </div>
         <div class="how-step">
           <div class="step-num">02</div>
           <div class="step-content">
-            <h4>Get Approved</h4>
-            <p>We verify your details and approve your guarantor request within 48 hours. No UK credit history needed.</p>
+            <h4 data-i18n="how_s2_h">Get Approved</h4>
+            <p data-i18n="how_s2_p">We verify your details and approve your guarantor request within 48 hours. No UK credit history needed.</p>
           </div>
         </div>
         <div class="how-step">
           <div class="step-num">03</div>
           <div class="step-content">
-            <h4>Browse Listings</h4>
-            <p>Access our curated network of GCC-friendly apartments, all pre-vetted and We Link verified.</p>
+            <h4 data-i18n="how_s3_h">Browse Listings</h4>
+            <p data-i18n="how_s3_p">Access our curated network of GCC-friendly apartments, all pre-vetted and We Link verified.</p>
           </div>
         </div>
         <div class="how-step">
           <div class="step-num">04</div>
           <div class="step-content">
-            <h4>Move In</h4>
-            <p>We handle the guarantor paperwork. You sign your lease and move in with full peace of mind.</p>
+            <h4 data-i18n="how_s4_h">Move In</h4>
+            <p data-i18n="how_s4_p">We handle the guarantor paperwork. You sign your lease and move in with full peace of mind.</p>
           </div>
         </div>
       </div>
     </div>
     <div class="how-col">
-      <h3>For Landlords</h3>
+      <h3 data-i18n="how_landlords">For Landlords</h3>
       <div class="how-steps">
         <div class="how-step">
           <div class="step-num">01</div>
           <div class="step-content">
-            <h4>List Your Property</h4>
-            <p>Submit your property details. We verify and publish your listing to our active student network.</p>
+            <h4 data-i18n="how_l1_h">List Your Property</h4>
+            <p data-i18n="how_l1_p">Submit your property details. We verify and publish your listing to our active student network.</p>
           </div>
         </div>
         <div class="how-step">
           <div class="step-num">02</div>
           <div class="step-content">
-            <h4>Receive Qualified Tenants</h4>
-            <p>We send you pre-screened GCC student applicants — known for reliability and often paying rent upfront.</p>
+            <h4 data-i18n="how_l2_h">Receive Qualified Tenants</h4>
+            <p data-i18n="how_l2_p">We send you pre-screened GCC student applicants — known for reliability and often paying rent upfront.</p>
           </div>
         </div>
         <div class="how-step">
@@ -2073,8 +2171,8 @@
 
 <!-- SERVICES -->
 <section class="services" id="services">
-  <div class="section-label">What We Offer</div>
-  <h2 class="section-title">Everything you need<br/>to rent in the UK.</h2>
+  <div class="section-label" data-i18n="services_label">What We Offer</div>
+  <h2 class="section-title" data-i18n-html="services_title">Everything you need<br/>to rent in the UK.</h2>
   <div class="services-grid">
     <div class="service-card">
       <div class="service-icon">
@@ -2084,8 +2182,8 @@
           <path d="M14 8v4M30 8v4" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </div>
-      <h3>Guarantor Services</h3>
-      <p>We act as your UK-based guarantor, accepted by landlords and letting agents across England, Scotland, and Wales.</p>
+      <h3 data-i18n="services_1_h">Guarantor Services</h3>
+      <p data-i18n="services_1_p">We act as your UK-based guarantor, accepted by landlords and letting agents across England, Scotland, and Wales.</p>
     </div>
     <div class="service-card">
       <div class="service-icon">
@@ -2094,8 +2192,8 @@
           <rect x="4" y="6" width="36" height="32" rx="2" stroke="#0d1b2a" stroke-width="2" fill="none"/>
         </svg>
       </div>
-      <h3>Verified Listings</h3>
-      <p>Browse apartments hand-picked for GCC students — filtered by city, budget, and proximity to your university.</p>
+      <h3 data-i18n="services_2_h">Verified Listings</h3>
+      <p data-i18n="services_2_p">Browse apartments hand-picked for GCC students — filtered by city, budget, and proximity to your university.</p>
     </div>
     <div class="service-card">
       <div class="service-icon">
@@ -2104,31 +2202,31 @@
           <path d="M8 38c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </div>
-      <h3>Concierge Support</h3>
-      <p>Dedicated support team fluent in Arabic and English. We guide you through every step of the rental process.</p>
+      <h3 data-i18n="services_3_h">Concierge Support</h3>
+      <p data-i18n="services_3_p">Dedicated support team fluent in Arabic and English. We guide you through every step of the rental process.</p>
     </div>
   </div>
 </section>
 
 <!-- CTA BAND -->
 <div class="cta-band">
-  <h2>Ready to find your<br/><em>perfect place?</em></h2>
-  <button class="btn-white" onclick="openModal('student')">Start Your Application</button>
+  <h2 data-i18n-html="cta_band_h">Ready to find your<br/><em>perfect place?</em></h2>
+  <button class="btn-white" onclick="openModal('student')" data-i18n="cta_band_btn">Start Your Application</button>
 </div>
 
 <!-- PROPERTIES -->
 <section class="properties" id="properties">
   <div class="properties-header">
     <div class="properties-header-left">
-      <div class="section-label">Available Now</div>
-      <h2>Browse <em>verified</em><br/>properties.</h2>
+      <div class="section-label" data-i18n="props_label">Available Now</div>
+      <h2 data-i18n-html="props_title">Browse <em>verified</em><br/>properties.</h2>
     </div>
-    <p style="font-size:0.85rem;font-weight:300;color:var(--text-light);max-width:300px;line-height:1.7;">All listings are hand-verified by We Link and open to GCC students with our guarantor service.</p>
+    <p style="font-size:0.85rem;font-weight:300;color:var(--text-light);max-width:300px;line-height:1.7;" data-i18n="props_subtitle">All listings are hand-verified by We Link and open to GCC students with our guarantor service.</p>
   </div>
 
   <!-- Filters -->
   <div class="filter-bar">
-    <button class="filter-pill active" data-city="all" onclick="filterProps('all', this)">All Cities</button>
+    <button class="filter-pill active" data-city="all" onclick="filterProps('all', this)" data-i18n="filter_all">All Cities</button>
     <button class="filter-pill" data-city="newcastle" onclick="filterProps('newcastle', this)">Newcastle</button>
     <button class="filter-pill" data-city="manchester" onclick="filterProps('manchester', this)">Manchester</button>
     <button class="filter-pill" data-city="london" onclick="filterProps('london', this)">London</button>
@@ -2136,15 +2234,15 @@
     <button class="filter-pill" data-city="edinburgh" onclick="filterProps('edinburgh', this)">Edinburgh</button>
     <button class="filter-pill" data-city="cardiff" onclick="filterProps('cardiff', this)">Cardiff</button>
     <select class="filter-select-bar" onchange="sortProps(this.value)">
-      <option value="default">Sort: Featured</option>
-      <option value="low">Price: Low to High</option>
-      <option value="high">Price: High to Low</option>
+      <option value="default" data-i18n="sort_featured">Sort: Featured</option>
+      <option value="low" data-i18n="sort_low">Price: Low to High</option>
+      <option value="high" data-i18n="sort_high">Price: High to Low</option>
     </select>
   </div>
 
   <!-- Sample listings note (hidden when live data loads) -->
   <div id="sampleNote" style="text-align:center;margin-bottom:8px">
-    <span style="display:inline-block;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);padding:8px 20px;border:1px solid var(--border);border-radius:2px">Sample listings. Full inventory launching soon.</span>
+    <span style="display:inline-block;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-light);padding:8px 20px;border:1px solid var(--border);border-radius:2px" data-i18n="sample_note">Sample listings. Full inventory launching soon.</span>
   </div>
 
   <!-- Properties grid — sample cards -->
@@ -2172,7 +2270,7 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£950 <span>/ month</span></div>
-          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[0])">View Details</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[0])" data-i18n="prop_view">View Details</button>
         </div>
       </div>
     </div>
@@ -2200,7 +2298,7 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£1,200 <span>/ month</span></div>
-          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[1])">View Details</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[1])" data-i18n="prop_view">View Details</button>
         </div>
       </div>
     </div>
@@ -2228,30 +2326,30 @@
         </div>
         <div class="prop-footer">
           <div class="prop-price">£2,100 <span>/ month</span></div>
-          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[2])">View Details</button>
+          <button class="prop-btn" onclick="event.stopPropagation();openPropModal(sampleProperties[2])" data-i18n="prop_view">View Details</button>
         </div>
       </div>
     </div>
   </div>
 
   <div class="load-more-wrap">
-    <button class="btn-outline" onclick="openModal('student')">Request a Custom Search →</button>
+    <button class="btn-outline" onclick="openModal('student')" data-i18n="props_more_btn">Request a Custom Search →</button>
   </div>
 </section>
 
 <!-- LANDLORDS -->
 <section class="landlord" id="landlords">
   <div class="landlord-text">
-    <div class="section-label">For Landlords</div>
-    <h2>Reliable tenants.<br/><em>Guaranteed.</em></h2>
-    <p>Every tenant on We Link is pre-screened and backed by our UK based guarantor service. Many students pay rent several months upfront, giving landlords predictable income and minimal administrative burden.</p>
+    <div class="section-label" data-i18n="landlord_label">For Landlords</div>
+    <h2 data-i18n-html="landlord_h">Reliable tenants.<br/><em>Guaranteed.</em></h2>
+    <p data-i18n="landlord_p">Every tenant on We Link is pre-screened and backed by our UK based guarantor service. Many students pay rent several months upfront, giving landlords predictable income and minimal administrative burden.</p>
     <div class="landlord-perks">
-      <div class="perk"><div class="perk-dot"></div><p>We Link acts as the UK guarantor — full legal protection for you</p></div>
-      <div class="perk"><div class="perk-dot"></div><p>Access to a growing pool of pre-screened, verified students</p></div>
-      <div class="perk"><div class="perk-dot"></div><p>Free listing submission — we only charge on successful placement</p></div>
-      <div class="perk"><div class="perk-dot"></div><p>Dedicated landlord dashboard to track applications and tenancies</p></div>
+      <div class="perk"><div class="perk-dot"></div><p data-i18n="landlord_perk1">We Link acts as the UK guarantor — full legal protection for you</p></div>
+      <div class="perk"><div class="perk-dot"></div><p data-i18n="landlord_perk2">Access to a growing pool of pre-screened, verified students</p></div>
+      <div class="perk"><div class="perk-dot"></div><p data-i18n="landlord_perk3">Free listing submission — we only charge on successful placement</p></div>
+      <div class="perk"><div class="perk-dot"></div><p data-i18n="landlord_perk4">Dedicated landlord dashboard to track applications and tenancies</p></div>
     </div>
-    <button class="btn-primary" onclick="openModal('landlord')">List Your Property</button>
+    <button class="btn-primary" onclick="openModal('landlord')" data-i18n="landlord_btn">List Your Property</button>
   </div>
   <div class="landlord-visual">
     <div class="listing-preview">
@@ -2309,33 +2407,33 @@
         </svg>
         <span>We Link</span>
       </div>
-      <div class="footer-tagline">Linking Tenants & Landlords</div>
+      <div class="footer-tagline" data-i18n="footer_tagline">Linking Tenants & Landlords</div>
     </div>
     <div class="footer-links">
       <div class="footer-col">
-        <h4>Students</h4>
+        <h4 data-i18n="footer_students">Students</h4>
         <ul>
-          <li><a href="#how">How It Works</a></li>
-          <li><a href="#services">Guarantor Service</a></li>
-          <li><a href="#properties">Browse Listings</a></li>
-          <li><a href="#" onclick="openModal('student'); return false;">Apply Now</a></li>
+          <li><a href="#how" data-i18n="footer_how">How It Works</a></li>
+          <li><a href="#services" data-i18n="footer_guarantor">Guarantor Service</a></li>
+          <li><a href="#properties" data-i18n="footer_browse">Browse Listings</a></li>
+          <li><a href="#" onclick="openModal('student'); return false;" data-i18n="footer_apply">Apply Now</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Landlords</h4>
+        <h4 data-i18n="footer_landlords">Landlords</h4>
         <ul>
-          <li><a href="#" onclick="openModal('landlord'); return false;">List a Property</a></li>
-          <li><a href="#landlords">Our Guarantee</a></li>
-          <li><a href="/pricing">Pricing</a></li>
-          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="#" onclick="openModal('landlord'); return false;" data-i18n="footer_list">List a Property</a></li>
+          <li><a href="#landlords" data-i18n="footer_tenants">Our Guarantee</a></li>
+          <li><a href="/pricing" data-i18n="footer_pricing">Pricing</a></li>
+          <li><a href="/contact" data-i18n="footer_contact">Contact Us</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Company</h4>
+        <h4 data-i18n="footer_company">Company</h4>
         <ul>
-          <li><a href="/about">About</a></li>
-          <li><a href="/privacy">Privacy Policy</a></li>
-          <li><a href="/terms">Terms</a></li>
+          <li><a href="/about" data-i18n="footer_about">About</a></li>
+          <li><a href="/privacy" data-i18n="footer_privacy">Privacy Policy</a></li>
+          <li><a href="/terms" data-i18n="footer_terms">Terms</a></li>
         </ul>
       </div>
     </div>
@@ -2343,7 +2441,7 @@
   <div class="footer-bottom">
     <div>
       <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);line-height:1.7;margin-bottom:6px">We Link is a Kuwaiti company providing guarantor and housing services for GCC students in the United Kingdom. Company Registration: [TBD].</div>
-      <div class="footer-copy">© 2026 We Link. All rights reserved.</div>
+      <div class="footer-copy" data-i18n="footer_copy">© 2026 We Link. All rights reserved.</div>
     </div>
     <div style="display:flex;gap:14px;align-items:center">
       <a href="https://wa.me/message/YZY354NHZTVML1" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.4);transition:color 0.2s;text-decoration:none" onmouseover="this.style.color='#25d366'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
@@ -2615,26 +2713,33 @@
         <h2 class="pm-title" id="pmTitle"></h2>
         <div class="pm-meta" id="pmMeta"></div>
         <p class="pm-desc" id="pmDesc"></p>
-        <div class="pm-features-heading">Features &amp; Amenities</div>
+        <div class="pm-features-heading" data-i18n="pm_features_h">Features &amp; Amenities</div>
         <ul class="pm-features" id="pmFeatures"></ul>
+        <!-- Video embed (shown only when video_url is set) -->
+        <div class="pm-video-section" id="pmVideoSection">
+          <div class="pm-video-heading" data-i18n="pm_video_title">Property Video</div>
+          <div class="pm-video-wrap">
+            <iframe id="pmVideoFrame" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+          </div>
+        </div>
       </div>
 
       <div class="pm-sidebar">
         <div class="pm-price-box">
-          <div class="pm-price-label">Monthly rent</div>
+          <div class="pm-price-label" data-i18n="pm_rent_label">Monthly rent</div>
           <div class="pm-price" id="pmPrice"></div>
-          <div class="pm-price-sub">per month · subject to availability</div>
+          <div class="pm-price-sub" data-i18n="pm_per_month">per month · subject to availability</div>
         </div>
         <div class="pm-verified-note">
           <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0"><circle cx="10" cy="10" r="9" stroke="#0d1b2a" stroke-width="1.5"/><polyline points="6,10 9,13 14,7" stroke="#0d1b2a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Verified by We Link team</span>
+          <span data-i18n="pm_verified">Verified by We Link team</span>
         </div>
-        <button class="pm-cta" onclick="closePropModal();openModal('student')">Apply with Guarantor</button>
+        <button class="pm-cta" onclick="closePropModal();openModal('student')" data-i18n="pm_apply_btn">Apply with Guarantor</button>
         <a class="pm-wa" id="pmWaLink" href="https://wa.me/message/YZY354NHZTVML1" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="#25d366" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.428a.75.75 0 0 0 .916.916l5.566-1.475A11.952 11.952 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.667-.523-5.188-1.435l-.372-.22-3.305.875.876-3.305-.22-.372A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-          Ask on WhatsApp
+          <span data-i18n="pm_wa_btn">Ask on WhatsApp</span>
         </a>
-        <div class="pm-disclaimer">Prices are indicative and subject to change. Contact us to confirm current availability and arrange a viewing.</div>
+        <div class="pm-disclaimer" data-i18n="pm_disclaimer">Prices are indicative and subject to change. Contact us to confirm current availability and arrange a viewing.</div>
       </div>
     </div>
   </div>
@@ -3223,13 +3328,51 @@ function openPropModal(prop) {
   const msg = encodeURIComponent(`Hi, I'm interested in ${prop.name} (${loc}) — could you tell me more?`);
   document.getElementById('pmWaLink').href = `https://wa.me/message/YZY354NHZTVML1?text=${msg}`;
 
+  // Video embed — whitelist YouTube and Vimeo only
+  const videoSection = document.getElementById('pmVideoSection');
+  const videoFrame   = document.getElementById('pmVideoFrame');
+  const embedUrl = buildVideoEmbedUrl(prop.video_url);
+  if (embedUrl) {
+    videoFrame.src = embedUrl;
+    videoSection.classList.add('visible');
+  } else {
+    videoFrame.src = '';
+    videoSection.classList.remove('visible');
+  }
+
   document.getElementById('propModalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+/* Convert a YouTube/Vimeo watch URL into a safe embed URL.
+   Returns null for missing, empty, or non-whitelisted URLs. */
+function buildVideoEmbedUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  url = url.trim();
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '');
+    // YouTube
+    if (host === 'youtube.com' && u.searchParams.get('v')) {
+      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+    }
+    if (host === 'youtu.be' && u.pathname.length > 1) {
+      return `https://www.youtube.com/embed${u.pathname}`;
+    }
+    // Vimeo
+    if (host === 'vimeo.com') {
+      const id = u.pathname.split('/').filter(Boolean)[0];
+      if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}`;
+    }
+  } catch (_) { /* invalid URL */ }
+  return null;
 }
 
 function closePropModal() {
   document.getElementById('propModalOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  // Stop video playback by clearing the src
+  document.getElementById('pmVideoFrame').src = '';
 }
 
 function handlePropOverlayClick(e) {
@@ -3257,3 +3400,5 @@ document.addEventListener('keydown', function(e) {
   }
 });
 </script>
+<script src="translations.js"></script>
+<script src="i18n.js"></script>

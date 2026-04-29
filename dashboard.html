@@ -1410,6 +1410,10 @@
         <textarea id="p-notes" placeholder="Furnished, bills, availability..."></textarea>
       </div>
       <div class="form-group">
+        <label>Video URL <span style="font-weight:300;opacity:0.5;font-size:0.65rem;letter-spacing:0.06em">(YouTube or Vimeo — optional)</span></label>
+        <input type="url" id="p-video" placeholder="https://www.youtube.com/watch?v=..."/>
+      </div>
+      <div class="form-group">
         <label>Property Images <span style="font-weight:300;opacity:0.5;font-size:0.65rem;letter-spacing:0.06em">(up to 6 — students can scroll through)</span></label>
         <div id="imgUploadArea" style="border:1px dashed var(--border);border-radius:3px;padding:16px;text-align:center;cursor:pointer;transition:border-color 0.2s" onclick="document.getElementById('p-img').click()" ondragover="event.preventDefault();this.style.borderColor='rgba(255,255,255,0.4)'" ondragleave="this.style.borderColor=''" ondrop="handleImgDrop(event)">
           <input type="file" id="p-img" accept="image/*" multiple style="display:none" onchange="previewImgs(this)"/>
@@ -1830,6 +1834,15 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 });
 
 // ===== PROPERTIES CRUD =====
+function isAllowedVideoUrl(url) {
+  if (!url) return true; // empty is fine (optional field)
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '');
+    return host === 'youtube.com' || host === 'youtu.be' || host === 'vimeo.com';
+  } catch (_) { return false; }
+}
+
 async function addProperty() {
   const name = document.getElementById('p-name').value.trim();
   if (!name) { showToast('Please enter a property name'); return; }
@@ -1845,6 +1858,14 @@ async function addProperty() {
     imageUrl = await uploadAllImages(name);
   }
 
+  const rawVideoUrl = (document.getElementById('p-video')?.value || '').trim();
+  const validVideoUrl = isAllowedVideoUrl(rawVideoUrl) ? rawVideoUrl : null;
+  if (rawVideoUrl && !validVideoUrl) {
+    showToast('Video URL must be a YouTube or Vimeo link');
+    btn.textContent = 'Save Property'; btn.disabled = false;
+    return;
+  }
+
   const newP = {
     name,
     city: document.getElementById('p-city').value,
@@ -1856,7 +1877,8 @@ async function addProperty() {
     notes: document.getElementById('p-notes').value || '',
     status: document.getElementById('p-status').value,
     emoji: emojis[Math.floor(Math.random()*emojis.length)],
-    image_url: imageUrl
+    image_url: imageUrl,
+    video_url: validVideoUrl || null
   };
   btn.textContent = 'Saving...';
   const result = await sb('properties', 'POST', newP);
@@ -1867,7 +1889,7 @@ async function addProperty() {
     closeModal('addProperty');
     resetImgUpload();
     showToast('Property saved ✓');
-    ['p-name','p-postcode','p-rent','p-beds','p-baths','p-notes'].forEach(id => document.getElementById(id).value = '');
+    ['p-name','p-postcode','p-rent','p-beds','p-baths','p-notes','p-video'].forEach(id => document.getElementById(id).value = '');
   } else {
     showToast('Error saving — please try again');
   }
@@ -1886,6 +1908,7 @@ async function editPropertyPrompt(id) {
   document.getElementById('p-baths').value = p.baths;
   document.getElementById('p-notes').value = p.notes || '';
   document.getElementById('p-status').value = p.status;
+  document.getElementById('p-video').value = p.video_url || '';
   // Change save button to update
   const btn = document.querySelector('#modal-addProperty .btn-sm.primary');
   btn.textContent = 'Update Property';
@@ -1908,6 +1931,14 @@ async function updateProperty(id) {
     imageUrl = await uploadAllImages(name);
   }
 
+  const rawVideoUrl = (document.getElementById('p-video')?.value || '').trim();
+  const validVideoUrl = isAllowedVideoUrl(rawVideoUrl) ? rawVideoUrl : null;
+  if (rawVideoUrl && !validVideoUrl) {
+    showToast('Video URL must be a YouTube or Vimeo link');
+    btn.textContent = 'Save Property'; btn.disabled = false;
+    return;
+  }
+
   const updated = {
     name,
     city: document.getElementById('p-city').value,
@@ -1917,7 +1948,8 @@ async function updateProperty(id) {
     beds: parseInt(document.getElementById('p-beds').value) || 0,
     baths: parseInt(document.getElementById('p-baths').value) || 1,
     notes: document.getElementById('p-notes').value,
-    status: document.getElementById('p-status').value
+    status: document.getElementById('p-status').value,
+    video_url: validVideoUrl || null
   };
 
   // Only include image_url if a new image was uploaded
