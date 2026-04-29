@@ -1909,6 +1909,8 @@ async function editPropertyPrompt(id) {
   document.getElementById('p-notes').value = p.notes || '';
   document.getElementById('p-status').value = p.status;
   document.getElementById('p-video').value = p.video_url || '';
+  // Show existing images in the preview area
+  showExistingImgPreviews(p.image_url);
   // Change save button to update
   const btn = document.querySelector('#modal-addProperty .btn-sm.primary');
   btn.textContent = 'Update Property';
@@ -2174,6 +2176,31 @@ function closeSidebar() { document.getElementById('sidebar').classList.remove('o
 // ===== IMAGE HANDLING =====
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3N0cmpwZm9tcGlra3d4bXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTk4ODksImV4cCI6MjA5MDc5NTg4OX0.1vZXK6lrlI3yprlCPopgZoo1EOtjJg3YVdwHrKeT83w';
 const SBASE = 'https://hegstrjpfompikkwxmpl.supabase.co';
+
+/* Show URLs already saved in Supabase as numbered thumbnails (edit mode) */
+function showExistingImgPreviews(imageUrl) {
+  const previews = document.getElementById('imgPreviews');
+  const placeholder = document.getElementById('imgPlaceholder');
+  previews.innerHTML = '';
+  if (!imageUrl) { placeholder.style.display = 'block'; return; }
+  const urls = imageUrl.split(',').map(u => u.trim()).filter(Boolean).slice(0, 6);
+  if (!urls.length) { placeholder.style.display = 'block'; return; }
+  placeholder.style.display = 'none';
+  urls.forEach((url, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;display:inline-block';
+    wrap.innerHTML = `
+      <img src="${url}" style="width:72px;height:56px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,255,255,0.1)" onerror="this.style.background='rgba(255,255,255,0.05)';this.removeAttribute('src')"/>
+      <div style="position:absolute;top:-4px;right:-4px;background:var(--navy);color:white;border-radius:50%;width:16px;height:16px;font-size:0.55rem;display:flex;align-items:center;justify-content:center;font-weight:600">${i + 1}</div>
+    `;
+    previews.appendChild(wrap);
+  });
+  /* Note below thumbnails */
+  const note = document.createElement('div');
+  note.style.cssText = 'width:100%;text-align:center;font-size:0.72rem;color:var(--text-light);margin-top:4px';
+  note.textContent = 'Upload new photos to replace these';
+  previews.appendChild(note);
+}
 
 function previewImgs(input) {
   const previews = document.getElementById('imgPreviews');

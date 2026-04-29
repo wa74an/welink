@@ -225,6 +225,23 @@
     height: 100%;
     border: none;
   }
+
+  /* ====== MAP EMBED ====== */
+  .pm-map-section {
+    margin: 20px 0 0;
+  }
+  .pm-map-wrap {
+    width: 100%;
+    height: 280px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--navy);
+  }
+  .pm-map-wrap iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
 </style>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"/></noscript>
 <style>
@@ -2722,6 +2739,14 @@
             <iframe id="pmVideoFrame" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
           </div>
         </div>
+
+        <!-- Map embed -->
+        <div class="pm-map-section">
+          <div class="pm-video-heading" data-i18n="pm_map_title">Location</div>
+          <div class="pm-map-wrap">
+            <iframe id="pmMapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          </div>
+        </div>
       </div>
 
       <div class="pm-sidebar">
@@ -3340,6 +3365,11 @@ function openPropModal(prop) {
     videoSection.classList.remove('visible');
   }
 
+  // Map embed — build query from postcode + city
+  const mapQuery = [prop.postcode, prop.city, 'UK'].filter(Boolean).join(', ');
+  document.getElementById('pmMapFrame').src =
+    `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed&z=15`;
+
   document.getElementById('propModalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3371,8 +3401,8 @@ function buildVideoEmbedUrl(url) {
 function closePropModal() {
   document.getElementById('propModalOverlay').classList.remove('open');
   document.body.style.overflow = '';
-  // Stop video playback by clearing the src
   document.getElementById('pmVideoFrame').src = '';
+  document.getElementById('pmMapFrame').src = '';
 }
 
 function handlePropOverlayClick(e) {

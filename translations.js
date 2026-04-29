@@ -79,6 +79,7 @@ const TRANSLATIONS = {
     pm_disclaimer:  'Prices are indicative and subject to change. Contact us to confirm current availability and arrange a viewing.',
     pm_verified_badge: 'We Link Verified',
     pm_video_title: 'Property Video',
+    pm_map_title:   'Location',
 
     /* LANDLORD SECTION */
     landlord_label: 'For Landlords',
@@ -189,6 +190,7 @@ const TRANSLATIONS = {
     pm_disclaimer:  'الأسعار استرشادية وقابلة للتغيير. تواصل معنا لتأكيد التوفر الحالي وترتيب زيارة.',
     pm_verified_badge: 'مُتحقق منه من We Link',
     pm_video_title: 'فيديو العقار',
+    pm_map_title:   'الموقع',
 
     /* LANDLORD SECTION */
     landlord_label: 'للملاك',
