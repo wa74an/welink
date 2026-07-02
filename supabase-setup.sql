@@ -127,31 +127,44 @@ CREATE POLICY "auth_insert_audit" ON public.audit_logs
 -- They were previously readable AND writable with the public anon key.
 -- Lock them down: the public site may READ properties only; everything
 -- else goes through admin-api (service role).
+--
+-- Each block is guarded and catches its own errors, so a missing table or
+-- policy quirk here can NEVER roll back the student-data lockdown above.
 
 -- 5a. PROPERTIES — public may read; only the server may write.
-ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "public_read_properties" ON public.properties;
-CREATE POLICY "public_read_properties" ON public.properties
-  FOR SELECT USING (true);
--- No INSERT/UPDATE/DELETE policy → anon cannot write. Admin writes via service role.
+DO $$
+BEGIN
+  IF to_regclass('public.properties') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY';
+    EXECUTE 'DROP POLICY IF EXISTS "public_read_properties" ON public.properties';
+    EXECUTE 'CREATE POLICY "public_read_properties" ON public.properties FOR SELECT USING (true)';
+  END IF;
+EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'properties lockdown skipped: %', SQLERRM;
+END $$;
 
 -- 5b. CLIENTS — private (names, emails, phones, budgets). No anon access at all.
-ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
--- Intentionally NO policies → the anon/public key is fully denied.
--- The admin dashboard reads/writes clients through admin-api (service role).
+DO $$
+BEGIN
+  IF to_regclass('public.clients') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY';
+    -- Remove any leftover permissive policies created via the Table Editor.
+    EXECUTE (SELECT COALESCE(string_agg(format('DROP POLICY %I ON public.clients;', policyname), ' '), '')
+             FROM pg_policies WHERE schemaname='public' AND tablename='clients');
+  END IF;
+EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'clients lockdown skipped: %', SQLERRM;
+END $$;
 
 -- 5c. APPLICATIONS — private. No anon access at all.
-ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
--- Intentionally NO policies → anon denied; admin-api (service role) only.
-
--- IMPORTANT: if you previously created any permissive policy on these three
--- tables via the Table Editor, remove it. List existing policies with:
---   SELECT schemaname, tablename, policyname, roles, cmd
---   FROM pg_policies
---   WHERE tablename IN ('properties','clients','applications');
--- Drop anything that grants the anon role write access, e.g.:
---   DROP POLICY "<name>" ON public.clients;
+DO $$
+BEGIN
+  IF to_regclass('public.applications') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY';
+    EXECUTE (SELECT COALESCE(string_agg(format('DROP POLICY %I ON public.applications;', policyname), ' '), '')
+             FROM pg_policies WHERE schemaname='public' AND tablename='applications');
+  END IF;
+EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'applications lockdown skipped: %', SQLERRM;
+END $$;
+-- (Both tables now have NO policies → anon fully denied; admin-api service role bypasses RLS.)
 
 
 -- 6. SEED INITIAL TERMS & CONDITIONS (only if none exist) ----
@@ -202,38 +215,42 @@ WHERE NOT EXISTS (SELECT 1 FROM public.terms_conditions);
 -- Bucket must exist and be PRIVATE (Storage → New bucket → "student-documents", Public = OFF).
 -- These policies live on storage.objects. Run as-is.
 
--- Remove any previous policies for this bucket (names from the old UI setup may differ;
--- see the query at the bottom to find and drop leftovers).
-DROP POLICY IF EXISTS "students_upload_own_folder" ON storage.objects;
-DROP POLICY IF EXISTS "students_read_own_folder"   ON storage.objects;
+-- Wrapped in a guarded block so a storage permission quirk can't roll back the
+-- rest of the script. Also auto-drops any anon policy that references the
+-- private student-documents bucket (the old "anon read/delete all" holes).
+DO $$
+DECLARE r RECORD;
+BEGIN
+  -- Drop leftover anon policies that touch the student-documents bucket
+  FOR r IN
+    SELECT policyname FROM pg_policies
+    WHERE schemaname='storage' AND tablename='objects'
+      AND (roles::text[] && ARRAY['anon','public'])
+      AND (COALESCE(qual,'') LIKE '%student-documents%' OR COALESCE(with_check,'') LIKE '%student-documents%')
+  LOOP
+    EXECUTE format('DROP POLICY %I ON storage.objects;', r.policyname);
+  END LOOP;
 
--- Students may upload into a folder named after their own user id
-CREATE POLICY "students_upload_own_folder" ON storage.objects
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    bucket_id = 'student-documents'
-    AND (storage.foldername(name))[1] = auth.uid()::text
-  );
+  DROP POLICY IF EXISTS "students_upload_own_folder" ON storage.objects;
+  DROP POLICY IF EXISTS "students_read_own_folder"   ON storage.objects;
 
--- Students may read their own files only
-CREATE POLICY "students_read_own_folder" ON storage.objects
-  FOR SELECT TO authenticated
-  USING (
-    bucket_id = 'student-documents'
-    AND (storage.foldername(name))[1] = auth.uid()::text
-  );
+  -- Students may upload into a folder named after their own user id
+  CREATE POLICY "students_upload_own_folder" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (bucket_id = 'student-documents' AND (storage.foldername(name))[1] = auth.uid()::text);
 
--- The admin dashboard downloads documents via admin-api → storage `sign` endpoint
--- (service role), so NO anon read/delete policy is created here.
---
--- ⚠️ ACTION REQUIRED IN THE STORAGE UI:
---   If you previously added the "anon can read all files" and
---   "anon can delete files" policies to the student-documents bucket,
---   DELETE them now (Storage → student-documents → Policies).
---   Find any remaining anon policies on storage.objects with:
---     SELECT policyname, roles, cmd, qual
---     FROM pg_policies
---     WHERE schemaname='storage' AND tablename='objects';
+  -- Students may read their own files only
+  CREATE POLICY "students_read_own_folder" ON storage.objects
+    FOR SELECT TO authenticated
+    USING (bucket_id = 'student-documents' AND (storage.foldername(name))[1] = auth.uid()::text);
+EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'storage policy step skipped: %', SQLERRM;
+END $$;
+
+-- The admin dashboard downloads documents via admin-api → storage `sign`
+-- endpoint (service role), so NO anon read/delete policy is created here.
+-- If any global "anon true" policy (not bucket-scoped) still exists, list with:
+--   SELECT policyname, roles, cmd, qual FROM pg_policies
+--   WHERE schemaname='storage' AND tablename='objects';
 
 
 -- ============================================================
