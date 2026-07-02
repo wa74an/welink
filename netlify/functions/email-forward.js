@@ -1,18 +1,61 @@
 // Netlify Function — Resend inbound email forwarder
 // Resend POSTs here when an email arrives at admin@welink-uk.com
 // This function re-sends it to Mentorazemi@gmail.com
+//
+// Requests are authenticated via the Svix signature Resend attaches to every
+// webhook (headers: svix-id / svix-timestamp / svix-signature). Without this,
+// anyone could POST here and make our Resend account send arbitrary email.
+
+const crypto = require('crypto');
 
 const RESEND_KEY = process.env.RESEND_KEY;
+const WEBHOOK_SECRET = process.env.RESEND_WEBHOOK_SECRET; // "whsec_..." from the Resend webhook
 const FORWARD_TO = 'Mentorazemi@gmail.com';
+
+// Verify the Svix signature over the RAW request body.
+function verifyWebhook(headers, rawBody) {
+  if (!WEBHOOK_SECRET) return false;
+  const id = headers['svix-id'];
+  const timestamp = headers['svix-timestamp'];
+  const sigHeader = headers['svix-signature'];
+  if (!id || !timestamp || !sigHeader) return false;
+
+  // Replay protection: reject timestamps more than 5 minutes off.
+  const ts = parseInt(timestamp, 10);
+  if (!Number.isFinite(ts) || Math.abs(Math.floor(Date.now() / 1000) - ts) > 300) return false;
+
+  const secretBytes = Buffer.from(WEBHOOK_SECRET.replace(/^whsec_/, ''), 'base64');
+  const expected = crypto
+    .createHmac('sha256', secretBytes)
+    .update(`${id}.${timestamp}.${rawBody}`)
+    .digest('base64');
+  const expectedBuf = Buffer.from(expected);
+
+  // Header is a space-separated list of "v1,<signature>" pairs.
+  return sigHeader.split(' ').some((part) => {
+    const sig = part.split(',')[1] || '';
+    const sigBuf = Buffer.from(sig);
+    return sigBuf.length === expectedBuf.length && crypto.timingSafeEqual(sigBuf, expectedBuf);
+  });
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  // Raw body exactly as received (needed for signature verification).
+  const rawBody = event.isBase64Encoded
+    ? Buffer.from(event.body || '', 'base64').toString('utf8')
+    : (event.body || '');
+
+  if (!verifyWebhook(event.headers || {}, rawBody)) {
+    return { statusCode: 401, body: 'Invalid signature' };
+  }
+
   let payload;
   try {
-    payload = JSON.parse(event.body || '{}');
+    payload = JSON.parse(rawBody || '{}');
   } catch {
     return { statusCode: 400, body: 'Invalid JSON' };
   }

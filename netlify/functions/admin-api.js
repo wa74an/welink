@@ -4,6 +4,10 @@
 
 const SUPABASE_URL = 'https://hegstrjpfompikkwxmpl.supabase.co';
 
+// Tables the dashboard may read/write through this proxy (service role).
+// Keeps the anon key out of all privileged writes.
+const DB_TABLES = ['properties', 'clients', 'applications'];
+
 const serviceKey = () => process.env.SUPABASE_SERVICE_KEY;
 const adminSecret = () => process.env.ADMIN_SECRET;
 
@@ -129,6 +133,55 @@ exports.handler = async (event) => {
         });
       }
       return response(204, '');
+    }
+
+    // ── GENERIC TABLE READ/WRITE (properties, clients, applications) ──
+    // These replace the old client-side anon-key access. Every call is
+    // already gated by the x-admin-secret check above.
+    const dbTable = (event.queryStringParameters || {}).table;
+
+    if (action === 'db-list' && method === 'GET') {
+      if (!DB_TABLES.includes(dbTable)) return response(400, { error: 'Invalid table' });
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/${dbTable}?select=*&order=created_at.desc`,
+        { headers: sbHeaders() }
+      );
+      return response(res.status, await res.text());
+    }
+
+    if (action === 'db-insert' && method === 'POST') {
+      if (!DB_TABLES.includes(dbTable)) return response(400, { error: 'Invalid table' });
+      const row = JSON.parse(event.body || '{}');
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${dbTable}`, {
+        method: 'POST',
+        headers: { ...sbHeaders(), 'Prefer': 'return=representation' },
+        body: JSON.stringify(row)
+      });
+      return response(res.status, await res.text());
+    }
+
+    if (action === 'db-update' && method === 'POST') {
+      if (!DB_TABLES.includes(dbTable)) return response(400, { error: 'Invalid table' });
+      const id = (event.queryStringParameters || {}).id;
+      if (!/^\d+$/.test(id || '')) return response(400, { error: 'Invalid id' });
+      const row = JSON.parse(event.body || '{}');
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${dbTable}?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { ...sbHeaders(), 'Prefer': 'return=representation' },
+        body: JSON.stringify(row)
+      });
+      return response(res.status, await res.text());
+    }
+
+    if (action === 'db-delete' && method === 'POST') {
+      if (!DB_TABLES.includes(dbTable)) return response(400, { error: 'Invalid table' });
+      const id = (event.queryStringParameters || {}).id;
+      if (!/^\d+$/.test(id || '')) return response(400, { error: 'Invalid id' });
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${dbTable}?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: { ...sbHeaders(), 'Prefer': 'return=minimal' }
+      });
+      return response(res.ok ? 204 : res.status, '');
     }
 
     return response(400, { error: 'Unknown action' });

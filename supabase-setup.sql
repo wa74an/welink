@@ -1,11 +1,21 @@
 -- ============================================================
--- We Link — Student Onboarding System: Supabase Setup
+-- We Link — Student Onboarding System: Supabase Setup (HARDENED)
 -- Run this entire script in your Supabase SQL Editor
 -- (Dashboard → SQL Editor → New Query → Paste → Run)
+--
+-- SECURITY MODEL
+--   • The ANON key is PUBLIC (it ships in every page's JavaScript).
+--     It must therefore have ZERO access to personal data.
+--   • Students read/write ONLY their own rows, using their own
+--     logged-in session (auth.uid() = their id).
+--   • The admin dashboard performs ALL privileged reads/writes through
+--     the Netlify function `admin-api`, which uses the SERVICE ROLE key
+--     (server-side only). The service role BYPASSES RLS, so no
+--     "anon can do everything" policy is ever needed.
 -- ============================================================
 
--- 1. STUDENT PROFILES
--- Extends auth.users with onboarding data
+
+-- 1. STUDENT PROFILES ----------------------------------------
 CREATE TABLE IF NOT EXISTS public.student_profiles (
   id            UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name     TEXT,
@@ -20,23 +30,26 @@ CREATE TABLE IF NOT EXISTS public.student_profiles (
 
 ALTER TABLE public.student_profiles ENABLE ROW LEVEL SECURITY;
 
--- Students can read/update their own profile
+-- Remove the old wide-open policy (public PII leak)
+DROP POLICY IF EXISTS "anon_read_all" ON public.student_profiles;
+
+-- Students may read / create / update ONLY their own profile
+DROP POLICY IF EXISTS "student_read_own"   ON public.student_profiles;
+DROP POLICY IF EXISTS "student_insert_own" ON public.student_profiles;
+DROP POLICY IF EXISTS "student_update_own" ON public.student_profiles;
+
 CREATE POLICY "student_read_own" ON public.student_profiles
-  FOR SELECT USING (auth.uid() = id);
+  FOR SELECT TO authenticated USING (auth.uid() = id);
 
 CREATE POLICY "student_insert_own" ON public.student_profiles
-  FOR INSERT WITH CHECK (auth.uid() = id);
+  FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "student_update_own" ON public.student_profiles
-  FOR UPDATE USING (auth.uid() = id);
-
--- Anon key can read all profiles (for admin dashboard)
-CREATE POLICY "anon_read_all" ON public.student_profiles
-  FOR SELECT USING (true);
+  FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+-- (Admin reads all profiles via admin-api / service role — no anon policy.)
 
 
--- 2. STUDENT DOCUMENTS
--- Metadata for uploaded files (actual files stored in Storage)
+-- 2. STUDENT DOCUMENTS ---------------------------------------
 CREATE TABLE IF NOT EXISTS public.student_documents (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id  UUID NOT NULL REFERENCES public.student_profiles(id) ON DELETE CASCADE,
@@ -50,21 +63,23 @@ CREATE TABLE IF NOT EXISTS public.student_documents (
 
 ALTER TABLE public.student_documents ENABLE ROW LEVEL SECURITY;
 
+-- Remove the old wide-open policy (public document-metadata leak)
+DROP POLICY IF EXISTS "anon_read_all_docs" ON public.student_documents;
+
+DROP POLICY IF EXISTS "student_manage_own_docs" ON public.student_documents;
 CREATE POLICY "student_manage_own_docs" ON public.student_documents
-  FOR ALL USING (auth.uid() = student_id);
+  FOR ALL TO authenticated
+  USING (auth.uid() = student_id)
+  WITH CHECK (auth.uid() = student_id);
+-- (Admin reads all document metadata via admin-api / service role.)
 
--- Anon key can read all documents metadata (for admin dashboard)
-CREATE POLICY "anon_read_all_docs" ON public.student_documents
-  FOR SELECT USING (true);
 
-
--- 3. TERMS & CONDITIONS
--- Admin-managed T&C versions
+-- 3. TERMS & CONDITIONS --------------------------------------
 CREATE TABLE IF NOT EXISTS public.terms_conditions (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  version     TEXT NOT NULL,                    -- e.g. "v1.0", "v1.1"
+  version     TEXT NOT NULL,
   title       TEXT NOT NULL DEFAULT 'Terms & Conditions',
-  content     TEXT NOT NULL,                    -- HTML or plain text
+  content     TEXT NOT NULL,
   is_active   BOOLEAN DEFAULT FALSE,
   created_by  TEXT DEFAULT 'admin',
   created_at  TIMESTAMPTZ DEFAULT NOW(),
@@ -73,21 +88,21 @@ CREATE TABLE IF NOT EXISTS public.terms_conditions (
 
 ALTER TABLE public.terms_conditions ENABLE ROW LEVEL SECURITY;
 
--- Everyone can read active terms (needed for onboarding)
+-- Remove the old policy that let ANYONE write/delete legal terms
+DROP POLICY IF EXISTS "anon_manage_terms" ON public.terms_conditions;
+
+-- Anyone may READ terms (needed to display them during onboarding)
+DROP POLICY IF EXISTS "anyone_read_terms" ON public.terms_conditions;
 CREATE POLICY "anyone_read_terms" ON public.terms_conditions
   FOR SELECT USING (true);
-
--- Anon key can manage terms (for admin dashboard)
-CREATE POLICY "anon_manage_terms" ON public.terms_conditions
-  FOR ALL USING (true);
+-- (Admin creates/edits/activates terms via admin-api / service role — no anon write.)
 
 
--- 4. AUDIT LOGS
--- Tracks important events for GDPR compliance
+-- 4. AUDIT LOGS ----------------------------------------------
 CREATE TABLE IF NOT EXISTS public.audit_logs (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id  UUID,
-  event_type  TEXT NOT NULL,   -- 'signup','doc_upload','onboarding_complete','terms_accepted','doc_accessed'
+  event_type  TEXT NOT NULL,
   details     JSONB,
   ip_address  TEXT,
   created_at  TIMESTAMPTZ DEFAULT NOW()
@@ -95,23 +110,53 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Authenticated users can insert their own logs
+-- Remove old policies that exposed all logs (incl. IPs) and allowed anon inserts
+DROP POLICY IF EXISTS "anon_read_audit"   ON public.audit_logs;
+DROP POLICY IF EXISTS "anon_insert_audit" ON public.audit_logs;
+
+-- Logged-in students may insert their own events only
+DROP POLICY IF EXISTS "auth_insert_audit" ON public.audit_logs;
 CREATE POLICY "auth_insert_audit" ON public.audit_logs
-  FOR INSERT WITH CHECK (auth.uid() = student_id OR student_id IS NULL);
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = student_id OR student_id IS NULL);
+-- (Admin reads/writes audit logs via admin-api / service role.)
 
--- Anon key can read all logs (for admin dashboard)
-CREATE POLICY "anon_read_audit" ON public.audit_logs
+
+-- 5. PROPERTIES / CLIENTS / APPLICATIONS ---------------------
+-- These tables back the admin dashboard (and the public property list).
+-- They were previously readable AND writable with the public anon key.
+-- Lock them down: the public site may READ properties only; everything
+-- else goes through admin-api (service role).
+
+-- 5a. PROPERTIES — public may read; only the server may write.
+ALTER TABLE public.properties ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "public_read_properties" ON public.properties;
+CREATE POLICY "public_read_properties" ON public.properties
   FOR SELECT USING (true);
+-- No INSERT/UPDATE/DELETE policy → anon cannot write. Admin writes via service role.
 
--- Anon key can insert audit logs (for admin actions)
-CREATE POLICY "anon_insert_audit" ON public.audit_logs
-  FOR INSERT WITH CHECK (true);
+-- 5b. CLIENTS — private (names, emails, phones, budgets). No anon access at all.
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+-- Intentionally NO policies → the anon/public key is fully denied.
+-- The admin dashboard reads/writes clients through admin-api (service role).
+
+-- 5c. APPLICATIONS — private. No anon access at all.
+ALTER TABLE public.applications ENABLE ROW LEVEL SECURITY;
+-- Intentionally NO policies → anon denied; admin-api (service role) only.
+
+-- IMPORTANT: if you previously created any permissive policy on these three
+-- tables via the Table Editor, remove it. List existing policies with:
+--   SELECT schemaname, tablename, policyname, roles, cmd
+--   FROM pg_policies
+--   WHERE tablename IN ('properties','clients','applications');
+-- Drop anything that grants the anon role write access, e.g.:
+--   DROP POLICY "<name>" ON public.clients;
 
 
--- 5. SEED INITIAL TERMS & CONDITIONS
+-- 6. SEED INITIAL TERMS & CONDITIONS (only if none exist) ----
 INSERT INTO public.terms_conditions (version, title, content, is_active)
-VALUES (
-  'v1.0',
+SELECT 'v1.0',
   'We Link Student Services — Terms & Conditions',
   '<h3>1. Introduction</h3>
 <p>These Terms and Conditions govern your use of We Link''s student services platform and the submission of your personal documents. By completing this onboarding process, you agree to these terms in full.</p>
@@ -150,49 +195,63 @@ VALUES (
 <h3>8. Contact</h3>
 <p>For any data protection enquiries, contact us at: <strong>admin@welink.co.uk</strong></p>',
   TRUE
-);
+WHERE NOT EXISTS (SELECT 1 FROM public.terms_conditions);
 
 
--- 6. STORAGE BUCKET SETUP
--- Run this in Supabase Dashboard → Storage → New Bucket
--- Name: student-documents
--- Public: FALSE (private bucket)
--- Then add the following policies:
+-- 7. STORAGE — student-documents bucket (PRIVATE) ------------
+-- Bucket must exist and be PRIVATE (Storage → New bucket → "student-documents", Public = OFF).
+-- These policies live on storage.objects. Run as-is.
 
--- NOTE: Storage policies are set via the Supabase Dashboard UI or via the storage schema.
--- Bucket: student-documents (PRIVATE)
+-- Remove any previous policies for this bucket (names from the old UI setup may differ;
+-- see the query at the bottom to find and drop leftovers).
+DROP POLICY IF EXISTS "students_upload_own_folder" ON storage.objects;
+DROP POLICY IF EXISTS "students_read_own_folder"   ON storage.objects;
+
+-- Students may upload into a folder named after their own user id
+CREATE POLICY "students_upload_own_folder" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'student-documents'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- Students may read their own files only
+CREATE POLICY "students_read_own_folder" ON storage.objects
+  FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'student-documents'
+    AND (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- The admin dashboard downloads documents via admin-api → storage `sign` endpoint
+-- (service role), so NO anon read/delete policy is created here.
 --
--- Policy 1 — Students upload to their own folder:
---   Operation: INSERT
---   Target roles: authenticated
---   Policy: (storage.foldername(name))[1] = auth.uid()::text
---
--- Policy 2 — Students read their own files:
---   Operation: SELECT
---   Target roles: authenticated
---   Policy: (storage.foldername(name))[1] = auth.uid()::text
---
--- Policy 3 — Anon key (admin) can read all files:
---   Operation: SELECT
---   Target roles: anon
---   Policy: true
---
--- Policy 4 — Anon key (admin) can delete files:
---   Operation: DELETE
---   Target roles: anon
---   Policy: true
+-- ⚠️ ACTION REQUIRED IN THE STORAGE UI:
+--   If you previously added the "anon can read all files" and
+--   "anon can delete files" policies to the student-documents bucket,
+--   DELETE them now (Storage → student-documents → Policies).
+--   Find any remaining anon policies on storage.objects with:
+--     SELECT policyname, roles, cmd, qual
+--     FROM pg_policies
+--     WHERE schemaname='storage' AND tablename='objects';
+
 
 -- ============================================================
--- IMPORTANT: After running this SQL, also do the following:
+-- AFTER RUNNING THIS SQL — required configuration
 --
--- 1. Go to Supabase Dashboard → Authentication → URL Configuration
---    Set "Site URL" to your deployed domain (e.g. https://welink.netlify.app)
---    Add to "Redirect URLs": https://yourdomain.com/register.html
+-- A. Netlify environment variables (Site → Settings → Environment):
+--    SUPABASE_SERVICE_KEY = <your Supabase service_role key>   (server-only)
+--    ADMIN_SECRET         = <a NEW long random string>         (admin login key)
+--    RESEND_KEY           = <your Resend API key>
+--    RESEND_WEBHOOK_SECRET= <the signing secret from the Resend inbound webhook>
+--    → Rotate ADMIN_SECRET now: the old value ('wl-adm-...') is in git history.
+--    → Re-deploy after changing env vars.
 --
--- 2. Go to Storage → Create new bucket named "student-documents"
---    Set it to PRIVATE (not public)
---    Then apply the storage policies described above.
+-- B. The public ANON key is safe to remain in the client ONLY because the
+--    policies above deny it access to personal data. You do NOT need to
+--    rotate the anon key — but you MAY, from Supabase → Settings → API.
 --
--- 3. Go to Authentication → Email Templates
---    Customize the confirmation email to match We Link branding.
+-- C. Supabase → Authentication → URL Configuration:
+--    Site URL: https://welink-uk.com
+--    Redirect URLs: https://welink-uk.com/register.html
 -- ============================================================
