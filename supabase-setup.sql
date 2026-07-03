@@ -30,14 +30,18 @@ CREATE TABLE IF NOT EXISTS public.student_profiles (
 
 ALTER TABLE public.student_profiles ENABLE ROW LEVEL SECURITY;
 
--- Remove the old wide-open policy (public PII leak)
-DROP POLICY IF EXISTS "anon_read_all" ON public.student_profiles;
+-- Remove ALL existing policies first — some may have been added manually or
+-- under different names (or granted to the `public` role) and still leak data.
+-- Then recreate exactly the intended set below.
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN SELECT policyname FROM pg_policies
+           WHERE schemaname='public' AND tablename='student_profiles'
+  LOOP EXECUTE format('DROP POLICY %I ON public.student_profiles;', r.policyname); END LOOP;
+END $$;
 
 -- Students may read / create / update ONLY their own profile
-DROP POLICY IF EXISTS "student_read_own"   ON public.student_profiles;
-DROP POLICY IF EXISTS "student_insert_own" ON public.student_profiles;
-DROP POLICY IF EXISTS "student_update_own" ON public.student_profiles;
-
 CREATE POLICY "student_read_own" ON public.student_profiles
   FOR SELECT TO authenticated USING (auth.uid() = id);
 
@@ -63,10 +67,15 @@ CREATE TABLE IF NOT EXISTS public.student_documents (
 
 ALTER TABLE public.student_documents ENABLE ROW LEVEL SECURITY;
 
--- Remove the old wide-open policy (public document-metadata leak)
-DROP POLICY IF EXISTS "anon_read_all_docs" ON public.student_documents;
+-- Drop ALL existing policies, then recreate only the intended one.
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN SELECT policyname FROM pg_policies
+           WHERE schemaname='public' AND tablename='student_documents'
+  LOOP EXECUTE format('DROP POLICY %I ON public.student_documents;', r.policyname); END LOOP;
+END $$;
 
-DROP POLICY IF EXISTS "student_manage_own_docs" ON public.student_documents;
 CREATE POLICY "student_manage_own_docs" ON public.student_documents
   FOR ALL TO authenticated
   USING (auth.uid() = student_id)
@@ -88,11 +97,17 @@ CREATE TABLE IF NOT EXISTS public.terms_conditions (
 
 ALTER TABLE public.terms_conditions ENABLE ROW LEVEL SECURITY;
 
--- Remove the old policy that let ANYONE write/delete legal terms
-DROP POLICY IF EXISTS "anon_manage_terms" ON public.terms_conditions;
+-- Drop ALL existing policies (incl. the old anon write/delete hole), then
+-- recreate only public read. Admin writes go through admin-api / service role.
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN SELECT policyname FROM pg_policies
+           WHERE schemaname='public' AND tablename='terms_conditions'
+  LOOP EXECUTE format('DROP POLICY %I ON public.terms_conditions;', r.policyname); END LOOP;
+END $$;
 
 -- Anyone may READ terms (needed to display them during onboarding)
-DROP POLICY IF EXISTS "anyone_read_terms" ON public.terms_conditions;
 CREATE POLICY "anyone_read_terms" ON public.terms_conditions
   FOR SELECT USING (true);
 -- (Admin creates/edits/activates terms via admin-api / service role — no anon write.)
@@ -110,12 +125,17 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
--- Remove old policies that exposed all logs (incl. IPs) and allowed anon inserts
-DROP POLICY IF EXISTS "anon_read_audit"   ON public.audit_logs;
-DROP POLICY IF EXISTS "anon_insert_audit" ON public.audit_logs;
+-- Drop ALL existing policies (incl. the old anon read/insert holes that exposed
+-- IP addresses), then recreate only the authenticated insert.
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN SELECT policyname FROM pg_policies
+           WHERE schemaname='public' AND tablename='audit_logs'
+  LOOP EXECUTE format('DROP POLICY %I ON public.audit_logs;', r.policyname); END LOOP;
+END $$;
 
 -- Logged-in students may insert their own events only
-DROP POLICY IF EXISTS "auth_insert_audit" ON public.audit_logs;
 CREATE POLICY "auth_insert_audit" ON public.audit_logs
   FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = student_id OR student_id IS NULL);
