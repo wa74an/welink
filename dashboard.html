@@ -1224,6 +1224,22 @@
 
     <!-- ===== STUDENTS ===== -->
     <div class="view" id="view-students">
+
+      <!-- Sign-up link to send to students -->
+      <div class="section-card" style="margin-bottom:18px">
+        <div style="padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:240px">
+            <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px">Student sign-up link</div>
+            <div style="font-size:0.8rem;color:var(--text-light);line-height:1.5;margin-bottom:10px">Send this to a student so they can create an account, accept the terms and upload their documents. They'll appear in the list below once they start.</div>
+            <code id="signupLink" style="font-size:0.82rem;color:var(--text);background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px;padding:8px 12px;display:inline-block;word-break:break-all">https://welink-uk.com/register</code>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button class="btn-sm" id="copyLinkBtn" onclick="copySignupLink()" style="padding:10px 18px">Copy link</button>
+            <a class="btn-sm" href="https://wa.me/?text=Hi%2C%20please%20create%20your%20We%20Link%20student%20account%20here%20to%20upload%20your%20documents%3A%20https%3A%2F%2Fwelink-uk.com%2Fregister" target="_blank" rel="noopener" style="padding:10px 18px;text-decoration:none;display:inline-flex;align-items:center">Send on WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
       <div class="section-card">
         <div class="section-card-header">
           <h3>Student Profiles</h3>
@@ -2623,6 +2639,36 @@ async function setActiveTerm(id) {
     loadTermsAdmin();
   } catch(e) {
     showToast('Failed to update active terms.');
+  }
+}
+
+// ===== STUDENT SIGN-UP LINK =====
+async function copySignupLink() {
+  const link = document.getElementById('signupLink').textContent.trim();
+  const btn = document.getElementById('copyLinkBtn');
+  const restore = () => { btn.textContent = 'Copy link'; };
+  try {
+    await navigator.clipboard.writeText(link);
+    btn.textContent = 'Copied ✓';
+    showToast('Sign-up link copied — send it to your student');
+    setTimeout(restore, 2000);
+  } catch (e) {
+    // Clipboard API blocked (older browser / insecure context) — select-and-copy
+    const ta = document.createElement('textarea');
+    ta.value = link;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      btn.textContent = 'Copied ✓';
+      showToast('Sign-up link copied — send it to your student');
+      setTimeout(restore, 2000);
+    } catch (_) {
+      showToast('Could not copy — select the link and copy it manually');
+    }
+    document.body.removeChild(ta);
   }
 }
 
