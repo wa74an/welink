@@ -1246,23 +1246,12 @@
     display: block;
   }
 
-  /* Phones: show the whole listing photo instead of a cropped zoom. Where the
-     photo doesn't match the 3:2 box, the gap is filled with a blurred, dimmed
-     copy of the same photo rather than flat navy, so nothing looks empty. */
+  /* Phones: a taller 4:3 frame that the photo always fills edge to edge.
+     Most listing photos are 4:3, so this shows far more of the shot than the
+     old short 220px box (which is what made them look zoomed in) while never
+     leaving empty bars. */
   @media(max-width:600px){
-    .prop-carousel { height: auto; aspect-ratio: 3 / 2; }
-    .carousel-slide { overflow: hidden; }
-    .carousel-slide img { object-fit: contain; position: relative; z-index: 1; }
-    .carousel-slide[style*="--bg"]::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: var(--bg);
-      background-size: cover;
-      background-position: center;
-      filter: blur(16px) brightness(0.6);
-      transform: scale(1.2);
-    }
+    .prop-carousel { height: auto; aspect-ratio: 4 / 3; }
   }
 
   .carousel-slide-emoji {
@@ -1817,18 +1806,7 @@
      A 3:2 box matches typical listing photos, so most fill edge-to-edge
      with no letterboxing, and taller/wider shots stay fully visible. */
   @media(max-width:600px){
-    .pm-gallery { height: auto; aspect-ratio: 3 / 2; }
-    .pm-slide img { object-fit: contain; position: relative; z-index: 1; }
-    .pm-slide[style*="--bg"]::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: var(--bg);
-      background-size: cover;
-      background-position: center;
-      filter: blur(16px) brightness(0.6);
-      transform: scale(1.2);
-    }
+    .pm-gallery { height: auto; aspect-ratio: 4 / 3; }
   }
   .pm-arrow {
     position: absolute;
@@ -3084,7 +3062,7 @@
 
       const cardId = 'card-' + p.id + '-' + i;
       const slidesHtml = images.map((img, si) => `
-        <div class="carousel-slide"${img ? ` style="--bg:url('${img}')"` : ''}>
+        <div class="carousel-slide">
           ${img
             ? `<img src="${img}" alt="${p.name}" loading="lazy"/>`
             : `<div class="carousel-slide-emoji" style="background:${grad}">${p.emoji || '🏠'}</div>`
@@ -3473,7 +3451,7 @@ function openPropModal(prop, opts = {}) {
 
   document.getElementById('pmSlides').innerHTML = slides.map(s =>
     s.url
-      ? `<div class="pm-slide" style="--bg:url('${s.url}')"><img src="${s.url}" alt="${prop.name}"/></div>`
+      ? `<div class="pm-slide"><img src="${s.url}" alt="${prop.name}"/></div>`
       : `<div class="pm-slide" style="background:${s.gradient || _pmGradients[0]}">${slidePlaceholder}</div>`
   ).join('');
 
