@@ -1604,6 +1604,12 @@
         </div>
       </div>
 
+      <!-- Linked student account / documents -->
+      <div style="padding:0 28px 20px">
+        <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:12px">Documents</div>
+        <div id="vc-student"></div>
+      </div>
+
       <!-- Applications linked -->
       <div style="padding:0 28px 24px">
         <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:12px">Applications</div>
@@ -1691,6 +1697,12 @@ async function loadAll() {
     renderClients();
     renderApplications();
     updateStats();
+
+    // Student accounts are matched to clients by email, so load them up front
+    // rather than only when the Students tab is opened. Non-fatal on failure.
+    fetchStudents()
+      .then(() => { renderApplications(); })
+      .catch(e => console.error('fetchStudents:', e));
   } catch(e) {
     showToast('Connection error — check your internet');
     console.error(e);
@@ -1779,9 +1791,24 @@ function renderApplications() {
     const c = findClientForApp(a);
     const wants = c ? [c.proptype, c.budget, c.movein ? `move-in ${c.movein}` : null]
                         .filter(Boolean).map(escH).join(' · ') : '';
+    // Whether this applicant has a portal account and submitted their documents
+    const student = c ? findStudentForClient(c) : null;
+    let docTag = '';
+    if (student) {
+      const have = REQUIRED_DOCS.filter(d => student.docs.includes(d)).length;
+      const ok = have === REQUIRED_DOCS.length;
+      docTag = `<div style="font-size:0.68rem;margin-top:4px;color:${ok ? 'var(--green)' : 'var(--amber)'}">
+                  ${ok ? '✓ documents complete' : `documents ${have}/${REQUIRED_DOCS.length}`}
+                </div>`;
+    } else if (allStudents.length) {
+      docTag = `<div style="font-size:0.68rem;margin-top:4px;color:var(--text-light)">no documents yet</div>`;
+    }
     return `
     <tr style="cursor:pointer" onclick="openApplicant(${a.id})" title="Open ${escH(a.client || 'applicant')}'s profile">
-      <td class="td-name">${escH(a.client || '')}</td>
+      <td class="td-name">
+        <div>${escH(a.client || '')}</div>
+        ${docTag}
+      </td>
       <td>
         <div>${escH(a.property || '')}</div>
         ${wants ? `<div style="font-size:0.72rem;color:var(--text-light);margin-top:3px">${wants}</div>` : ''}
@@ -2105,6 +2132,35 @@ function viewClient(id) {
     deleteClient(c.id);
   };
 
+  // Linked student account — shows whether this person has actually created a
+  // portal account and submitted their identity documents.
+  const student = findStudentForClient(c);
+  const studentDiv = document.getElementById('vc-student');
+  if (student) {
+    const have = REQUIRED_DOCS.filter(d => student.docs.includes(d)).length;
+    const done = student.onboarding_completed;
+    const complete = done && have === REQUIRED_DOCS.length;
+    const colour = complete ? 'var(--green)' : 'var(--amber)';
+    const missing = REQUIRED_DOCS.filter(d => !student.docs.includes(d))
+      .map(d => ({passport:'Passport', student_civil_id:'Student Civil ID', parent_civil_id:"Parent's Civil ID"}[d] || d));
+    studentDiv.innerHTML = `
+      <div style="padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div style="min-width:0">
+            <div style="font-size:0.82rem;color:${colour}">${student.docs.length} file${student.docs.length!==1?'s':''} uploaded · ${have}/${REQUIRED_DOCS.length} required</div>
+            <div style="font-size:0.72rem;color:var(--text-light);margin-top:3px">Onboarding ${done ? 'completed' : 'not finished'}${missing.length ? ' · still needed: ' + escH(missing.join(', ')) : ''}</div>
+          </div>
+          <button class="btn-sm" style="flex-shrink:0" onclick="closeModal('viewClient');viewStudent('${escH(student.id)}')">Open documents</button>
+        </div>
+      </div>`;
+  } else {
+    studentDiv.innerHTML = `
+      <div style="padding:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="font-size:0.8rem;color:var(--text-light)">No student account yet — they haven't registered or uploaded documents.</div>
+        <button class="btn-sm" style="flex-shrink:0" onclick="copySignupLink()">Copy sign-up link</button>
+      </div>`;
+  }
+
   // Linked applications — uses the same matching as the applications table,
   // so a row that opens this profile always appears in this list.
   const clientApps = applications.filter(a => findClientForApp(a)?.id === c.id);
@@ -2405,40 +2461,75 @@ function logout() {
 // ===== STUDENTS =====
 let allStudents = [];
 
+/* Fetch student accounts + their uploaded document types into allStudents.
+   Split out from loadStudents so client profiles can use the data without the
+   Students tab having been opened. */
+async function fetchStudents() {
+  const studentData = await adminApi('list-students') || { profiles: [], users: [] };
+  const emailMap = {};
+  (studentData.users || []).forEach(u => { emailMap[u.id] = u.email; });
+
+  const docs = await adminApi('list-docs') || [];
+  const docMap = {};
+  docs.forEach(d => {
+    if (!docMap[d.student_id]) docMap[d.student_id] = [];
+    docMap[d.student_id].push(d.doc_type);
+  });
+
+  allStudents = (studentData.profiles || []).map(p => ({
+    ...p,
+    email: emailMap[p.id] || '—',
+    docs: docMap[p.id] || []
+  }));
+
+  const pending = allStudents.filter(s => !s.onboarding_completed).length;
+  const badge = document.getElementById('studentsBadge');
+  if (badge) {
+    if (pending > 0) { badge.textContent = pending; badge.style.display = ''; }
+    else badge.style.display = 'none';
+  }
+  return allStudents;
+}
+
 async function loadStudents() {
   document.getElementById('studentsLoading').style.display = 'block';
   document.getElementById('studentsEmpty').style.display = 'none';
   document.getElementById('studentsTable').innerHTML = '';
   try {
-    // Load profiles + emails via serverless function (service role key stays server-side)
-    const studentData = await adminApi('list-students') || { profiles: [], users: [] };
-    const emailMap = {};
-    (studentData.users || []).forEach(u => { emailMap[u.id] = u.email; });
-
-    // Load document types per student
-    const docs = await adminApi('list-docs') || [];
-    const docMap = {};
-    docs.forEach(d => {
-      if (!docMap[d.student_id]) docMap[d.student_id] = [];
-      docMap[d.student_id].push(d.doc_type);
-    });
-
-    allStudents = (studentData.profiles || []).map(p => ({
-      ...p,
-      email: emailMap[p.id] || '—',
-      docs: docMap[p.id] || []
-    }));
-
+    await fetchStudents();
     renderStudentsTable(allStudents);
-    // Update badge
-    const pending = allStudents.filter(s => !s.onboarding_completed).length;
-    const badge = document.getElementById('studentsBadge');
-    if (pending > 0) { badge.textContent = pending; badge.style.display = ''; }
-    else badge.style.display = 'none';
   } catch(e) {
     console.error('loadStudents:', e);
     document.getElementById('studentsLoading').textContent = 'Failed to load students.';
   }
+}
+
+/* A client (website lead) and a student (portal account) are separate records.
+   Link them on email so a client's profile can show their document progress. */
+const REQUIRED_DOCS = ['passport', 'student_civil_id', 'parent_civil_id'];
+
+function findStudentForClient(c) {
+  if (!c) return null;
+  const email = (c.email || '').trim().toLowerCase();
+  if (email) {
+    const byEmail = allStudents.find(s => (s.email || '').trim().toLowerCase() === email);
+    if (byEmail) return byEmail;
+  }
+  const full = `${c.fname || ''} ${c.lname || ''}`.replace(/\s+/g, ' ').trim().toLowerCase();
+  if (!full) return null;
+  return allStudents.find(s => (s.full_name || '').replace(/\s+/g, ' ').trim().toLowerCase() === full) || null;
+}
+
+function findClientForStudent(s) {
+  if (!s) return null;
+  const email = (s.email || '').trim().toLowerCase();
+  if (email) {
+    const byEmail = clients.find(c => (c.email || '').trim().toLowerCase() === email);
+    if (byEmail) return byEmail;
+  }
+  const full = (s.full_name || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  if (!full) return null;
+  return clients.find(c => `${c.fname || ''} ${c.lname || ''}`.replace(/\s+/g, ' ').trim().toLowerCase() === full) || null;
 }
 
 function renderStudentsTable(students) {
@@ -2458,9 +2549,16 @@ function renderStudentsTable(students) {
     const statusBadge = s.onboarding_completed
       ? `<span style="font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border:1px solid rgba(76,187,138,0.3);background:rgba(76,187,138,0.1);color:#4cbb8a">Complete</span>`
       : `<span style="font-size:0.63rem;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border:1px solid rgba(240,180,41,0.3);background:rgba(184,122,0,0.15);color:#f0b429">Pending</span>`;
+    // What this person enquired about on the website, if we can match them
+    const lead = findClientForStudent(s);
+    const wants = lead ? [lead.proptype, lead.budget, lead.movein ? `move-in ${lead.movein}` : null]
+                          .filter(Boolean).map(escH).join(' · ') : '';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${escH(s.full_name || '—')}</td>
+      <td>
+        <div>${escH(s.full_name || '—')}</div>
+        ${wants ? `<div style="font-size:0.7rem;color:var(--text-light);margin-top:3px">${wants}</div>` : ''}
+      </td>
       <td style="color:var(--text-light);font-size:0.8rem">${escH(s.email || '—')}</td>
       <td style="font-size:0.8rem">${escH(s.parent_phone || '—')}</td>
       <td style="font-size:0.8rem">${docsUploaded} file${docsUploaded !== 1 ? 's' : ''} · ${docsRequired}/3 required</td>
