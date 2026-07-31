@@ -1756,26 +1756,38 @@ function renderApplications() {
     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-light)">No applications yet</td></tr>';
     return;
   }
-  tbody.innerHTML = applications.map(a => `
-    <tr>
-      <td class="td-name">${a.client}</td>
-      <td>${a.property}</td>
-      <td>${a.type}</td>
-      <td style="color:var(--text-light)">${a.date}</td>
+  // Rows open the applicant's full profile (budget, move-in, property type,
+  // and what they asked for). The action buttons stop propagation so they
+  // don't also open the profile.
+  tbody.innerHTML = applications.map(a => {
+    const c = findClientForApp(a);
+    const wants = c ? [c.proptype, c.budget, c.movein ? `move-in ${c.movein}` : null]
+                        .filter(Boolean).map(escH).join(' · ') : '';
+    return `
+    <tr style="cursor:pointer" onclick="openApplicant(${a.id})" title="Open ${escH(a.client || 'applicant')}'s profile">
+      <td class="td-name">${escH(a.client || '')}</td>
+      <td>
+        <div>${escH(a.property || '')}</div>
+        ${wants ? `<div style="font-size:0.72rem;color:var(--text-light);margin-top:3px">${wants}</div>` : ''}
+      </td>
+      <td>${escH(a.type || '')}</td>
+      <td style="color:var(--text-light)">${escH(a.date || '')}</td>
       <td>${statusBadge(a.status)}</td>
       <td>
         <div class="td-actions">
-          ${a.status === 'Pending' ? `<button class="action-btn" onclick="approveApp(${a.id})">Approve</button><button class="action-btn danger" onclick="rejectApp(${a.id})">Reject</button>` : `<button class="action-btn" onclick="">View</button>`}
+          ${a.status === 'Pending'
+            ? `<button class="action-btn" onclick="event.stopPropagation();approveApp(${a.id})">Approve</button><button class="action-btn danger" onclick="event.stopPropagation();rejectApp(${a.id})">Reject</button>`
+            : `<button class="action-btn" onclick="event.stopPropagation();openApplicant(${a.id})">View</button>`}
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 
   const recent = document.getElementById('recentAppsTable');
   recent.innerHTML = applications.slice(0,4).map(a => `
-    <tr>
-      <td class="td-name">${a.client}</td>
-      <td style="font-size:0.78rem;color:var(--text-light)">${a.type}</td>
+    <tr style="cursor:pointer" onclick="openApplicant(${a.id})" title="Open ${escH(a.client || 'applicant')}'s profile">
+      <td class="td-name">${escH(a.client || '')}</td>
+      <td style="font-size:0.78rem;color:var(--text-light)">${escH(a.type || '')}</td>
       <td>${statusBadge(a.status)}</td>
     </tr>
   `).join('');
@@ -2015,6 +2027,29 @@ async function addClient() {
   }
 }
 
+/* Applications store the applicant as a name string, so link them back to the
+   client record by name, falling back to email for rows saved as
+   "New Applicant" or under a slightly different name. */
+function findClientForApp(a) {
+  if (!a) return null;
+  const who = (a.client || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  if (!who) return null;
+  return clients.find(c => {
+    const full = `${c.fname || ''} ${c.lname || ''}`.replace(/\s+/g, ' ').trim().toLowerCase();
+    return (full && (who.includes(full) || full.includes(who)))
+        || (c.email && who === c.email.toLowerCase());
+  }) || null;
+}
+
+/* Open the full applicant profile from an application row. */
+function openApplicant(appId) {
+  const a = applications.find(x => x.id === appId);
+  if (!a) return;
+  const c = findClientForApp(a);
+  if (c) { viewClient(c.id); return; }
+  showToast(`No client record found for ${a.client || 'this application'}`);
+}
+
 function viewClient(id) {
   const c = clients.find(x => x.id === id);
   if (!c) return;
@@ -2054,15 +2089,9 @@ function viewClient(id) {
     deleteClient(c.id);
   };
 
-  // Linked applications. Match on the full name, but fall back to the email so
-  // rows saved as "New Applicant" or under a slightly different name still link.
-  const fullName = `${c.fname || ''} ${c.lname || ''}`.replace(/\s+/g,' ').trim().toLowerCase();
-  const clientApps = applications.filter(a => {
-    const who = (a.client || '').replace(/\s+/g,' ').trim().toLowerCase();
-    if (!who) return false;
-    return (fullName && (who.includes(fullName) || fullName.includes(who)))
-        || (c.email && who === c.email.toLowerCase());
-  });
+  // Linked applications — uses the same matching as the applications table,
+  // so a row that opens this profile always appears in this list.
+  const clientApps = applications.filter(a => findClientForApp(a)?.id === c.id);
 
   // What the applicant actually asked for — stored on the client record, so
   // this fills in for older applications too.
