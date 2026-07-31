@@ -1233,10 +1233,18 @@
   }
 
   .carousel-slide {
+    /* flex-basis must be an explicit 100%, not just min-width. With only a
+       min-width the slide's base size is max-content — the photo's intrinsic
+       width (e.g. 1024px) — and because it can't shrink it renders far wider
+       than the frame, so the photo appears zoomed and clipped on the right.
+       Safari hits this whenever the carousel's height is indefinite. */
+    flex: 0 0 100%;
+    width: 100%;
     min-width: 100%;
+    max-width: 100%;
     height: 100%;
     position: relative;
-    flex-shrink: 0;
+    overflow: hidden;
   }
 
   .carousel-slide img {
@@ -1788,7 +1796,13 @@
     transition: transform 0.4s ease;
   }
   .pm-slide {
+    /* Same fix as .carousel-slide: an explicit flex-basis, otherwise the
+       slide sizes to the photo's intrinsic width and the image renders
+       zoomed and clipped. */
+    flex: 0 0 100%;
+    width: 100%;
     min-width: 100%;
+    max-width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
