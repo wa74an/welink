@@ -1134,7 +1134,7 @@
               <th>Name</th>
               <th>Nationality</th>
               <th>University</th>
-              <th>Budget</th>
+              <th>Applied for</th>
               <th>Status</th>
               <th>Joined</th>
               <th>Actions</th>
@@ -1754,28 +1754,69 @@ function renderProperties() {
   `).join('');
 }
 
+/* Everyone who has applied, not just those with a full client record.
+   Most applications predate the client table (or were created when the client
+   insert was failing), so listing `clients` alone hid most applicants. */
+function buildClientRows() {
+  const rows = clients.map(c => ({ kind: 'client', c }));
+  const seen = new Set();
+  applications.forEach(a => {
+    if (findClientForApp(a)) return;            // already covered by a client row
+    const key = (a.client || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!key || seen.has(key)) return;          // one row per person
+    seen.add(key);
+    rows.push({ kind: 'application', a });
+  });
+  return rows;
+}
+
 function renderClients() {
   const tbody = document.getElementById('clientsTable');
-  if (!clients.length) {
+  const rows = buildClientRows();
+  if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-light)">No clients yet — add your first one</td></tr>';
     return;
   }
-  tbody.innerHTML = clients.map(c => `
+
+  tbody.innerHTML = rows.map(r => {
+    if (r.kind === 'client') {
+      const c = r.c;
+      const applied = [c.proptype, c.budget, c.movein ? `move-in ${c.movein}` : null]
+        .filter(Boolean).map(escH).join(' · ');
+      return `
     <tr>
-      <td class="td-name">${c.fname} ${c.lname}</td>
-      <td>${c.nationality}</td>
-      <td>${c.uni}</td>
-      <td>${c.budget}</td>
+      <td class="td-name">${escH(`${c.fname || ''} ${c.lname || ''}`.trim())}</td>
+      <td>${escH(c.nationality || '—')}</td>
+      <td>${escH(c.uni || '—')}</td>
+      <td>${applied || '<span style="color:var(--text-light)">—</span>'}
+        ${c.notes ? `<div style="font-size:0.7rem;color:var(--text-light);margin-top:3px">${escH(c.notes)}</div>` : ''}
+      </td>
       <td>${statusBadge(c.status)}</td>
-      <td style="color:var(--text-light)">${c.joined}</td>
+      <td style="color:var(--text-light)">${escH(c.joined || '—')}</td>
       <td>
         <div class="td-actions">
           <button class="action-btn" onclick="viewClient(${c.id})">View</button>
           <button class="action-btn danger" onclick="deleteClient(${c.id})">Remove</button>
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+    }
+
+    // Applicant known only from an application — no enquiry details were saved
+    const a = r.a;
+    return `
+    <tr>
+      <td class="td-name">${escH(a.client || '—')}
+        <div style="font-size:0.68rem;color:var(--text-light);margin-top:3px">from application</div>
+      </td>
+      <td style="color:var(--text-light)">—</td>
+      <td style="color:var(--text-light)">—</td>
+      <td>${escH(a.property || '—')}</td>
+      <td>${statusBadge(a.status)}</td>
+      <td style="color:var(--text-light)">${escH(a.date || '—')}</td>
+      <td><div class="td-actions"><button class="action-btn" onclick="showView('applications', document.querySelector('.nav-item[onclick*=\'applications\']'))">In applications</button></div></td>
+    </tr>`;
+  }).join('');
 }
 
 function renderApplications() {
@@ -1838,7 +1879,9 @@ function renderApplications() {
 
 function updateStats() {
   document.getElementById('statProps').textContent = properties.length;
-  document.getElementById('statClients').textContent = clients.length;
+  // Count everyone listed under Clients, including applicants who only exist
+  // as an application, so the stat matches the table.
+  document.getElementById('statClients').textContent = buildClientRows().length;
   const pending = applications.filter(a => a.status === 'Pending').length;
   document.getElementById('statPending').textContent = pending;
   document.getElementById('appsBadge').textContent = pending;
