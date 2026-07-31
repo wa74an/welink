@@ -1814,7 +1814,7 @@ function renderClients() {
       <td>${escH(a.property || '—')}</td>
       <td>${statusBadge(a.status)}</td>
       <td style="color:var(--text-light)">${escH(a.date || '—')}</td>
-      <td><div class="td-actions"><button class="action-btn" onclick="showView('applications', document.querySelector('.nav-item[onclick*=\'applications\']'))">In applications</button></div></td>
+      <td><div class="td-actions"><button class="action-btn" onclick="viewApplicantOnly(${a.id})">View</button></div></td>
     </tr>`;
   }).join('');
 }
@@ -2133,12 +2133,47 @@ function openApplicant(appId) {
   if (!a) return;
   const c = findClientForApp(a);
   if (c) { viewClient(c.id); return; }
-  showToast(`No client record found for ${a.client || 'this application'}`);
+  // No client record — show what the application itself holds
+  viewApplicantOnly(a.id);
 }
 
 function viewClient(id) {
   const c = clients.find(x => x.id === id);
   if (!c) return;
+  renderClientProfile(c);
+}
+
+/* Open an applicant who exists only as an application (no client record).
+   Builds a client-shaped object from what the application does carry so the
+   same profile can be shown, read-only. Takes an application id rather than a
+   name so quotes in names can't break the call. */
+function viewApplicantOnly(appId) {
+  const seed = applications.find(a => String(a.id) === String(appId));
+  if (!seed) return;
+  const key = (seed.client || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  // Show every application this person made, not just the one clicked
+  const apps = applications.filter(a => (a.client || '').replace(/\s+/g, ' ').trim().toLowerCase() === key);
+  if (!apps.length) return;
+  const latest = apps[0];
+  const parts = (latest.client || '').trim().split(/\s+/);
+  // Match a student account by name so their documents still show
+  const student = allStudents.find(s =>
+    (s.full_name || '').replace(/\s+/g, ' ').trim().toLowerCase() === key) || null;
+  renderClientProfile({
+    id: null,
+    fname: parts[0] || latest.client || '—',
+    lname: parts.slice(1).join(' '),
+    nationality: '', uni: '', budget: '', movein: '', proptype: '',
+    notes: '',
+    email: student ? student.email : '',
+    phone: student ? student.parent_phone : '',
+    joined: latest.date,
+    status: latest.status
+  }, { readOnly: true, student, apps });
+}
+
+function renderClientProfile(c, opts = {}) {
+  const readOnly = opts.readOnly === true;
 
   // Populate modal
   const initials = (c.fname?.[0]||'') + (c.lname?.[0]||'');
@@ -2156,13 +2191,18 @@ function viewClient(id) {
   document.getElementById('vc-joined').textContent = c.joined || '—';
   document.getElementById('vc-status-badge').innerHTML = statusBadge(c.status);
 
-  // Highlight current status button
+  // Highlight current status button. Status and delete act on a client row,
+  // so they're disabled for applicants who only exist as an application.
   document.querySelectorAll('.vc-status-btn').forEach(btn => {
     btn.classList.toggle('active-status', btn.dataset.status === c.status);
+    btn.disabled = readOnly;
+    btn.style.opacity = readOnly ? '0.4' : '';
+    btn.style.cursor = readOnly ? 'not-allowed' : '';
+    btn.title = readOnly ? 'Status is managed from the Applications tab for this applicant' : '';
   });
 
   // Store current client id for status updates
-  document.getElementById('modal-viewClient').dataset.clientId = c.id;
+  document.getElementById('modal-viewClient').dataset.clientId = readOnly ? '' : c.id;
 
   // WhatsApp & email links
   const phone = (c.phone || '').replace(/[^+0-9]/g,'');
@@ -2170,14 +2210,16 @@ function viewClient(id) {
   document.getElementById('vc-email-btn').href = c.email ? `mailto:${c.email}` : '#';
 
   // Delete button
-  document.getElementById('vc-delete-btn').onclick = () => {
+  const delBtn = document.getElementById('vc-delete-btn');
+  delBtn.style.display = readOnly ? 'none' : '';
+  delBtn.onclick = () => {
     closeModal('viewClient');
     deleteClient(c.id);
   };
 
   // Linked student account — shows whether this person has actually created a
   // portal account and submitted their identity documents.
-  const student = findStudentForClient(c);
+  const student = opts.student !== undefined ? opts.student : findStudentForClient(c);
   const studentDiv = document.getElementById('vc-student');
   if (student) {
     const have = REQUIRED_DOCS.filter(d => student.docs.includes(d)).length;
@@ -2206,7 +2248,7 @@ function viewClient(id) {
 
   // Linked applications — uses the same matching as the applications table,
   // so a row that opens this profile always appears in this list.
-  const clientApps = applications.filter(a => findClientForApp(a)?.id === c.id);
+  const clientApps = opts.apps || applications.filter(a => findClientForApp(a)?.id === c.id);
 
   // What the applicant actually asked for — stored on the client record, so
   // this fills in for older applications too.
