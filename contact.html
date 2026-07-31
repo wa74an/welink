@@ -221,8 +221,9 @@
     const fname = g('cf-fname'), lname = g('cf-lname'), email = g('cf-email'), type = g('cf-type'), message = g('cf-message');
     const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
     try {
-      await fetch(SB_URL+'/rest/v1/clients',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({fname,lname,email,status:'Pending',joined:today.slice(3)})});
-      await fetch('https://api.resend.com/emails',{method:'POST',headers:{'Authorization':'Bearer re_GuFzmW7h_KMNjggPhaoHPQiBFeSfKRck1','Content-Type':'application/json'},body:JSON.stringify({from:'We Link Notifications <noreply@welink-uk.com>',to:['admin@welink-uk.com','Mentorazemi@gmail.com'],reply_to:email,subject:'New Contact Form Message — '+fname+' '+lname,html:'<p><b>From:</b> '+fname+' '+lname+'</p><p><b>Email:</b> '+email+'</p><p><b>Type:</b> '+type+'</p><p><b>Message:</b></p><p>'+message+'</p>',from_name:'We Link'})});
+      // Saved and emailed server-side: the `clients` table is RLS-locked and
+      // the Resend key must never appear in this page's source.
+      await fetch('/.netlify/functions/send-enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'contact',fname,lname,email,enquiryType:type,message})});
     } catch(err){console.error(err);}
     document.getElementById('contactForm').style.display='none';
     document.getElementById('formSuccess').style.display='block';

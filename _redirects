@@ -9,3 +9,7 @@
 /about          /about.html       200
 /privacy        /privacy.html     200
 /terms          /terms.html       200
+
+# Shareable per-property links: /property/12-axis-jesmond → home page,
+# which reads the id from the URL and opens that listing.
+/property/*     /index.html       200
