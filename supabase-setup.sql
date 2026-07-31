@@ -163,6 +163,17 @@ EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'properties lockdown skipped: %', SQLERR
 END $$;
 
 -- 5b. CLIENTS — private (names, emails, phones, budgets). No anon access at all.
+-- Also store the applicant's own description of what they're looking for.
+-- Without this column the enquiry text only ever existed in the notification
+-- email, so the dashboard could not show what a client actually applied for.
+DO $$
+BEGIN
+  IF to_regclass('public.clients') IS NOT NULL THEN
+    EXECUTE 'ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS notes TEXT';
+  END IF;
+EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'clients.notes column skipped: %', SQLERRM;
+END $$;
+
 DO $$
 BEGIN
   IF to_regclass('public.clients') IS NOT NULL THEN

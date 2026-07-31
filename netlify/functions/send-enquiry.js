@@ -129,6 +129,9 @@ exports.handler = async (event) => {
       'Content-Type': 'application/json',
       'Prefer': 'return=minimal'
     };
+    const movein   = clean(data.movein, 60) || null;
+    const proptype = clean(data.proptype, 60) || null;
+
     const clientRow = {
       fname: fname || 'Unknown',
       lname,
@@ -137,23 +140,39 @@ exports.handler = async (event) => {
       phone,
       uni,
       budget,
-      movein: clean(data.movein, 60) || null,
-      proptype: clean(data.proptype, 60) || null,
+      movein,
+      proptype,
       status: 'Pending',
       joined: shortDate.slice(3)
     };
+
+    // Record what they actually asked for, not just the university, so the
+    // dashboard can show it against the application.
+    const wanted = [proptype, budget, movein ? `move-in ${movein}` : null].filter(Boolean).join(' · ');
     const appRow = {
       client: name || email || 'New Applicant',
-      property: isLandlord ? 'Landlord Enquiry' : (uni ? `Student - ${uni}` : 'Student Enquiry'),
+      property: isLandlord
+        ? 'Landlord Enquiry'
+        : [uni ? `Student - ${uni}` : 'Student Enquiry', wanted].filter(Boolean).join(' — '),
       type: isLandlord ? 'Landlord' : 'Student',
       date: shortDate,
       status: 'Pending'
     };
+
+    const insert = (table, row) =>
+      fetch(`${SUPABASE_URL}/rest/v1/${table}`, { method: 'POST', headers: sbHeaders, body: JSON.stringify(row) });
+
     try {
-      const [c, a] = await Promise.all([
-        fetch(`${SUPABASE_URL}/rest/v1/clients`, { method: 'POST', headers: sbHeaders, body: JSON.stringify(clientRow) }),
-        fetch(`${SUPABASE_URL}/rest/v1/applications`, { method: 'POST', headers: sbHeaders, body: JSON.stringify(appRow) })
-      ]);
+      // `notes` holds the applicant's own description of what they want. If the
+      // column hasn't been added yet the insert would 400 and the lead would be
+      // lost, so retry without it rather than dropping the enquiry.
+      let c = await insert('clients', notes ? { ...clientRow, notes } : clientRow);
+      if (!c.ok && notes) {
+        const body = await c.text();
+        console.error('client insert with notes failed, retrying without:', c.status, body);
+        c = await insert('clients', clientRow);
+      }
+      const a = await insert('applications', appRow);
       if (!c.ok) console.error('client insert failed:', c.status, await c.text());
       if (!a.ok) console.error('application insert failed:', a.status, await a.text());
     } catch (e) { console.error('lead insert error:', e); }

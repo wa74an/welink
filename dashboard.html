@@ -1582,6 +1582,10 @@
           <div class="vc-label">Property Type</div>
           <div class="vc-value" id="vc-proptype">—</div>
         </div>
+        <div class="vc-field" style="grid-column:1/-1">
+          <div class="vc-label">What they asked for</div>
+          <div class="vc-value" id="vc-notes" style="white-space:pre-wrap;line-height:1.6">—</div>
+        </div>
       </div>
 
       <!-- Applications linked -->
@@ -2025,6 +2029,7 @@ function viewClient(id) {
   document.getElementById('vc-budget').textContent = c.budget || '—';
   document.getElementById('vc-movein').textContent = c.movein || '—';
   document.getElementById('vc-proptype').textContent = c.proptype || '—';
+  document.getElementById('vc-notes').textContent = c.notes || '— (not provided)';
   document.getElementById('vc-email').textContent = c.email || '—';
   document.getElementById('vc-phone').textContent = c.phone || '—';
   document.getElementById('vc-joined').textContent = c.joined || '—';
@@ -2049,17 +2054,30 @@ function viewClient(id) {
     deleteClient(c.id);
   };
 
-  // Linked applications
-  const clientApps = applications.filter(a =>
-    a.client && a.client.toLowerCase().includes((c.fname + ' ' + c.lname).toLowerCase().trim())
-  );
+  // Linked applications. Match on the full name, but fall back to the email so
+  // rows saved as "New Applicant" or under a slightly different name still link.
+  const fullName = `${c.fname || ''} ${c.lname || ''}`.replace(/\s+/g,' ').trim().toLowerCase();
+  const clientApps = applications.filter(a => {
+    const who = (a.client || '').replace(/\s+/g,' ').trim().toLowerCase();
+    if (!who) return false;
+    return (fullName && (who.includes(fullName) || fullName.includes(who)))
+        || (c.email && who === c.email.toLowerCase());
+  });
+
+  // What the applicant actually asked for — stored on the client record, so
+  // this fills in for older applications too.
+  const asked = [c.proptype, c.budget, c.movein ? `move-in ${c.movein}` : null, c.uni]
+    .filter(Boolean).map(escH).join(' · ');
+
   const appsDiv = document.getElementById('vc-applications');
   if (clientApps.length) {
     appsDiv.innerHTML = clientApps.map(a => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;gap:8px">
         <div style="flex:1;min-width:0">
-          <div style="font-size:0.82rem;font-weight:400;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.property}</div>
-          <div style="font-size:0.7rem;color:var(--text-light);margin-top:2px">${a.date}</div>
+          <div style="font-size:0.82rem;font-weight:400;color:var(--text)">${escH(a.property || 'Enquiry')}</div>
+          ${asked ? `<div style="font-size:0.72rem;color:var(--text);opacity:0.8;margin-top:3px;line-height:1.5">${asked}</div>` : ''}
+          ${c.notes ? `<div style="font-size:0.72rem;color:var(--text-light);margin-top:4px;line-height:1.5;white-space:pre-wrap">${escH(c.notes)}</div>` : ''}
+          <div style="font-size:0.7rem;color:var(--text-light);margin-top:4px">${escH(a.date || '')}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
           ${statusBadge(a.status)}
