@@ -226,7 +226,7 @@ SELECT 'v1.0',
 <p>We Link may contact you via email or the phone numbers provided regarding your application, property matches, and service updates.</p>
 
 <h3>8. Contact</h3>
-<p>For any data protection enquiries, contact us at: <strong>admin@welink.co.uk</strong></p>',
+<p>For any data protection enquiries, contact us at: <strong>mentor@welink-uk.com</strong></p>',
   TRUE
 WHERE NOT EXISTS (SELECT 1 FROM public.terms_conditions);
 

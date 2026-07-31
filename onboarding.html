@@ -760,7 +760,7 @@ async function loadTerms() {
       activeTermsVersionId = data[0].id;
       document.getElementById('termsBox').innerHTML = data[0].content;
     } else {
-      document.getElementById('termsBox').innerHTML = '<p>No terms available. Please contact We Link at admin@welink.co.uk.</p>';
+      document.getElementById('termsBox').innerHTML = '<p>No terms available. Please contact We Link at mentor@welink-uk.com.</p>';
     }
   } catch(e) {
     document.getElementById('termsBox').innerHTML = '<p>Could not load terms. Please refresh the page.</p>';
