@@ -260,7 +260,15 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    /* The page ends on the dark footer. iOS Safari paints the area past the
+       end of the document with the root background, so a white root showed a
+       large white band under the footer when overscrolling. Match the footer
+       and stop the document rubber-banding. */
+    background: var(--navy);
+    overscroll-behavior-y: none;
+  }
 
   body {
     font-family: 'Assemblage', 'Cormorant Garamond', Georgia, serif;
@@ -1236,6 +1244,15 @@
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  /* Phones: show the whole listing photo on the card instead of a cropped
+     zoom (matches the detail gallery). A 3:2 box fits typical listing photos
+     edge-to-edge; odd-shaped ones letterbox against the navy backdrop
+     rather than being cut off. */
+  @media(max-width:600px){
+    .prop-carousel { height: auto; aspect-ratio: 3 / 2; }
+    .carousel-slide img { object-fit: contain; }
   }
 
   .carousel-slide-emoji {
@@ -2882,16 +2899,41 @@
     document.getElementById('mobileMenu').classList.remove('open');
   }
 
+  /* iOS Safari ignores `overflow:hidden` on <body> for scroll locking — the
+     page still drags behind the modal and exposes blank space past the footer.
+     Pinning the body and restoring the offset afterwards works everywhere. */
+  let _lockedScrollY = 0;
+  function lockScroll() {
+    _lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${_lockedScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+  }
+  function unlockScroll() {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, _lockedScrollY);
+  }
+  window.lockScroll = lockScroll;
+  window.unlockScroll = unlockScroll;
+
   function openModal(type) {
     document.getElementById('modalOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
     if (type === 'student') selectType('student');
     if (type === 'landlord') selectType('landlord');
   }
 
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('open');
-    document.body.style.overflow = '';
+    unlockScroll();
   }
 
   function handleOverlayClick(e) {
@@ -3464,7 +3506,7 @@ function openPropModal(prop, opts = {}) {
     `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed&z=15`;
 
   document.getElementById('propModalOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockScroll();
 }
 
 /* Convert a YouTube/Vimeo watch URL into a safe embed URL.
@@ -3493,7 +3535,7 @@ function buildVideoEmbedUrl(url) {
 
 function closePropModal(opts = {}) {
   document.getElementById('propModalOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockScroll();
   document.getElementById('pmVideoFrame').src = '';
   document.getElementById('pmMapFrame').src = '';
   pmCurrentPropId = null;

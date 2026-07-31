@@ -10,6 +10,8 @@
 /privacy        /privacy.html     200
 /terms          /terms.html       200
 
-# Shareable per-property links: /property/12-axis-jesmond → home page,
-# which reads the id from the URL and opens that listing.
-/property/*     /index.html       200
+# Shareable per-property links: /property/12-axis-jesmond
+# Served by a function that injects the listing's own Open Graph tags, so
+# WhatsApp/iMessage/social previews show the property photo, name and price
+# instead of the generic homepage card. The page itself is unchanged.
+/property/*     /.netlify/functions/property-page   200
