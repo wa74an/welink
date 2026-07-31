@@ -1246,13 +1246,23 @@
     display: block;
   }
 
-  /* Phones: show the whole listing photo on the card instead of a cropped
-     zoom (matches the detail gallery). A 3:2 box fits typical listing photos
-     edge-to-edge; odd-shaped ones letterbox against the navy backdrop
-     rather than being cut off. */
+  /* Phones: show the whole listing photo instead of a cropped zoom. Where the
+     photo doesn't match the 3:2 box, the gap is filled with a blurred, dimmed
+     copy of the same photo rather than flat navy, so nothing looks empty. */
   @media(max-width:600px){
     .prop-carousel { height: auto; aspect-ratio: 3 / 2; }
-    .carousel-slide img { object-fit: contain; }
+    .carousel-slide { overflow: hidden; }
+    .carousel-slide img { object-fit: contain; position: relative; z-index: 1; }
+    .carousel-slide[style*="--bg"]::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+      filter: blur(16px) brightness(0.6);
+      transform: scale(1.2);
+    }
   }
 
   .carousel-slide-emoji {
@@ -1794,6 +1804,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
   }
   .pm-slide img {
     width: 100%;
@@ -1806,7 +1818,17 @@
      with no letterboxing, and taller/wider shots stay fully visible. */
   @media(max-width:600px){
     .pm-gallery { height: auto; aspect-ratio: 3 / 2; }
-    .pm-slide img { object-fit: contain; }
+    .pm-slide img { object-fit: contain; position: relative; z-index: 1; }
+    .pm-slide[style*="--bg"]::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: var(--bg);
+      background-size: cover;
+      background-position: center;
+      filter: blur(16px) brightness(0.6);
+      transform: scale(1.2);
+    }
   }
   .pm-arrow {
     position: absolute;
@@ -3062,7 +3084,7 @@
 
       const cardId = 'card-' + p.id + '-' + i;
       const slidesHtml = images.map((img, si) => `
-        <div class="carousel-slide">
+        <div class="carousel-slide"${img ? ` style="--bg:url('${img}')"` : ''}>
           ${img
             ? `<img src="${img}" alt="${p.name}" loading="lazy"/>`
             : `<div class="carousel-slide-emoji" style="background:${grad}">${p.emoji || '🏠'}</div>`
@@ -3451,7 +3473,7 @@ function openPropModal(prop, opts = {}) {
 
   document.getElementById('pmSlides').innerHTML = slides.map(s =>
     s.url
-      ? `<div class="pm-slide"><img src="${s.url}" alt="${prop.name}"/></div>`
+      ? `<div class="pm-slide" style="--bg:url('${s.url}')"><img src="${s.url}" alt="${prop.name}"/></div>`
       : `<div class="pm-slide" style="background:${s.gradient || _pmGradients[0]}">${slidePlaceholder}</div>`
   ).join('');
 
