@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="description" content="Simple, transparent pricing from We Link. Free to list, commission only on successful placement."/>
+<meta name="description" content="We Link pricing: property search service 100 KD, and an annual UK guarantor fee from 300 KD based on your monthly rent. Two separate services."/>
 <title>Pricing — We Link</title>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://welink-uk.com/pricing"/>
 <meta property="og:title" content="Pricing — We Link"/>
-<meta property="og:description" content="Simple, transparent pricing. Free to list for landlords. Annual guarantor fee for students based on monthly rent."/>
+<meta property="og:description" content="Property search 100 KD. Annual UK guarantor fee from 300 KD, based on your monthly rent. Take either service on its own."/>
 <meta property="og:image" content="https://welink-uk.com/og-image.png"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Pricing — We Link"/>
-<meta name="twitter:description" content="Simple, transparent pricing. Free to list for landlords. Annual guarantor fee for students based on monthly rent."/>
+<meta name="twitter:description" content="Property search 100 KD. Annual UK guarantor fee from 300 KD, based on your monthly rent. Take either service on its own."/>
 <meta name="twitter:image" content="https://welink-uk.com/og-image.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -88,6 +88,21 @@
   .pricing-card.featured .pricing-features li { color: rgba(255,255,255,0.7); }
   .pricing-card.featured .pricing-features li::before { background: rgba(255,255,255,0.4); }
 
+  /* GUARANTOR FEE TIERS */
+  .tier-section { margin-bottom: 60px; }
+  .tier-head { font-size: 1.6rem; font-weight: 300; color: var(--navy); margin-bottom: 8px; }
+  .tier-sub { font-size: 0.88rem; font-weight: 300; color: var(--text-light); line-height: 1.7; margin-bottom: 28px; max-width: 560px; }
+  .tier-table { width: 100%; border-collapse: collapse; }
+  .tier-table th { text-align: left; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mid-gray); font-weight: 500; padding: 0 0 14px; border-bottom: 1px solid var(--border); }
+  .tier-table th:last-child, .tier-table td:last-child { text-align: right; }
+  .tier-table td { padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; color: var(--text); }
+  .tier-table tr:last-child td { border-bottom: none; }
+  .tier-fee { font-weight: 500; color: var(--navy); white-space: nowrap; }
+  .tier-foot { font-size: 0.8rem; color: var(--text-light); line-height: 1.7; margin-top: 18px; }
+  @media (max-width: 480px) {
+    .tier-table td, .tier-table th { font-size: 0.85rem; }
+  }
+
   /* FAQ */
   .faq-section { margin-top: 60px; border-top: 1px solid var(--border); padding-top: 48px; }
   .faq-section h2 { font-size: 1.6rem; font-weight: 300; color: var(--navy); margin-bottom: 36px; }
@@ -155,53 +170,85 @@
 <div class="page-wrap">
   <div class="page-label">Pricing</div>
   <h1>Simple, <em>transparent</em><br/>pricing.</h1>
-  <p class="page-intro">No upfront fees for students or landlords. We succeed when you do, which means we only charge when a placement is completed.</p>
+  <p class="page-intro">Two separate services. Take the property search on its own, the guarantor on its own, or both together — you only pay for what you use.</p>
 
   <div class="pricing-grid">
     <div class="pricing-card">
-      <div class="pricing-audience">For Students</div>
-      <div class="pricing-name">Student Guarantor</div>
-      <div class="pricing-amount">[TBD]</div>
-      <p class="pricing-note">An annual fee based on your monthly rent, paid once per year. Contact us for a quote.</p>
+      <div class="pricing-audience">Service One</div>
+      <div class="pricing-name">Property Search</div>
+      <div class="pricing-amount">100 KD</div>
+      <p class="pricing-note">One flat fee. We handle the entire search from start to finish — all you do is sign the paperwork.</p>
       <ul class="pricing-features">
-        <li>Full UK guarantor letter issued</li>
-        <li>Application reviewed within 48 hours</li>
-        <li>Accepted by landlords and letting agents nationwide</li>
-        <li>Student portal access for document management</li>
-        <li>Dedicated WhatsApp support in Arabic and English</li>
+        <li>We find properties matched to your budget, university and move-in date</li>
+        <li>We deal with the landlords and letting agents on your behalf</li>
+        <li>All viewings, enquiries and negotiation handled for you</li>
+        <li>Paperwork prepared and explained before you sign</li>
+        <li>Support in Arabic and English throughout</li>
       </ul>
     </div>
     <div class="pricing-card featured">
-      <div class="pricing-audience">For Landlords</div>
-      <div class="pricing-name">Property Listing</div>
-      <div class="pricing-amount">Free to list</div>
-      <p class="pricing-note">One month rent commission charged only on successful placement.</p>
+      <div class="pricing-audience">Service Two</div>
+      <div class="pricing-name">UK Guarantor</div>
+      <div class="pricing-amount">From 300 KD</div>
+      <p class="pricing-note">An annual fee, based on the monthly rent of the property. Renewed only if you still need a guarantor. Full breakdown below.</p>
       <ul class="pricing-features">
-        <li>Verified listing published to our student network</li>
-        <li>Pre-screened tenant applicants only</li>
-        <li>We act as UK guarantor for every placement</li>
-        <li>Landlord dashboard to track applications</li>
-        <li>No placement, no charge</li>
+        <li>We Link acts as your UK based guarantor on the tenancy</li>
+        <li>Removes the need for a UK homeowner to sign for you</li>
+        <li>Accepted by landlords and letting agents nationwide</li>
+        <li>Application reviewed within 48 hours</li>
+        <li>Student portal to upload and track your documents</li>
       </ul>
     </div>
+  </div>
+
+  <div class="tier-section">
+    <h2 class="tier-head">Guarantor fees</h2>
+    <p class="tier-sub">The guarantor fee is set by the monthly rent of the property you are renting, and is charged annually. Find your rent band below.</p>
+    <table class="tier-table">
+      <thead>
+        <tr><th>Monthly rent</th><th>Guarantor fee</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>£0 – £1,199</td><td class="tier-fee">300 KD</td></tr>
+        <tr><td>£1,200 – £1,599</td><td class="tier-fee">350 KD</td></tr>
+        <tr><td>£1,600 – £1,799</td><td class="tier-fee">400 KD</td></tr>
+        <tr><td>£1,800 – £2,099</td><td class="tier-fee">450 KD</td></tr>
+        <tr><td>£2,100 – £2,399</td><td class="tier-fee">500 KD</td></tr>
+        <tr><td>£2,400 – £2,699</td><td class="tier-fee">600 KD</td></tr>
+      </tbody>
+    </table>
+    <p class="tier-foot">Renting above £2,699 per month? Get in touch and we will quote you directly.</p>
+  </div>
+
+  <div class="tier-section">
+    <h2 class="tier-head">For landlords</h2>
+    <p class="tier-sub">Listing a property with We Link is free. A one month rent commission is charged only once a tenant has signed and moved in — no placement, no charge.</p>
   </div>
 
   <div class="faq-section">
     <h2>Common questions</h2>
     <div class="faq-item">
-      <div class="faq-q">When is the landlord commission charged?</div>
-      <div class="faq-a">The one month rent commission is charged only once a tenant has signed a tenancy agreement and moved in. There is no charge if no placement is made.</div>
+      <div class="faq-q">Do I have to take both services?</div>
+      <div class="faq-a">No. The property search and the guarantor are charged separately and can be taken on their own. If you have already found a property yourself, you only pay the guarantor fee. If you have your own guarantor, you only pay the search fee.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">Are there any hidden fees for students?</div>
-      <div class="faq-a">No. We Link does not charge students for the guarantor service, the application process, or the portal. Your only costs are the rent and any standard tenancy fees your landlord may require.</div>
+      <div class="faq-q">What does the 100 KD search fee cover?</div>
+      <div class="faq-a">Everything involved in finding and securing the property. We search based on your budget, university and move-in date, deal with the landlords and letting agents directly, handle the enquiries, viewings and negotiation, and prepare the paperwork. All you need to do is sign it.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How is the guarantor fee decided?</div>
+      <div class="faq-a">It is based on the monthly rent of the property you are renting, using the bands listed above, and is charged annually — not monthly. It is only renewed for a further year if you still need a guarantor. If your rent is above £2,699 per month, contact us and we will quote you directly.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">When do I pay?</div>
+      <div class="faq-a">Fees are confirmed with you in writing before anything is signed. Nothing is charged without your approval, and there are no hidden extras beyond the fees shown on this page.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">What does the guarantor service cover?</div>
       <div class="faq-a">We Link acts as your UK based guarantor on the tenancy agreement, satisfying the requirements of most UK landlords and letting agents. This removes the need for a UK based personal guarantor.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">Can I list multiple properties?</div>
+      <div class="faq-q">Can landlords list multiple properties?</div>
       <div class="faq-a">Yes. Landlords can list as many properties as they wish. Each successful placement carries the standard one month rent commission.</div>
     </div>
   </div>
