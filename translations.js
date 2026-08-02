@@ -6,6 +6,7 @@ const TRANSLATIONS = {
     nav_services:  'Services',
     nav_properties:'Properties',
     nav_landlords: 'For Landlords',
+    nav_pricing:   'Pricing',
     nav_login:     'Student Login',
     nav_cta:       'Get Started',
 
@@ -117,6 +118,7 @@ const TRANSLATIONS = {
     nav_services:  'الخدمات',
     nav_properties:'العقارات',
     nav_landlords: 'للملاك',
+    nav_pricing:   'الأسعار',
     nav_login:     'دخول الطالب',
     nav_cta:       'ابدأ الآن',
 

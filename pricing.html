@@ -55,6 +55,17 @@
   .mobile-menu a:last-child { border-bottom: none; }
   .mobile-cta { color: var(--navy) !important; font-weight: 500 !important; }
 
+  /* Keep the nav on one line between tablet and full desktop widths.
+     With seven items the links wrapped and collided with the logo and the
+     language toggle before the mobile menu took over at 768px. */
+  nav ul a { white-space: nowrap; }
+  @media (max-width: 1200px) {
+    nav { padding-left: 32px; padding-right: 32px; }
+    nav ul { gap: 22px; }
+    nav ul a { font-size: 0.72rem; letter-spacing: 0.07em; }
+  }
+
+
   @media (max-width: 768px) {
     nav { padding: 18px 24px; }
     nav ul { display: none; }
@@ -150,6 +161,7 @@
     <li><a href="/#services">Services</a></li>
     <li><a href="/#properties">Properties</a></li>
     <li><a href="/#landlords">For Landlords</a></li>
+    <li><a href="/pricing">Pricing</a></li>
     <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important">Student Login</a></li>
     <li><a href="/" class="nav-btn">Get Started</a></li>
   </ul>
@@ -163,6 +175,7 @@
   <a href="/#services" onclick="closeMenu()">Services</a>
   <a href="/#properties" onclick="closeMenu()">Properties</a>
   <a href="/#landlords" onclick="closeMenu()">For Landlords</a>
+  <a href="/pricing" onclick="closeMenu()">Pricing</a>
   <a href="/login" onclick="closeMenu()">Student Login</a>
   <a href="/" class="mobile-cta" onclick="closeMenu()">Get Started</a>
 </div>

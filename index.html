@@ -126,6 +126,7 @@
   /* Hide float when modal is open */
   .modal-overlay.open ~ .social-float { display: none !important; }
 
+
   @media (max-width: 768px) {
     .social-float { bottom: 20px; right: 16px; }
     .social-btn { width: 44px; height: 44px; }
@@ -1648,6 +1649,17 @@
     .footer-links { flex-wrap: wrap; gap: 32px; }
   }
 
+
+  /* Keep the nav on one line between tablet and full desktop widths.
+     With seven items the links wrapped and collided with the logo and the
+     language toggle before the mobile menu took over at 768px. */
+  nav ul a { white-space: nowrap; }
+  @media (max-width: 1200px) {
+    nav { padding-left: 32px; padding-right: 32px; }
+    nav ul { gap: 22px; }
+    nav ul a { font-size: 0.72rem; letter-spacing: 0.07em; }
+  }
+
   @media (max-width: 768px) {
     nav ul { display: none; }
     .hamburger { display: flex; }
@@ -2151,6 +2163,7 @@
     <li><a href="#services" data-i18n="nav_services">Services</a></li>
     <li><a href="#properties" data-i18n="nav_properties">Properties</a></li>
     <li><a href="#landlords" data-i18n="nav_landlords">For Landlords</a></li>
+    <li><a href="/pricing" data-i18n="nav_pricing">Pricing</a></li>
     <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important;transition:background 0.2s,border-color 0.2s!important" onmouseover="this.style.background='rgba(13,27,42,0.06)'" onmouseout="this.style.background=''" data-i18n="nav_login">Student Login</a></li>
     <li><a href="#" class="nav-btn" onclick="openModal()" data-i18n="nav_cta">Get Started</a></li>
   </ul>
@@ -2171,6 +2184,7 @@
   <a href="#services" onclick="closeMenu()" data-i18n="nav_services">Services</a>
   <a href="#properties" onclick="closeMenu()" data-i18n="nav_properties">Properties</a>
   <a href="#landlords" onclick="closeMenu()" data-i18n="nav_landlords">For Landlords</a>
+  <a href="/pricing" onclick="closeMenu()" data-i18n="nav_pricing">Pricing</a>
   <a href="/login" onclick="closeMenu()" data-i18n="nav_login">Student Login</a>
   <a href="#" class="mobile-cta" onclick="closeMenu(); openModal()" data-i18n="nav_cta">Get Started</a>
   <div style="display:flex;gap:0;border:1px solid rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;width:fit-content;margin-top:8px">
