@@ -72,6 +72,30 @@
     .hamburger { display: flex; }
   }
 
+
+  /* ====== LANG SWITCHER ====== */
+  .lang-switcher { display:flex; align-items:center; flex-shrink:0; border:1px solid rgba(13,27,42,0.22); border-radius:2px; overflow:hidden; font-size:0.7rem; letter-spacing:0.1em; font-weight:500; order:1; }
+  .lang-btn { background:none; border:none; cursor:pointer; padding:7px 13px; color:var(--text-light); font-family:inherit; font-size:inherit; letter-spacing:inherit; font-weight:inherit; transition:background 0.15s,color 0.15s; line-height:1; }
+  .lang-btn.active { background:var(--navy); color:#fff; }
+  .lang-btn:hover:not(.active) { background:rgba(13,27,42,0.06); color:var(--navy); }
+  .lang-sep { width:1px; background:rgba(13,27,42,0.22); align-self:stretch; }
+  @media (max-width: 768px) { .lang-switcher { margin-right:10px; } }
+
+  /* ====== RTL ====== */
+  [dir="rtl"] nav { flex-direction: row-reverse; }
+  [dir="rtl"] nav ul { flex-direction: row-reverse; }
+  [dir="rtl"] .mobile-menu { text-align: right; }
+  [dir="rtl"] .page-label { flex-direction: row-reverse; }
+  [dir="rtl"] .pricing-features li { padding-left:0; padding-right:20px; }
+  [dir="rtl"] .pricing-features li::before { left:auto; right:0; }
+  [dir="rtl"] .tier-table th, [dir="rtl"] .tier-table td { text-align: right; }
+  [dir="rtl"] .tier-table th:last-child, [dir="rtl"] .tier-table td:last-child { text-align: left; }
+  /* Rent bands and fees are mixed currency + digits. Left to the surrounding
+     RTL context the bidi algorithm reorders them ("£0 – £1,199" reads back as
+     "£1,199 – £0"), so isolate each cell as its own LTR run. */
+  [dir="rtl"] .tier-table td { direction: ltr; unicode-bidi: isolate; }
+  [dir="rtl"] .footer-top, [dir="rtl"] .footer-links { flex-direction: row-reverse; }
+
   /* PAGE CONTENT */
   .page-wrap { padding-top: 120px; padding-bottom: 100px; max-width: 860px; margin: 0 auto; padding-left: 40px; padding-right: 40px; }
   .page-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--navy); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
@@ -157,69 +181,74 @@
     <span class="nav-logo-text">We Link</span>
   </a>
   <ul>
-    <li><a href="/#how">How It Works</a></li>
-    <li><a href="/#services">Services</a></li>
-    <li><a href="/#properties">Properties</a></li>
-    <li><a href="/#landlords">For Landlords</a></li>
-    <li><a href="/pricing">Pricing</a></li>
-    <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important">Student Login</a></li>
-    <li><a href="/" class="nav-btn">Get Started</a></li>
+    <li><a href="/#how" data-i18n="nav_how">How It Works</a></li>
+    <li><a href="/#services" data-i18n="nav_services">Services</a></li>
+    <li><a href="/#properties" data-i18n="nav_properties">Properties</a></li>
+    <li><a href="/#landlords" data-i18n="nav_landlords">For Landlords</a></li>
+    <li><a href="/pricing" data-i18n="nav_pricing">Pricing</a></li>
+    <li><a href="/login" style="border:1px solid rgba(13,27,42,0.25);padding:9px 20px;border-radius:2px;color:var(--navy)!important;font-weight:500!important" data-i18n="nav_login">Student Login</a></li>
+    <li><a href="/" class="nav-btn" data-i18n="nav_cta">Get Started</a></li>
   </ul>
+  <div class="lang-switcher" aria-label="Language switcher">
+    <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" data-lang="ar" onclick="setLang('ar')">AR</button>
+  </div>
   <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="/#how" onclick="closeMenu()">How It Works</a>
-  <a href="/#services" onclick="closeMenu()">Services</a>
-  <a href="/#properties" onclick="closeMenu()">Properties</a>
-  <a href="/#landlords" onclick="closeMenu()">For Landlords</a>
-  <a href="/pricing" onclick="closeMenu()">Pricing</a>
-  <a href="/login" onclick="closeMenu()">Student Login</a>
-  <a href="/" class="mobile-cta" onclick="closeMenu()">Get Started</a>
+  <a href="/#how" onclick="closeMenu()" data-i18n="nav_how">How It Works</a>
+  <a href="/#services" onclick="closeMenu()" data-i18n="nav_services">Services</a>
+  <a href="/#properties" onclick="closeMenu()" data-i18n="nav_properties">Properties</a>
+  <a href="/#landlords" onclick="closeMenu()" data-i18n="nav_landlords">For Landlords</a>
+  <a href="/pricing" onclick="closeMenu()" data-i18n="nav_pricing">Pricing</a>
+  <a href="/login" onclick="closeMenu()" data-i18n="nav_login">Student Login</a>
+  <a href="/" class="mobile-cta" onclick="closeMenu()" data-i18n="nav_cta">Get Started</a>
 </div>
 
 <div class="page-wrap">
-  <div class="page-label">Pricing</div>
-  <h1>Simple, <em>transparent</em><br/>pricing.</h1>
-  <p class="page-intro">Two separate services. Take the property search on its own, the guarantor on its own, or both together — you only pay for what you use.</p>
+  <div class="page-label" data-i18n="pr_label">Pricing</div>
+  <h1 data-i18n-html="pr_h1">Simple, <em>transparent</em><br/>pricing.</h1>
+  <p class="page-intro" data-i18n="pr_intro">Two separate services. Take the property search on its own, the guarantor on its own, or both together — you only pay for what you use.</p>
 
   <div class="pricing-grid">
     <div class="pricing-card">
-      <div class="pricing-audience">Service One</div>
-      <div class="pricing-name">Property Search</div>
-      <div class="pricing-amount">100 KD</div>
-      <p class="pricing-note">A one-off fee, charged only once everything is signed. We handle the entire search from start to finish — all you do is sign the paperwork.</p>
+      <div class="pricing-audience" data-i18n="pr_s1_tag">Service One</div>
+      <div class="pricing-name" data-i18n="pr_s1_name">Property Search</div>
+      <div class="pricing-amount" data-i18n="pr_s1_amt">100 KD</div>
+      <p class="pricing-note" data-i18n="pr_s1_note">A one-off fee, charged only once everything is signed. We handle the entire search from start to finish — all you do is sign the paperwork.</p>
       <ul class="pricing-features">
-        <li>We find properties matched to your budget, university and move-in date</li>
-        <li>We deal with the landlords and letting agents on your behalf</li>
-        <li>All viewings, enquiries and negotiation handled for you</li>
-        <li>Paperwork prepared and explained before you sign</li>
-        <li>Support in Arabic and English throughout</li>
+        <li data-i18n="pr_s1_f1">We find properties matched to your budget, university and move-in date</li>
+        <li data-i18n="pr_s1_f2">We deal with the landlords and letting agents on your behalf</li>
+        <li data-i18n="pr_s1_f3">All viewings, enquiries and negotiation handled for you</li>
+        <li data-i18n="pr_s1_f4">Paperwork prepared and explained before you sign</li>
+        <li data-i18n="pr_s1_f5">Support in Arabic and English throughout</li>
       </ul>
     </div>
     <div class="pricing-card featured">
-      <div class="pricing-audience">Service Two</div>
-      <div class="pricing-name">UK Guarantor</div>
-      <div class="pricing-amount">From 300 KD</div>
-      <p class="pricing-note">An annual fee, paid upfront, based on the monthly rent of the property. Renewed only if you still need a guarantor. Full breakdown below.</p>
+      <div class="pricing-audience" data-i18n="pr_s2_tag">Service Two</div>
+      <div class="pricing-name" data-i18n="pr_s2_name">UK Guarantor</div>
+      <div class="pricing-amount" data-i18n="pr_s2_amt">From 300 KD</div>
+      <p class="pricing-note" data-i18n="pr_s2_note">An annual fee, paid upfront, based on the monthly rent of the property. Renewed only if you still need a guarantor. Full breakdown below.</p>
       <ul class="pricing-features">
-        <li>We Link acts as your UK based guarantor on the tenancy</li>
-        <li>Removes the need for a UK homeowner to sign for you</li>
-        <li>Accepted by landlords and letting agents nationwide</li>
-        <li>Application reviewed within 48 hours</li>
-        <li>Student portal to upload and track your documents</li>
+        <li data-i18n="pr_s2_f1">We Link acts as your UK based guarantor on the tenancy</li>
+        <li data-i18n="pr_s2_f2">Removes the need for a UK homeowner to sign for you</li>
+        <li data-i18n="pr_s2_f3">Accepted by landlords and letting agents nationwide</li>
+        <li data-i18n="pr_s2_f4">Application reviewed within 48 hours</li>
+        <li data-i18n="pr_s2_f5">Student portal to upload and track your documents</li>
       </ul>
     </div>
   </div>
 
   <div class="tier-section">
-    <h2 class="tier-head">Guarantor fees</h2>
-    <p class="tier-sub">The guarantor fee is set by the monthly rent of the property you are renting. It is charged annually and paid upfront, before the guarantee is issued. Find your rent band below.</p>
+    <h2 class="tier-head" data-i18n="pr_tier_h">Guarantor fees</h2>
+    <p class="tier-sub" data-i18n="pr_tier_sub">The guarantor fee is set by the monthly rent of the property you are renting. It is charged annually and paid upfront, before the guarantee is issued. Find your rent band below.</p>
     <table class="tier-table">
       <thead>
-        <tr><th>Monthly rent</th><th>Guarantor fee</th></tr>
+        <tr><th data-i18n="pr_th_rent">Monthly rent</th><th data-i18n="pr_th_fee">Guarantor fee</th></tr>
       </thead>
       <tbody>
         <tr><td>£0 – £1,199</td><td class="tier-fee">300 KD</td></tr>
@@ -230,45 +259,45 @@
         <tr><td>£2,400 – £2,699</td><td class="tier-fee">600 KD</td></tr>
       </tbody>
     </table>
-    <p class="tier-foot">Renting above £2,699 per month? Get in touch and we will quote you directly.</p>
+    <p class="tier-foot" data-i18n="pr_tier_foot">Renting above £2,699 per month? Get in touch and we will quote you directly.</p>
   </div>
 
   <div class="tier-section">
-    <h2 class="tier-head">For landlords</h2>
-    <p class="tier-sub">Listing a property with We Link is free. A one month rent commission is charged only once a tenant has signed and moved in — no placement, no charge.</p>
+    <h2 class="tier-head" data-i18n="pr_ll_h">For landlords</h2>
+    <p class="tier-sub" data-i18n="pr_ll_text">Listing a property with We Link is free. A one month rent commission is charged only once a tenant has signed and moved in — no placement, no charge.</p>
   </div>
 
   <div class="faq-section">
-    <h2>Common questions</h2>
+    <h2 data-i18n="pr_faq_h">Common questions</h2>
     <div class="faq-item">
-      <div class="faq-q">Do I have to take both services?</div>
-      <div class="faq-a">No. The property search and the guarantor are charged separately and can be taken on their own. If you have already found a property yourself, you only pay the guarantor fee. If you have your own guarantor, you only pay the search fee.</div>
+      <div class="faq-q" data-i18n="pr_q1">Do I have to take both services?</div>
+      <div class="faq-a" data-i18n="pr_a1">No. The property search and the guarantor are charged separately and can be taken on their own. If you have already found a property yourself, you only pay the guarantor fee. If you have your own guarantor, you only pay the search fee.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">What does the 100 KD search fee cover?</div>
-      <div class="faq-a">Everything involved in finding and securing the property. We search based on your budget, university and move-in date, deal with the landlords and letting agents directly, handle the enquiries, viewings and negotiation, and prepare the paperwork. All you need to do is sign it.</div>
+      <div class="faq-q" data-i18n="pr_q2">What does the 100 KD search fee cover?</div>
+      <div class="faq-a" data-i18n="pr_a2">Everything involved in finding and securing the property. We search based on your budget, university and move-in date, deal with the landlords and letting agents directly, handle the enquiries, viewings and negotiation, and prepare the paperwork. All you need to do is sign it.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">How is the guarantor fee decided?</div>
-      <div class="faq-a">It is based on the monthly rent of the property you are renting, using the bands listed above, and is charged annually — not monthly. It is only renewed for a further year if you still need a guarantor. If your rent is above £2,699 per month, contact us and we will quote you directly.</div>
+      <div class="faq-q" data-i18n="pr_q3">How is the guarantor fee decided?</div>
+      <div class="faq-a" data-i18n="pr_a3">It is based on the monthly rent of the property you are renting, using the bands listed above, and is charged annually — not monthly. It is only renewed for a further year if you still need a guarantor. If your rent is above £2,699 per month, contact us and we will quote you directly.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">When do I pay?</div>
-      <div class="faq-a">The two fees are paid at different points. The 100 KD search fee is a one-off, charged only once everything has been signed — so you are not paying us to look. The guarantor fee is paid upfront, before we issue the guarantee, because the guarantee has to be in place for the landlord to accept you. Both are confirmed with you in writing beforehand, and there are no hidden extras beyond the fees on this page.</div>
+      <div class="faq-q" data-i18n="pr_q4">When do I pay?</div>
+      <div class="faq-a" data-i18n="pr_a4">The two fees are paid at different points. The 100 KD search fee is a one-off, charged only once everything has been signed — so you are not paying us to look. The guarantor fee is paid upfront, before we issue the guarantee, because the guarantee has to be in place for the landlord to accept you. Both are confirmed with you in writing beforehand, and there are no hidden extras beyond the fees on this page.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">What does the guarantor service cover?</div>
-      <div class="faq-a">We Link acts as your UK based guarantor on the tenancy agreement, satisfying the requirements of most UK landlords and letting agents. This removes the need for a UK based personal guarantor.</div>
+      <div class="faq-q" data-i18n="pr_q5">What does the guarantor service cover?</div>
+      <div class="faq-a" data-i18n="pr_a5">We Link acts as your UK based guarantor on the tenancy agreement, satisfying the requirements of most UK landlords and letting agents. This removes the need for a UK based personal guarantor.</div>
     </div>
     <div class="faq-item">
-      <div class="faq-q">Can landlords list multiple properties?</div>
-      <div class="faq-a">Yes. Landlords can list as many properties as they wish. Each successful placement carries the standard one month rent commission.</div>
+      <div class="faq-q" data-i18n="pr_q6">Can landlords list multiple properties?</div>
+      <div class="faq-a" data-i18n="pr_a6">Yes. Landlords can list as many properties as they wish. Each successful placement carries the standard one month rent commission.</div>
     </div>
   </div>
 
   <div class="cta-row">
-    <a href="/" class="btn-primary">Apply as a Student</a>
-    <a href="/contact" class="btn-outline-link">Talk to Us</a>
+    <a href="/" class="btn-primary" data-i18n="pr_cta_apply">Apply as a Student</a>
+    <a href="/contact" class="btn-outline-link" data-i18n="pr_cta_talk">Talk to Us</a>
   </div>
 </div>
 
@@ -290,7 +319,7 @@
       <div class="footer-col">
         <h4>Students</h4>
         <ul>
-          <li><a href="/#how">How It Works</a></li>
+          <li><a href="/#how" data-i18n="nav_how">How It Works</a></li>
           <li><a href="/#services">Guarantor Service</a></li>
           <li><a href="/#properties">Browse Listings</a></li>
           <li><a href="/">Apply Now</a></li>
@@ -301,7 +330,7 @@
         <ul>
           <li><a href="/">List a Property</a></li>
           <li><a href="/#landlords">Our Guarantee</a></li>
-          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/pricing" data-i18n="nav_pricing">Pricing</a></li>
           <li><a href="/contact">Contact Us</a></li>
         </ul>
       </div>
@@ -341,5 +370,7 @@
     document.getElementById('mobileMenu').classList.remove('open');
   }
 </script>
+<script src="translations.js"></script>
+<script src="i18n.js"></script>
 </body>
 </html>
