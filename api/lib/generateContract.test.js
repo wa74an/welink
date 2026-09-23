@@ -22,7 +22,10 @@ const baseFields = {
   contract_start_date: '01/10/2026',
   contract_end_date: '30/09/2027',
   contract_weekday: 'Thursday',
-  contract_date: '01/10/2026'
+  contract_date: '01/10/2026',
+  uk_property_address: 'Apartment 513, Silverworks, Charlotte Street, Birmingham, B3 1DD',
+  tenant_title: 'السيد/',
+  guarantor_title: 'السيدة/'
 };
 
 function extractText(buf) {

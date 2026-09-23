@@ -1,12 +1,5 @@
 {
-  "services": {
-    "convert-pdf": {
-      "root": "services/convert-pdf/",
-      "entrypoint": "Dockerfile.vercel"
-    }
-  },
   "rewrites": [
-    { "source": "/internal/convert-pdf", "destination": { "service": "convert-pdf" } },
     { "source": "/admin", "destination": "/dashboard.html" },
     { "source": "/login", "destination": "/register.html" },
     { "source": "/register", "destination": "/register.html" },

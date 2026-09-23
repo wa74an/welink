@@ -29,10 +29,15 @@ CREATE TABLE IF NOT EXISTS public.guarantor_contracts (
   contract_date                 DATE NOT NULL,
   pdf_storage_path              TEXT NOT NULL,
   generated_by                  TEXT NOT NULL,          -- free-text admin name; no per-admin identity exists in this app
-  tenant_civil_id_image_path    TEXT,                   -- cleared by the 7-day purge job (guarantor has no upload/OCR step)
+  tenant_civil_id_image_path    TEXT,                   -- cleared by the 7-day purge job
+  guarantor_civil_id_image_path TEXT,                   -- cleared by the 7-day purge job
   civil_id_uploaded_at          TIMESTAMPTZ,             -- drives the purge job
   created_at                    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Idempotent for anyone re-running this against a table created before the
+-- parent Civil ID upload/OCR step existed.
+ALTER TABLE public.guarantor_contracts ADD COLUMN IF NOT EXISTS guarantor_civil_id_image_path TEXT;
 
 ALTER TABLE public.guarantor_contracts ENABLE ROW LEVEL SECURITY;
 
@@ -51,11 +56,9 @@ END $$;
 -- 2. STORAGE BUCKETS ---------------------------------------------
 -- Create both as PRIVATE buckets (Storage → New bucket → Public = OFF):
 --   guarantor-contracts   — long-lived generated PDFs
---   guarantor-civil-ids   — short-lived tenant Civil ID uploads (image or
---                           PDF scan), purged after 7 days. Named after the
---                           feature, not the party — only the tenant's ID is
---                           ever uploaded here; the guarantor has no
---                           upload/OCR step and is entered manually.
+--   guarantor-civil-ids   — short-lived Civil ID uploads (image or PDF scan)
+--                           for either the tenant or the parent, purged
+--                           after 7 days.
 --
 -- Neither bucket gets a storage.objects policy: admin never uploads with a
 -- user JWT (there's no admin Supabase Auth session in this app), so every

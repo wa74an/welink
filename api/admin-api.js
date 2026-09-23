@@ -165,6 +165,16 @@ async function route(req) {
       const generatedBy = typeof body.generated_by === 'string' ? body.generated_by.trim() : '';
       if (!generatedBy) return response(400, { error: 'generated_by is required' });
 
+      // The template's "السيد/" (Mr.) / "السيدة/" (Mrs./Ms.) honorific before
+      // each party's name is resolved from an explicit sex selection — never
+      // guessed from the name — so admin-api computes it here rather than
+      // trusting a client-supplied Arabic string.
+      const TITLES = { male: 'السيد/', female: 'السيدة/' };
+      if (!TITLES[body.tenant_sex]) return response(400, { error: 'tenant_sex must be "male" or "female"' });
+      if (!TITLES[body.guarantor_sex]) return response(400, { error: 'guarantor_sex must be "male" or "female"' });
+      const tenantTitle = TITLES[body.tenant_sex];
+      const guarantorTitle = TITLES[body.guarantor_sex];
+
       // Contract date/weekday are the drafting date (today), computed here
       // rather than admin-entered — one less field to get wrong, and it's
       // never ambiguous. Arabic weekday names, Sunday-first (getDay(): 0=Sun).
@@ -188,7 +198,9 @@ async function route(req) {
         contract_weekday: contractWeekday,
         contract_date: contractDate,
         contract_start_date: toDisplayDate(body.contract_start_date),
-        contract_end_date: toDisplayDate(body.contract_end_date)
+        contract_end_date: toDisplayDate(body.contract_end_date),
+        tenant_title: tenantTitle,
+        guarantor_title: guarantorTitle
       };
 
       let docxBuffer;
@@ -218,7 +230,7 @@ async function route(req) {
         return response(502, { error: 'Could not store generated PDF' });
       }
 
-      const hasCivilIdImages = !!body.tenant_civil_id_image_path;
+      const hasCivilIdImages = !!(body.tenant_civil_id_image_path || body.guarantor_civil_id_image_path);
       const row = {
         tenant_name: body.tenant_name,
         tenant_address: body.tenant_address,
@@ -239,6 +251,7 @@ async function route(req) {
         pdf_storage_path: pdfPath,
         generated_by: generatedBy,
         tenant_civil_id_image_path: body.tenant_civil_id_image_path || null,
+        guarantor_civil_id_image_path: body.guarantor_civil_id_image_path || null,
         civil_id_uploaded_at: hasCivilIdImages ? new Date().toISOString() : null
       };
 

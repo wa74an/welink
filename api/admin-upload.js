@@ -1,4 +1,6 @@
-// Vercel Function — admin-side tenant Civil ID upload (image or PDF scan).
+// Vercel Function — admin-side Civil ID upload (image or PDF scan), for
+// either the tenant or the parent ("guarantor" internally/in storage paths
+// and DB columns — the admin UI labels this party "Parent").
 //
 // No precedent in this codebase: students upload directly to Supabase
 // Storage using their own Supabase Auth session (onboarding.html), but
@@ -6,9 +8,6 @@
 // writes to the private `guarantor-civil-ids` bucket using the service-role
 // key, gated by the same x-admin-secret check as the rest of the admin
 // surface — same pattern as admin-api.js's sbHeaders().
-//
-// Tenant-only: the guarantor Civil ID upload/OCR step was removed — the
-// guarantor's identity is confirmed manually, not photographed.
 //
 // Files here are temporary: cleanup-civil-ids.js deletes them 7 days after
 // the contract that used them is generated.
@@ -35,7 +34,7 @@ module.exports = async (req, res) => {
   const body = req.body || {};
   const { image, kind, mimeType } = body;
 
-  if (kind !== 'tenant') return response(res, 400, { error: 'Invalid kind' });
+  if (kind !== 'tenant' && kind !== 'guarantor') return response(res, 400, { error: 'Invalid kind' });
   if (!ALLOWED_EXT[mimeType]) return response(res, 400, { error: 'Invalid mimeType' });
   if (typeof image !== 'string' || !image) return response(res, 400, { error: 'Missing image' });
 

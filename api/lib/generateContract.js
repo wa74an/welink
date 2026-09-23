@@ -19,7 +19,9 @@ const REQUIRED_FIELDS = [
   'guarantor_name', 'guarantor_address', 'guarantor_civil_id', 'guarantor_phone',
   'rent_amount_gbp', 'rent_due_day',
   'contract_start_date', 'contract_end_date',
-  'contract_weekday', 'contract_date'
+  'contract_weekday', 'contract_date',
+  'uk_property_address',
+  'tenant_title', 'guarantor_title'
 ];
 
 // Optional per the confirmed decision: passport is sometimes never supplied.
@@ -35,6 +37,21 @@ class MissingFieldError extends Error {
 
 function isBlank(value) {
   return value === undefined || value === null || String(value).trim() === '';
+}
+
+// Fields inserted into an RTL paragraph that contain "+", spaces, or other
+// bidi-neutral characters (phone numbers, passport numbers) can have their
+// space-separated groups visually reordered by the Unicode bidi algorithm —
+// e.g. "+44 7700 900111" rendering as "7700 44+ / 900111" across two lines.
+// Wrapping the value in LRI (U+2066) / PDI (U+2069) isolates forces it to
+// resolve as a single left-to-right run regardless of the surrounding RTL
+// context, without touching the template's XML.
+const LTR_ISOLATED_FIELDS = ['tenant_phone', 'guarantor_phone', 'tenant_passport', 'guarantor_passport'];
+const LRI = '⁦';
+const PDI = '⁩';
+
+function ltrIsolate(value) {
+  return value ? `${LRI}${value}${PDI}` : value;
 }
 
 function validateFields(fields) {
@@ -55,8 +72,14 @@ function mergeContract(fields, templatePath = DEFAULT_TEMPLATE_PATH) {
   validateFields(fields);
 
   const data = {};
-  for (const name of REQUIRED_FIELDS) data[name] = String(fields[name]);
-  for (const name of OPTIONAL_FIELDS) data[name] = isBlank(fields[name]) ? '' : String(fields[name]);
+  for (const name of REQUIRED_FIELDS) {
+    const value = String(fields[name]);
+    data[name] = LTR_ISOLATED_FIELDS.includes(name) ? ltrIsolate(value) : value;
+  }
+  for (const name of OPTIONAL_FIELDS) {
+    const value = isBlank(fields[name]) ? '' : String(fields[name]);
+    data[name] = LTR_ISOLATED_FIELDS.includes(name) ? ltrIsolate(value) : value;
+  }
 
   const content = fs.readFileSync(templatePath, 'binary');
   const zip = new PizZip(content);
