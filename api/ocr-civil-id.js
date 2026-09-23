@@ -1,4 +1,7 @@
-// Vercel Function — Civil ID OCR via Claude vision, structured output.
+// Vercel Function — tenant Civil ID OCR via Claude vision, structured output.
+//
+// Tenant-only: the guarantor Civil ID upload/OCR step was removed — the
+// guarantor's identity is confirmed manually, not photographed.
 //
 // This is ALWAYS best-effort, advisory extraction. Nothing it returns is
 // ever treated as final: the admin reviews and can edit every field before
@@ -6,7 +9,7 @@
 // A low-confidence or failed extraction must leave the field blank for the
 // admin to fill in manually — never a guessed value.
 //
-// Never logs the image bytes or the extracted Civil ID number — only
+// Never logs the image/PDF bytes or the extracted Civil ID number — only
 // success/failure and timing, per the data-protection requirements around
 // government-ID data.
 
@@ -28,7 +31,8 @@ const EXT_TO_MEDIA_TYPE = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   png: 'image/png',
-  webp: 'image/webp'
+  webp: 'image/webp',
+  pdf: 'application/pdf'
 };
 
 function response(res, statusCode, body) {
@@ -43,13 +47,14 @@ module.exports = async (req, res) => {
 
   const body = req.body || {};
   const path = body.path;
-  // Same shape admin-upload writes: {uuid}/{tenant|guarantor}/{timestamp}.{ext}
-  if (!path || !/^[0-9a-f-]{36}\/(tenant|guarantor)\/\d+\.[a-z]+$/.test(path)) {
+  // Same shape admin-upload writes: {uuid}/tenant/{timestamp}.{ext}
+  if (!path || !/^[0-9a-f-]{36}\/tenant\/\d+\.[a-z]+$/.test(path)) {
     return response(res, 400, { error: 'Invalid path' });
   }
   const ext = path.split('.').pop();
   const mediaType = EXT_TO_MEDIA_TYPE[ext];
-  if (!mediaType) return response(res, 400, { error: 'Unsupported image type' });
+  if (!mediaType) return response(res, 400, { error: 'Unsupported file type' });
+  const isPdf = mediaType === 'application/pdf';
 
   const startedAt = Date.now();
   try {
@@ -58,11 +63,14 @@ module.exports = async (req, res) => {
       { headers: { apikey: serviceKey(), Authorization: `Bearer ${serviceKey()}` } }
     );
     if (!objRes.ok) {
-      console.error('ocr-civil-id: could not fetch uploaded image, status', objRes.status);
-      return response(res, 502, { error: 'Could not read uploaded image' });
+      console.error('ocr-civil-id: could not fetch uploaded file, status', objRes.status);
+      return response(res, 502, { error: 'Could not read uploaded file' });
     }
-    const imageBuffer = Buffer.from(await objRes.arrayBuffer());
-    const imageBase64 = imageBuffer.toString('base64');
+    const fileBuffer = Buffer.from(await objRes.arrayBuffer());
+    const fileBase64 = fileBuffer.toString('base64');
+    const fileContentBlock = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: mediaType, data: fileBase64 } }
+      : { type: 'image', source: { type: 'base64', media_type: mediaType, data: fileBase64 } };
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const result = await client.messages.parse({
@@ -76,14 +84,14 @@ module.exports = async (req, res) => {
         {
           role: 'user',
           content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+            fileContentBlock,
             {
               type: 'text',
               text:
-                'This is a photo of a Kuwait Civil ID card. Extract the cardholder\'s full name ' +
+                'This is a photo or scan of a Kuwait Civil ID card. Extract the cardholder\'s full name ' +
                 '(as printed, in its original script) and their Civil ID number. ' +
                 'If you cannot read a field with confidence, return null for it rather than guessing. ' +
-                'Set confidence to "low" if the image is blurry, cropped, glare-obscured, or you are ' +
+                'Set confidence to "low" if the image/scan is blurry, cropped, glare-obscured, or you are ' +
                 'not fully certain of either value; otherwise "high".'
             }
           ]

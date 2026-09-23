@@ -1396,18 +1396,12 @@
     <div class="admin-modal-body">
       <div id="contractAlert" style="display:none;padding:10px 14px;font-size:0.8rem;margin-bottom:16px;border:1px solid rgba(224,92,92,0.3);background:rgba(224,92,92,0.1);color:#f0a0a0"></div>
 
-      <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px">Step 1 — Civil ID photos (optional but speeds things up)</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:10px">
-        <div class="form-group">
-          <label>Tenant Civil ID photo</label>
-          <input type="file" accept="image/png,image/jpeg,image/webp" id="contractTenantIdFile"/>
-        </div>
-        <div class="form-group">
-          <label>Guarantor Civil ID photo</label>
-          <input type="file" accept="image/png,image/jpeg,image/webp" id="contractGuarantorIdFile"/>
-        </div>
+      <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px">Step 1 — Tenant Civil ID (optional but speeds things up)</div>
+      <div class="form-group" style="max-width:340px">
+        <label>Tenant Civil ID (photo or PDF scan)</label>
+        <input type="file" accept="image/png,image/jpeg,image/webp,application/pdf" id="contractTenantIdFile"/>
       </div>
-      <button class="btn-sm" onclick="extractContractIds()" id="contractExtractBtn">Extract from photos</button>
+      <button class="btn-sm" onclick="extractContractIds()" id="contractExtractBtn">Extract from ID</button>
       <div id="contractExtractStatus" style="font-size:0.75rem;color:var(--text-light);margin-top:8px"></div>
 
       <hr style="border-color:var(--border);margin:22px 0"/>
@@ -1427,7 +1421,7 @@
       <div class="form-group"><label>Full name</label><input id="c-guarantor-name"/></div>
       <div class="form-group"><label>UK address</label><input id="c-guarantor-address"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-        <div class="form-group"><label>Civil ID <span id="c-guarantor-civil-flag" style="display:none;color:#e0a05c;font-weight:400;font-size:0.68rem">not read — check</span></label><input id="c-guarantor-civil-id"/></div>
+        <div class="form-group"><label>Civil ID</label><input id="c-guarantor-civil-id"/></div>
         <div class="form-group"><label>Phone</label><input id="c-guarantor-phone"/></div>
         <div class="form-group"><label>Passport (optional)</label><input id="c-guarantor-passport"/></div>
       </div>
@@ -2836,7 +2830,7 @@ async function downloadDoc(filePath, fileName) {
 
 // ===== GUARANTOR CONTRACTS =====
 let contracts = [];
-let contractState = { tenantImagePath: null, guarantorImagePath: null };
+let contractState = { tenantImagePath: null };
 
 async function callFunction(url, body) {
   const key = getAdminKey();
@@ -2912,9 +2906,8 @@ function openNewContractModal() {
 }
 
 function resetContractForm() {
-  contractState = { tenantImagePath: null, guarantorImagePath: null };
+  contractState = { tenantImagePath: null };
   document.getElementById('contractTenantIdFile').value = '';
-  document.getElementById('contractGuarantorIdFile').value = '';
   document.getElementById('contractExtractStatus').textContent = '';
   document.getElementById('contractAlert').style.display = 'none';
   ['tenant-name','tenant-address','tenant-civil-id','tenant-phone','tenant-passport',
@@ -2924,49 +2917,44 @@ function resetContractForm() {
     if (el) el.value = '';
   });
   document.getElementById('c-tenant-civil-flag').style.display = 'none';
-  document.getElementById('c-guarantor-civil-flag').style.display = 'none';
   document.getElementById('c-start-date').value = new Date().toISOString().slice(0, 10);
 }
 
+// Tenant-only: the guarantor Civil ID upload/OCR step was removed — the
+// guarantor's identity is confirmed manually, not photographed.
 async function extractContractIds() {
   const btn = document.getElementById('contractExtractBtn');
   const status = document.getElementById('contractExtractStatus');
   const tenantFile = document.getElementById('contractTenantIdFile').files[0];
-  const guarantorFile = document.getElementById('contractGuarantorIdFile').files[0];
-  if (!tenantFile && !guarantorFile) { status.textContent = 'Choose at least one Civil ID photo first.'; return; }
+  if (!tenantFile) { status.textContent = 'Choose the tenant\'s Civil ID (photo or PDF) first.'; return; }
 
   btn.disabled = true;
-  status.textContent = 'Uploading and reading Civil ID photo(s)…';
+  status.textContent = 'Uploading and reading the Civil ID…';
   try {
-    if (tenantFile) await extractOne(tenantFile, 'tenant');
-    if (guarantorFile) await extractOne(guarantorFile, 'guarantor');
+    const base64 = await fileToBase64(tenantFile);
+    const uploadData = await callFunction('/api/admin-upload', { image: base64, kind: 'tenant', mimeType: tenantFile.type });
+    if (!uploadData || !uploadData.path) throw new Error('upload failed');
+    contractState.tenantImagePath = uploadData.path;
+
+    const ocrData = await callFunction('/api/ocr-civil-id', { path: uploadData.path });
+    const nameField = document.getElementById('c-tenant-name');
+    const idField = document.getElementById('c-tenant-civil-id');
+    const flag = document.getElementById('c-tenant-civil-flag');
+
+    const readOk = ocrData && ocrData.confidence === 'high';
+    if (readOk && ocrData.full_name) nameField.value = ocrData.full_name;
+    if (readOk && ocrData.civil_id_number) {
+      idField.value = ocrData.civil_id_number;
+      flag.style.display = 'none';
+    } else {
+      flag.style.display = 'inline';
+    }
     status.textContent = 'Done — review every field below before generating.';
   } catch (e) {
     console.error('extractContractIds:', e);
-    status.textContent = 'Could not read one or more photos — please enter the fields manually.';
+    status.textContent = 'Could not read the Civil ID — please enter the fields manually.';
   } finally {
     btn.disabled = false;
-  }
-}
-
-async function extractOne(file, kind) {
-  const base64 = await fileToBase64(file);
-  const uploadData = await callFunction('/api/admin-upload', { image: base64, kind, mimeType: file.type });
-  if (!uploadData || !uploadData.path) throw new Error('upload failed for ' + kind);
-  contractState[kind + 'ImagePath'] = uploadData.path;
-
-  const ocrData = await callFunction('/api/ocr-civil-id', { path: uploadData.path });
-  const nameField = document.getElementById(`c-${kind}-name`);
-  const idField = document.getElementById(`c-${kind}-civil-id`);
-  const flag = document.getElementById(`c-${kind}-civil-flag`);
-
-  const readOk = ocrData && ocrData.confidence === 'high';
-  if (readOk && ocrData.full_name) nameField.value = ocrData.full_name;
-  if (readOk && ocrData.civil_id_number) {
-    idField.value = ocrData.civil_id_number;
-    flag.style.display = 'none';
-  } else {
-    flag.style.display = 'inline';
   }
 }
 
@@ -2990,8 +2978,7 @@ async function submitContract() {
     contract_start_date: document.getElementById('c-start-date').value,
     contract_end_date: document.getElementById('c-end-date').value,
     generated_by: document.getElementById('c-generated-by').value.trim(),
-    tenant_civil_id_image_path: contractState.tenantImagePath,
-    guarantor_civil_id_image_path: contractState.guarantorImagePath
+    tenant_civil_id_image_path: contractState.tenantImagePath
   };
 
   const required = ['tenant_name','tenant_address','tenant_civil_id','tenant_phone',

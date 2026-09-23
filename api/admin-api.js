@@ -218,7 +218,7 @@ async function route(req) {
         return response(502, { error: 'Could not store generated PDF' });
       }
 
-      const hasCivilIdImages = !!(body.tenant_civil_id_image_path || body.guarantor_civil_id_image_path);
+      const hasCivilIdImages = !!body.tenant_civil_id_image_path;
       const row = {
         tenant_name: body.tenant_name,
         tenant_address: body.tenant_address,
@@ -239,7 +239,6 @@ async function route(req) {
         pdf_storage_path: pdfPath,
         generated_by: generatedBy,
         tenant_civil_id_image_path: body.tenant_civil_id_image_path || null,
-        guarantor_civil_id_image_path: body.guarantor_civil_id_image_path || null,
         civil_id_uploaded_at: hasCivilIdImages ? new Date().toISOString() : null
       };
 

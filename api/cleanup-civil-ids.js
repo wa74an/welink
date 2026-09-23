@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
 
   try {
     const listRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/guarantor_contracts?select=id,tenant_civil_id_image_path,guarantor_civil_id_image_path&civil_id_uploaded_at=lt.${cutoff}&or=(tenant_civil_id_image_path.not.is.null,guarantor_civil_id_image_path.not.is.null)`,
+      `${SUPABASE_URL}/rest/v1/guarantor_contracts?select=id,tenant_civil_id_image_path&civil_id_uploaded_at=lt.${cutoff}&tenant_civil_id_image_path=not.is.null`,
       { headers: sbHeaders() }
     );
     if (!listRes.ok) {
@@ -51,20 +51,14 @@ module.exports = async (req, res) => {
     let failed = 0;
 
     for (const row of rows) {
-      const paths = [row.tenant_civil_id_image_path, row.guarantor_civil_id_image_path].filter(Boolean);
-      let allDeleted = true;
-      for (const path of paths) {
-        const ok = await deleteStorageObject(path);
-        if (!ok) allDeleted = false;
-      }
+      const ok = await deleteStorageObject(row.tenant_civil_id_image_path);
 
-      if (allDeleted) {
+      if (ok) {
         const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/guarantor_contracts?id=eq.${row.id}`, {
           method: 'PATCH',
           headers: { ...sbHeaders(), Prefer: 'return=minimal' },
           body: JSON.stringify({
             tenant_civil_id_image_path: null,
-            guarantor_civil_id_image_path: null,
             civil_id_uploaded_at: null
           })
         });

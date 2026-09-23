@@ -29,8 +29,7 @@ CREATE TABLE IF NOT EXISTS public.guarantor_contracts (
   contract_date                 DATE NOT NULL,
   pdf_storage_path              TEXT NOT NULL,
   generated_by                  TEXT NOT NULL,          -- free-text admin name; no per-admin identity exists in this app
-  tenant_civil_id_image_path    TEXT,                   -- cleared by the 7-day purge job
-  guarantor_civil_id_image_path TEXT,                   -- cleared by the 7-day purge job
+  tenant_civil_id_image_path    TEXT,                   -- cleared by the 7-day purge job (guarantor has no upload/OCR step)
   civil_id_uploaded_at          TIMESTAMPTZ,             -- drives the purge job
   created_at                    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -52,7 +51,11 @@ END $$;
 -- 2. STORAGE BUCKETS ---------------------------------------------
 -- Create both as PRIVATE buckets (Storage → New bucket → Public = OFF):
 --   guarantor-contracts   — long-lived generated PDFs
---   guarantor-civil-ids   — short-lived raw Civil ID images, purged after 7 days
+--   guarantor-civil-ids   — short-lived tenant Civil ID uploads (image or
+--                           PDF scan), purged after 7 days. Named after the
+--                           feature, not the party — only the tenant's ID is
+--                           ever uploaded here; the guarantor has no
+--                           upload/OCR step and is entered manually.
 --
 -- Neither bucket gets a storage.objects policy: admin never uploads with a
 -- user JWT (there's no admin Supabase Auth session in this app), so every
@@ -74,12 +77,9 @@ END $$;
 --
 -- A. Create the two Storage buckets above (private, no policies).
 --
--- B. New Vercel environment variables (Project Settings → Environment
---    Variables), in addition to the ones already migrated from Netlify:
---    ANTHROPIC_API_KEY       = <Anthropic API key, for the Civil ID OCR step>
---    CONVERT_INTERNAL_SECRET = <a new long random string, generated during
---                               the PDF-conversion function's setup — never
---                               sent from the browser, server-to-server only>
+-- B. Vercel environment variables (Project Settings → Environment Variables)
+--    — ANTHROPIC_API_KEY, CONVERT_INTERNAL_SECRET, and CRON_SECRET are
+--    already set on the `welink` Vercel project as of this migration.
 --
 -- C. A daily Vercel Cron (configured in vercel.json) hits
 --    /api/cleanup-civil-ids to auto-delete raw Civil ID images 7 days after
