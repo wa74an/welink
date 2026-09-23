@@ -1,2 +1,6 @@
 "files (18)/"
 .claude/
+node_modules/
+.vercel
+.env
+.env.local

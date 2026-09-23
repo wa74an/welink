@@ -3246,7 +3246,7 @@ window.submitForm = async function() {
   // `applications` are RLS-locked, and the Resend key must never be exposed
   // in this page's source.
   try {
-    await fetch('/.netlify/functions/send-enquiry', {
+    await fetch('/api/send-enquiry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

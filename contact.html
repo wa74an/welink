@@ -236,7 +236,7 @@
     try {
       // Saved and emailed server-side: the `clients` table is RLS-locked and
       // the Resend key must never appear in this page's source.
-      await fetch('/.netlify/functions/send-enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'contact',fname,lname,email,enquiryType:type,message})});
+      await fetch('/api/send-enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'contact',fname,lname,email,enquiryType:type,message})});
     } catch(err){console.error(err);}
     document.getElementById('contactForm').style.display='none';
     document.getElementById('formSuccess').style.display='block';

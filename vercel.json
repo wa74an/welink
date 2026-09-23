@@ -1,0 +1,35 @@
+{
+  "services": {
+    "convert-pdf": {
+      "root": "services/convert-pdf/",
+      "entrypoint": "Dockerfile.vercel"
+    }
+  },
+  "rewrites": [
+    { "source": "/internal/convert-pdf", "destination": { "service": "convert-pdf" } },
+    { "source": "/admin", "destination": "/dashboard.html" },
+    { "source": "/login", "destination": "/register.html" },
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/onboarding", "destination": "/onboarding.html" },
+    { "source": "/portal", "destination": "/portal.html" },
+    { "source": "/student", "destination": "/portal.html" },
+    { "source": "/pricing", "destination": "/pricing.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/property/:id", "destination": "/api/property-page?id=:id" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ],
+  "crons": [
+    { "path": "/api/cleanup-civil-ids", "schedule": "0 3 * * *" }
+  ]
+}

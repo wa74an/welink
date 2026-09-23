@@ -1,0 +1,27 @@
+# Vercel "service" — real headless LibreOffice for docx -> PDF conversion.
+# This is the piece Netlify Functions (and plain Vercel Node functions) can't
+# host: LibreOffice needs a persistent process and a real filesystem, not a
+# stateless Lambda-style invocation. Runs as its own container-image
+# Function, called only by services/../api/admin-api.js server-to-server.
+
+FROM node:20-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libreoffice-writer \
+        fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
+# Dubai font: the template's body text is set in Dubai. Without the real
+# font file installed here, LibreOffice silently substitutes a fallback on
+# Linux and the PDF's layout drifts from the Word original — exactly the
+# risk flagged during template review. ./fonts carries all four weights
+# (Regular/Medium/Light/Bold).
+COPY fonts/ /usr/share/fonts/truetype/dubai/
+RUN fc-cache -f
+
+WORKDIR /app
+COPY server.js .
+
+# Vercel sets PORT via project settings (defaults to 80) and forwards
+# traffic to whatever the container listens on.
+CMD ["node", "server.js"]
