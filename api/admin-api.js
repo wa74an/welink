@@ -172,6 +172,14 @@ async function route(req) {
       const TITLES = { male: 'السيد/', female: 'السيدة/' };
       if (!TITLES[body.tenant_sex]) return response(400, { error: 'tenant_sex must be "male" or "female"' });
       if (!TITLES[body.guarantor_sex]) return response(400, { error: 'guarantor_sex must be "male" or "female"' });
+      // The ID/phone/passport row in the contract has fixed-width cells; a value
+      // too long for its cell would wrap and misalign the row. Refuse rather
+      // than produce a misaligned legal document.
+      const FIT = { tenant_civil_id: 14, guarantor_civil_id: 14, tenant_phone: 17, guarantor_phone: 17, tenant_passport: 12, guarantor_passport: 12 };
+      for (const [k, max] of Object.entries(FIT)) {
+        const v = String(body[k] || '').trim();
+        if (v.length > max) return response(400, { error: `${k} is too long to fit the contract layout (max ${max} characters)` });
+      }
       const tenantTitle = TITLES[body.tenant_sex];
       const guarantorTitle = TITLES[body.guarantor_sex];
 
