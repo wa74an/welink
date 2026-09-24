@@ -29,9 +29,10 @@ const CivilIdExtraction = z.object({
   full_name: z.string().nullable().describe('Full name in Arabic script exactly as printed on the card — never the English/Latin transliteration.'),
   civil_id_number: z.string().nullable(),
   address: z.string().nullable().describe(
-    'The Kuwait home address from the BACK of the card, composed in Arabic from its printed fields ' +
-    '(building/المبنى, unit type/الوحدة, street/الشارع, block/القطعة, area name/العنوان) as one line, ' +
-    'e.g. "29 منزل شارع جاسم عبدالله جاسم الفريح قطعة 2 المنصوريه". Null if the back of the card ' +
+    'The Kuwait home address from the BACK of the card, composed in Arabic as ONE line in EXACTLY this ' +
+    'order: area name (العنوان), then "قطعة" + block number, then "شارع" + street name/number, then the ' +
+    'unit type as printed (e.g. منزل; use "مبنى" if none) + building number (المبنى). ' +
+    'e.g. "المنصوريه قطعة 2 شارع جاسم عبدالله جاسم الفريح منزل 29". Omit any part that is not printed. Null if the back of the card ' +
     'was not provided or the address fields are not legible — never guess or reuse the front-side address label.'
   ),
   sex: z.enum(['male', 'female']).nullable().describe(
