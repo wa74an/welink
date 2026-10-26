@@ -2867,7 +2867,10 @@ async function callFunction(url, body) {
     body: JSON.stringify(body)
   });
   if (res.status === 401) { clearAdminKey(); forceLogin(); showToast('Session expired — please sign in again'); return null; }
-  if (!res.ok) { console.error('callFunction error:', url, await res.text()); return null; }
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'The request failed. Please try again.');
+  }
   return res.json();
 }
 
@@ -2975,7 +2978,7 @@ async function extractContractIds() {
       : 'Done — review every field below before generating.';
   } catch (e) {
     console.error('extractContractIds:', e);
-    status.textContent = 'Could not read one or more Civil IDs — please enter the fields manually.';
+    status.textContent = e.message || 'Could not read one or more Civil IDs — please enter the fields manually.';
   } finally {
     btn.disabled = false;
   }

@@ -6,7 +6,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.128.0",
     "docxtemplater": "^3.50.0",
     "pizzip": "^3.1.7",
     "zod": "^3.24.1"
