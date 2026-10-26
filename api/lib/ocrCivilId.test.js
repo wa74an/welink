@@ -72,6 +72,14 @@ describe('Civil ID extraction', () => {
     expect(request.input[0].content[0].file_data).toMatch(/^data:application\/pdf;base64,/);
   });
 
+  it('uses the fresh Vercel request token instead of a stale build-time token', async () => {
+    vi.stubEnv('VERCEL_OIDC_TOKEN', 'expired-build-token');
+    fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce({ ok: true, json: async () => completed() });
+    const res = await invoke({ path }, { 'x-admin-secret': 'test-admin', 'x-vercel-oidc-token': 'fresh-runtime-token' });
+    expect(res.statusCode).toBe(200);
+    expect(fetch.mock.calls[1][1].headers.Authorization).toBe('Bearer fresh-runtime-token');
+  });
+
   it.each([401, 402, 429, 500])('reports provider failure %s as unavailable, never as an unreadable ID', async status => {
     vi.stubEnv('AI_GATEWAY_API_KEY', 'test-gateway');
     fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce({ ok: false, status });

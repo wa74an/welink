@@ -93,17 +93,23 @@ module.exports = async (req, res) => {
   }
 
   const startedAt = Date.now();
+  let stage = 'storage';
   try {
     const contentBlocks = [await fetchAsContentBlock(path, mediaType)];
     if (backPath) contentBlocks.push(await fetchAsContentBlock(backPath, backMediaType));
 
     // Prefer a dedicated OpenAI key if configured; Vercel deployments can
     // otherwise authenticate to AI Gateway with their rotating OIDC token.
+    stage = 'credentials';
     const directKey = process.env.OPENAI_API_KEY;
-    const apiKey = directKey || process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+    // Vercel Functions receive the refreshed token on each request, rather
+    // than relying on the build-time environment token (which can expire).
+    const oidcToken = req.headers['x-vercel-oidc-token'] || process.env.VERCEL_OIDC_TOKEN;
+    const apiKey = directKey || process.env.AI_GATEWAY_API_KEY || oidcToken;
     if (!apiKey) throw new Error('OCR credentials are not configured');
     const endpoint = directKey ? 'https://api.openai.com/v1/responses' : 'https://ai-gateway.vercel.sh/v1/responses';
     const model = process.env.OPENAI_OCR_MODEL || 'gpt-5.4';
+    stage = 'provider';
     const aiRes = await fetch(endpoint, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -146,6 +152,7 @@ module.exports = async (req, res) => {
       throw error;
     }
     const result = await aiRes.json();
+    stage = 'parse';
     if (result.status !== 'completed') throw new Error('OCR response was incomplete');
     const outputText = (result.output || [])
       .filter(item => item.type === 'message')
@@ -162,7 +169,7 @@ module.exports = async (req, res) => {
     }
     return response(res, 200, parsed);
   } catch (err) {
-    console.error('ocr-civil-id error:', err.name, 'status', err.status || 'unavailable');
+    console.error('ocr-civil-id error:', stage, err.name, 'status', err.status || 'unavailable');
     return response(res, 503, { error: 'ID reading is temporarily unavailable. Please enter the fields manually or try again shortly.' });
   }
 };
