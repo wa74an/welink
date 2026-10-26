@@ -28,7 +28,7 @@ async function invoke(body = { path }, headers = { 'x-admin-secret': 'test-admin
 
 describe('Civil ID extraction', () => {
   beforeEach(() => {
-    for (const key of ['OPENAI_API_KEY', 'OPENAI_OCR_MODEL', 'OCR_MODEL', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN']) vi.stubEnv(key, '');
+    for (const key of ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'OPENAI_OCR_MODEL', 'OCR_MODEL', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN']) vi.stubEnv(key, '');
     vi.stubEnv('ADMIN_SECRET', 'test-admin');
     vi.stubEnv('SUPABASE_SERVICE_KEY', 'test-storage');
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -91,6 +91,39 @@ describe('Civil ID extraction', () => {
     expect(url).toBe('https://ai-gateway.vercel.sh/v1/responses');
     expect(options.headers.Authorization).toBe('Bearer test-oidc');
     expect(JSON.parse(options.body).model).toBe('anthropic/claude-opus-5');
+  });
+
+  it('uses existing Anthropic credit directly for Opus 5 image and PDF reading', async () => {
+    vi.stubEnv('OCR_MODEL', 'anthropic/claude-opus-5');
+    vi.stubEnv('ANTHROPIC_API_KEY', 'test-anthropic');
+    vi.stubEnv('VERCEL_OIDC_TOKEN', 'unused-gateway-token');
+    fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce(storageFile())
+      .mockResolvedValueOnce({ ok: true, json: async () => ({
+        stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify(extracted) }]
+      }) });
+    const res = await invoke({ path, backPath: path.replace('.png', '.pdf') });
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual(extracted);
+    const [url, options] = fetch.mock.calls[2];
+    expect(url).toBe('https://api.anthropic.com/v1/messages');
+    expect(options.headers['x-api-key']).toBe('test-anthropic');
+    expect(options.headers).not.toHaveProperty('Authorization');
+    const request = JSON.parse(options.body);
+    expect(request.model).toBe('claude-opus-5');
+    expect(request.messages[0].content[0]).toMatchObject({ type: 'image', source: { type: 'base64', media_type: 'image/png' } });
+    expect(request.messages[0].content[1]).toMatchObject({ type: 'document', source: { type: 'base64', media_type: 'application/pdf' } });
+    expect(request.output_config.format.schema.additionalProperties).toBe(false);
+    expect(request).not.toHaveProperty('input');
+    expect(request).not.toHaveProperty('reasoning');
+  });
+
+  it('never accepts truncated Anthropic extraction output', async () => {
+    vi.stubEnv('OCR_MODEL', 'anthropic/claude-opus-5');
+    vi.stubEnv('ANTHROPIC_API_KEY', 'test-anthropic');
+    fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce({ ok: true, json: async () => ({
+      stop_reason: 'max_tokens', content: [{ type: 'text', text: JSON.stringify(extracted) }]
+    }) });
+    expect((await invoke()).statusCode).toBe(503);
   });
 
   it.each([401, 402, 429, 500])('reports provider failure %s as unavailable, never as an unreadable ID', async status => {
