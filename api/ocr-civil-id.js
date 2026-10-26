@@ -149,6 +149,11 @@ module.exports = async (req, res) => {
     if (!aiRes.ok) {
       const error = new Error('OCR provider request failed');
       error.status = aiRes.status;
+      const failure = await aiRes.json().catch(() => ({}));
+      const code = failure.error?.code || failure.error?.type || failure.code;
+      // Keep only a machine-readable error category, never the provider's
+      // message or request body, which could include ID data.
+      if (typeof code === 'string' && /^[a-zA-Z0-9_.-]{1,100}$/.test(code)) error.providerCode = code;
       throw error;
     }
     const result = await aiRes.json();
@@ -169,7 +174,7 @@ module.exports = async (req, res) => {
     }
     return response(res, 200, parsed);
   } catch (err) {
-    console.error('ocr-civil-id error:', stage, err.name, 'status', err.status || 'unavailable');
+    console.error('ocr-civil-id error:', stage, err.name, 'status', err.status || 'unavailable', 'code', err.providerCode || 'unavailable');
     return response(res, 503, { error: 'ID reading is temporarily unavailable. Please enter the fields manually or try again shortly.' });
   }
 };
