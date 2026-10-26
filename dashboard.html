@@ -2970,9 +2970,18 @@ async function extractContractIds() {
   btn.disabled = true;
   status.textContent = 'Uploading and reading the Civil ID(s)…';
   try {
-    let anyFailed = false;
-    if (tenantFile) { const ok = await extractOne(tenantFile, tenantBackFile, 'tenant'); if (!ok) anyFailed = true; }
-    if (guarantorFile) { const ok = await extractOne(guarantorFile, guarantorBackFile, 'guarantor'); if (!ok) anyFailed = true; }
+    // Read both people concurrently; a failed request must not prevent the
+    // other person's readable fields from being filled.
+    const tasks = [];
+    if (tenantFile) tasks.push(extractOne(tenantFile, tenantBackFile, 'tenant'));
+    if (guarantorFile) tasks.push(extractOne(guarantorFile, guarantorBackFile, 'guarantor'));
+    const results = await Promise.allSettled(tasks);
+    const failures = results.filter(result => result.status === 'rejected');
+    const anyFailed = results.some(result => result.status === 'rejected' || !result.value);
+    if (failures.length) {
+      status.textContent = 'Some IDs could not be read. ' + (failures[0].reason.message || 'Please try again.') + ' Review any fields already filled below.';
+      return;
+    }
     status.textContent = anyFailed
       ? 'Done — one or more Civil IDs could not be read confidently; review every field below.'
       : 'Done — review every field below before generating.';
@@ -2988,26 +2997,36 @@ async function extractContractIds() {
 // either way the upload always succeeds and the admin can edit the fields.
 // backFile is optional — many admins only have a single combined scan.
 async function extractOne(file, backFile, kind) {
-  const base64 = await fileToBase64(file);
-  const uploadData = await callFunction('/api/admin-upload', { image: base64, kind, mimeType: file.type });
+  const uploadFile = async selectedFile => {
+    const image = await fileToBase64(selectedFile);
+    const uploaded = await callFunction('/api/admin-upload', { image, kind, mimeType: selectedFile.type });
+    if (!uploaded || !uploaded.path) throw new Error('Could not upload the ' + kind + ' ID. Please try again.');
+    return uploaded;
+  };
+  const [uploadData, backUploadData] = await Promise.all([
+    uploadFile(file),
+    backFile ? uploadFile(backFile) : Promise.resolve(null)
+  ]);
   if (!uploadData || !uploadData.path) throw new Error('upload failed for ' + kind);
   contractState[kind + 'ImagePath'] = uploadData.path;
 
-  let backPath = null;
-  if (backFile) {
-    const backBase64 = await fileToBase64(backFile);
-    const backUploadData = await callFunction('/api/admin-upload', { image: backBase64, kind, mimeType: backFile.type });
-    if (backUploadData && backUploadData.path) backPath = backUploadData.path;
-  }
+  const backPath = backUploadData ? backUploadData.path : null;
 
   const ocrData = await callFunction('/api/ocr-civil-id', { path: uploadData.path, backPath });
   const nameField = document.getElementById(`c-${kind}-name`);
   const idField = document.getElementById(`c-${kind}-civil-id`);
   const flag = document.getElementById(`c-${kind}-civil-flag`);
 
-  const readOk = ocrData && ocrData.confidence === 'high';
-  if (readOk && ocrData.full_name) nameField.value = ocrData.full_name;
-  if (readOk && ocrData.civil_id_number) {
+  // A difficult name must not discard a clearly read ID number (or vice
+  // versa). Only fill fields individually marked as confident.
+  const confident = field => ocrData && (ocrData.field_confidence
+    ? ocrData.field_confidence[field] === 'high'
+    : ocrData.confidence === 'high');
+  const nameReadOk = confident('full_name') && !!ocrData.full_name;
+  const idReadOk = confident('civil_id_number') && !!ocrData.civil_id_number;
+  const readOk = nameReadOk && idReadOk;
+  if (nameReadOk) nameField.value = ocrData.full_name;
+  if (idReadOk) {
     idField.value = ocrData.civil_id_number;
     flag.style.display = 'none';
   } else {
@@ -3020,7 +3039,7 @@ async function extractOne(file, backFile, kind) {
   // read — so both are flagged independently of the name/Civil ID confidence.
   const addressField = document.getElementById(`c-${kind}-address`);
   const addressFlag = document.getElementById(`c-${kind}-address-flag`);
-  if (ocrData && ocrData.address) {
+  if (confident('address') && ocrData.address) {
     addressField.value = ocrData.address;
     addressFlag.style.display = 'none';
   } else {
@@ -3029,7 +3048,7 @@ async function extractOne(file, backFile, kind) {
 
   const sexField = document.getElementById(`c-${kind}-sex`);
   const sexFlag = document.getElementById(`c-${kind}-sex-flag`);
-  if (ocrData && (ocrData.sex === 'male' || ocrData.sex === 'female')) {
+  if (confident('sex') && (ocrData.sex === 'male' || ocrData.sex === 'female')) {
     sexField.value = ocrData.sex;
     sexFlag.style.display = 'none';
   } else {

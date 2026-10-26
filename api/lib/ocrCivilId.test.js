@@ -6,7 +6,8 @@ const handler = require('../ocr-civil-id.js');
 const path = '00000000-0000-0000-0000-000000000000/tenant/123.png';
 const extracted = {
   full_name: 'اسم تجريبي', civil_id_number: '000000000000',
-  address: null, sex: null, confidence: 'high'
+  address: null, sex: null, confidence: 'high',
+  field_confidence: { full_name: 'high', civil_id_number: 'high', address: 'low', sex: 'low' }
 };
 const completed = (data = extracted) => ({
   status: 'completed',
@@ -27,7 +28,7 @@ async function invoke(body = { path }, headers = { 'x-admin-secret': 'test-admin
 
 describe('Civil ID extraction', () => {
   beforeEach(() => {
-    for (const key of ['OPENAI_API_KEY', 'OPENAI_OCR_MODEL', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN']) vi.stubEnv(key, '');
+    for (const key of ['OPENAI_API_KEY', 'OPENAI_OCR_MODEL', 'OCR_MODEL', 'AI_GATEWAY_API_KEY', 'VERCEL_OIDC_TOKEN']) vi.stubEnv(key, '');
     vi.stubEnv('ADMIN_SECRET', 'test-admin');
     vi.stubEnv('SUPABASE_SERVICE_KEY', 'test-storage');
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -78,6 +79,18 @@ describe('Civil ID extraction', () => {
     const res = await invoke({ path }, { 'x-admin-secret': 'test-admin', 'x-vercel-oidc-token': 'fresh-runtime-token' });
     expect(res.statusCode).toBe(200);
     expect(fetch.mock.calls[1][1].headers.Authorization).toBe('Bearer fresh-runtime-token');
+  });
+
+  it('can restore the original Claude Opus 5 model through Gateway without the expired Anthropic key', async () => {
+    vi.stubEnv('OCR_MODEL', 'anthropic/claude-opus-5');
+    vi.stubEnv('OPENAI_API_KEY', 'unrelated-openai-key');
+    vi.stubEnv('VERCEL_OIDC_TOKEN', 'test-oidc');
+    fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce({ ok: true, json: async () => completed() });
+    expect((await invoke()).statusCode).toBe(200);
+    const [url, options] = fetch.mock.calls[1];
+    expect(url).toBe('https://ai-gateway.vercel.sh/v1/responses');
+    expect(options.headers.Authorization).toBe('Bearer test-oidc');
+    expect(JSON.parse(options.body).model).toBe('anthropic/claude-opus-5');
   });
 
   it.each([401, 402, 429, 500])('reports provider failure %s as unavailable, never as an unreadable ID', async status => {
