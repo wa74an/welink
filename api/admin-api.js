@@ -3,7 +3,7 @@
 // All requests must include x-admin-secret matching the ADMIN_SECRET env var.
 
 const crypto = require('crypto');
-const { listReviews, saveReview } = require('./lib/dashboardReviews');
+const { listReviews, saveReview, readSettings, saveSettings } = require('./lib/dashboardReviews');
 const { mergeContract, MissingFieldError } = require('./lib/generateContract');
 const { convertToPdf } = require('./lib/convertToPdf');
 
@@ -150,6 +150,13 @@ async function route(req) {
 
     // Shared dashboard review data is stored as one private object per contract.
     // This keeps independent reviewers from overwriting decisions for other contracts.
+    if (action === 'dashboard-settings' && method === 'GET') {
+      return response(200, await readSettings(SUPABASE_URL, sbHeaders()));
+    }
+    if (action === 'save-dashboard-settings' && method === 'POST') {
+      const result = await saveSettings(SUPABASE_URL, sbHeaders(), req.body || {});
+      return response(result.status, result.body);
+    }
     if (action === 'dashboard-reviews' && method === 'GET') {
       return response(200, await listReviews(SUPABASE_URL, sbHeaders()));
     }

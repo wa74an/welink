@@ -883,7 +883,7 @@
   .vc-status-btn[data-status="Inactive"].active-status { background: rgba(255,255,255,0.08); color: var(--mid-gray); border-color: var(--mid-gray); }
 
 </style>
-<link rel="stylesheet" href="/assets/dashboard.css?v=20261103">
+<link rel="stylesheet" href="/assets/dashboard.css?v=20261103b">
 </head>
 <body>
 <div id="loadingBar"></div>
@@ -1136,54 +1136,20 @@
 
     <!-- ===== SETTINGS ===== -->
     <div class="view" id="view-settings">
-      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
-        <div class="section-card" style="max-width:520px;flex:1;min-width:280px">
-          <div class="section-card-header"><h3>Account Settings</h3></div>
-          <div style="padding:24px 28px">
-            <div class="form-group">
-              <label>Business Name</label>
-              <input type="text" value="We Link"/>
-            </div>
-            <div class="form-group">
-              <label>Contact Email</label>
-              <input type="email" value="mentor@welink-uk.com"/>
-            </div>
-            <div class="form-group">
-              <label>WhatsApp Number</label>
-              <input type="tel" value="+44 7700 000000"/>
-            </div>
-            <div class="form-group">
-              <label>Default Guarantor Fee (%)</label>
-              <input type="number" value="7"/>
-            </div>
-            <div class="form-group">
-              <label>Change Password</label>
-              <input type="password" placeholder="New password"/>
-            </div>
-            <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
-              <button class="btn-sm primary" onclick="showToast('Settings saved successfully')">Save Changes</button>
-              <a href="index.html" target="_blank" class="btn-sm" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H4M9 1V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-                View Live Site
-              </a>
-            </div>
+      <div class="section-card">
+        <div class="section-card-header"><h3>Workspace preferences</h3></div>
+        <div class="admin-modal-body" style="max-width:700px">
+          <div class="form-row-2">
+            <div class="form-group"><label for="workspaceName">Greeting name</label><input id="workspaceName" maxlength="80" value="Mentor" autocomplete="nickname"></div>
+            <div class="form-group"><label for="workspaceTimezone">Workspace timezone</label><select id="workspaceTimezone"><option value="Asia/Kuwait">Kuwait · UTC+3</option><option value="Europe/London">United Kingdom · local time</option></select></div>
           </div>
-        </div>
-        <div class="section-card" style="width:220px;flex-shrink:0">
-          <div class="section-card-header"><h3>Quick Links</h3></div>
-          <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px">
-            <a href="index.html" target="_blank" style="font-size:0.8rem;color:var(--text-light);text-decoration:none;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:3px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 11L11 1M11 1H5M11 1V7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              View Live Website
-            </a>
-            <a href="mailto:mentor@welink-uk.com" style="font-size:0.8rem;color:var(--text-light);text-decoration:none;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:3px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M1 4l5 3 5-3" stroke="currentColor" stroke-width="1.3"/></svg>
-              Email Support
-            </a>
-            <button class="btn-sm" style="width:100%;color:var(--red);border-color:var(--red-bg)" onclick="logout()">Sign Out</button>
-          </div>
+          <p class="name-note">Shared across your workspace. Used for greetings, contract generation dates in earnings reports and month boundaries. Original contracts remain unchanged.</p>
+          <p class="name-note" id="workspaceSettingsStatus" role="status">Loading saved preferences…</p>
+          <button class="btn-sm primary" id="saveWorkspaceSettings" disabled data-refresh-action="save-settings">Save preferences</button>
         </div>
       </div>
+      <div class="section-card"><div class="section-card-header"><h3>Guarantor fees</h3></div><div class="admin-modal-body refresh-ui"><p class="name-note">Fixed KWD fees based on the GBP monthly rent. These replace the old percentage placeholder in the dashboard.</p><button class="btn" data-refresh-action="fee-bands">View fee bands ↗</button></div></div>
+      <div class="section-card"><div class="section-card-header"><h3>Account & links</h3></div><div class="admin-modal-body" style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn-sm" href="/" target="_blank" rel="noopener">View live website ↗</a><a class="btn-sm" href="mailto:mentor@welink-uk.com">Email support</a><button class="btn-sm" onclick="logout()">Sign out</button></div></div>
     </div>
 
     <!-- ===== STUDENTS ===== -->
@@ -3271,7 +3237,7 @@ function acceptCookies(){localStorage.setItem('wl_cookies','accepted');document.
 function declineCookies(){localStorage.setItem('wl_cookies','declined');document.getElementById('cookieBanner').style.display='none';}
 </script>
 <p class="workspace-credit" style="position:fixed;left:var(--sidebar-w);right:0;bottom:0;text-align:center;font-size:0.65rem;letter-spacing:0.12em;color:rgba(255,255,255,0.28);padding:12px 0;text-transform:uppercase;pointer-events:none;z-index:40">Made by Scaler Studios</p>
-<script src="/assets/dashboard-core.js?v=20261103"></script>
-<script src="/assets/dashboard.js?v=20261103"></script>
+<script src="/assets/dashboard-core.js?v=20261103b"></script>
+<script src="/assets/dashboard.js?v=20261103b"></script>
 </body>
 </html>

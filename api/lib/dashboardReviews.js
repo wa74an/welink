@@ -34,4 +34,21 @@ async function saveReview(url,headers,body,fetcher=fetch){
  if(!res.ok)throw new Error('Could not save earnings review');
  return {status:200,body:parsed.value};
 }
-module.exports={validateReview,listReviews,saveReview};
+const DEFAULT_SETTINGS={display_name:'Mentor',timezone:'Asia/Kuwait'};
+function validateSettings(body){
+ if(typeof body.display_name!=='string'||!body.display_name.trim()||body.display_name.length>80||/[\x00-\x1f<>]/.test(body.display_name))return {error:'Enter a display name (1–80 characters)'};
+ if(!['Asia/Kuwait','Europe/London'].includes(body.timezone))return {error:'Choose a supported workspace timezone'};
+ return {value:{display_name:body.display_name.trim(),timezone:body.timezone}};
+}
+async function readSettings(url,headers,fetcher=fetch){
+ const res=await fetcher(`${url}/storage/v1/object/authenticated/${BUCKET}/dashboard-settings/workspace.json`,{headers});
+ if(res.status===404)return DEFAULT_SETTINGS;
+ if(!res.ok){const error=await res.json().catch(()=>({}));if(String(error.statusCode)==='404')return DEFAULT_SETTINGS;throw new Error('Could not read workspace preferences')}
+ const parsed=validateSettings(await res.json());if(parsed.error)throw new Error('Invalid saved workspace preferences');return parsed.value;
+}
+async function saveSettings(url,headers,body,fetcher=fetch){
+ const parsed=validateSettings(body);if(parsed.error)return {status:400,body:{error:parsed.error}};
+ const res=await fetcher(`${url}/storage/v1/object/${BUCKET}/dashboard-settings/workspace.json`,{method:'POST',headers:{...headers,'x-upsert':'true','cache-control':'no-store'},body:JSON.stringify(parsed.value)});
+ if(!res.ok)throw new Error('Could not save workspace preferences');return {status:200,body:parsed.value};
+}
+module.exports={validateReview,listReviews,saveReview,validateSettings,readSettings,saveSettings};
