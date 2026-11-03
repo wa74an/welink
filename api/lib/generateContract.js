@@ -40,13 +40,13 @@ function isBlank(value) {
 }
 
 // Fields inserted into an RTL paragraph that contain "+", spaces, or other
-// bidi-neutral characters (phone numbers, passport numbers) can have their
+// bidi-neutral characters (phone numbers, passport numbers, UK addresses) can have their
 // space-separated groups visually reordered by the Unicode bidi algorithm —
 // e.g. "+44 7700 900111" rendering as "7700 44+ / 900111" across two lines.
 // Wrapping the value in LRI (U+2066) / PDI (U+2069) isolates forces it to
 // resolve as a single left-to-right run regardless of the surrounding RTL
 // context, without touching the template's XML.
-const LTR_ISOLATED_FIELDS = ['tenant_phone', 'guarantor_phone', 'tenant_passport', 'guarantor_passport'];
+const LTR_ISOLATED_FIELDS = ['tenant_phone', 'guarantor_phone', 'tenant_passport', 'guarantor_passport', 'uk_property_address'];
 const LRI = '⁦';
 const PDI = '⁩';
 
