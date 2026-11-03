@@ -883,7 +883,7 @@
   .vc-status-btn[data-status="Inactive"].active-status { background: rgba(255,255,255,0.08); color: var(--mid-gray); border-color: var(--mid-gray); }
 
 </style>
-<link rel="stylesheet" href="/assets/dashboard.css?v=20261103b">
+<link rel="stylesheet" href="/assets/dashboard.css?v=20261103c">
 </head>
 <body>
 <div id="loadingBar"></div>
@@ -1212,9 +1212,8 @@
             <h3>Terms & Conditions</h3>
             <button class="btn-sm primary" onclick="openTermsEditor(null)">+ New Version</button>
           </div>
-          <div id="termsAdminList" style="padding:0 0 8px">
-            <div style="padding:24px;text-align:center;color:var(--text-light);font-size:0.82rem" id="termsLoading">Loading…</div>
-          </div>
+          <div style="padding:24px;text-align:center;color:var(--text-light);font-size:0.82rem" id="termsLoading">Loading…</div>
+          <div id="termsAdminList" style="padding:0 0 8px"></div>
         </div>
       </div>
     </div>
@@ -3237,7 +3236,7 @@ function acceptCookies(){localStorage.setItem('wl_cookies','accepted');document.
 function declineCookies(){localStorage.setItem('wl_cookies','declined');document.getElementById('cookieBanner').style.display='none';}
 </script>
 <p class="workspace-credit" style="position:fixed;left:var(--sidebar-w);right:0;bottom:0;text-align:center;font-size:0.65rem;letter-spacing:0.12em;color:rgba(255,255,255,0.28);padding:12px 0;text-transform:uppercase;pointer-events:none;z-index:40">Made by Scaler Studios</p>
-<script src="/assets/dashboard-core.js?v=20261103b"></script>
-<script src="/assets/dashboard.js?v=20261103b"></script>
+<script src="/assets/dashboard-core.js?v=20261103c"></script>
+<script src="/assets/dashboard.js?v=20261103c"></script>
 </body>
 </html>
