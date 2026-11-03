@@ -3,6 +3,7 @@
 // All requests must include x-admin-secret matching the ADMIN_SECRET env var.
 
 const crypto = require('crypto');
+const { listReviews, saveReview } = require('./lib/dashboardReviews');
 const { mergeContract, MissingFieldError } = require('./lib/generateContract');
 const { convertToPdf } = require('./lib/convertToPdf');
 
@@ -147,13 +148,30 @@ async function route(req) {
       return response(204, '');
     }
 
+    // Shared dashboard review data is stored as one private object per contract.
+    // This keeps independent reviewers from overwriting decisions for other contracts.
+    if (action === 'dashboard-reviews' && method === 'GET') {
+      return response(200, await listReviews(SUPABASE_URL, sbHeaders()));
+    }
+    if (action === 'save-dashboard-review' && method === 'POST') {
+      const result = await saveReview(SUPABASE_URL, sbHeaders(), req.body || {});
+      return response(result.status, result.body);
+    }
+
     // ── LIST GUARANTOR CONTRACTS ───────────────────────────────
     if (action === 'list-contracts' && method === 'GET') {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/guarantor_contracts?select=*&order=created_at.desc`,
-        { headers: sbHeaders() }
-      );
-      return response(res.status, await res.text());
+      const rows = [];
+      for (let offset = 0; ; offset += 1000) {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/guarantor_contracts?select=*&order=created_at.desc,id.desc&limit=1000&offset=${offset}`,
+          { headers: sbHeaders() }
+        );
+        if (!res.ok) return response(res.status, await res.text());
+        const page = await res.json();
+        rows.push(...page);
+        if (page.length < 1000) break;
+      }
+      return response(200, rows);
     }
 
     // ── GENERATE A GUARANTOR CONTRACT (merge -> PDF -> store -> record) ──
