@@ -6,8 +6,9 @@ const handler = require('../ocr-civil-id.js');
 const path = '00000000-0000-0000-0000-000000000000/tenant/123.png';
 const extracted = {
   full_name: 'اسم تجريبي', civil_id_number: '000000000000',
+  expiry_date: '2099-12-31',
   address: null, sex: null, confidence: 'high',
-  field_confidence: { full_name: 'high', civil_id_number: 'high', address: 'low', sex: 'low' }
+  field_confidence: { full_name: 'high', civil_id_number: 'high', expiry_date: 'high', address: 'low', sex: 'low' }
 };
 const completed = (data = extracted) => ({
   status: 'completed',
@@ -49,7 +50,7 @@ describe('Civil ID extraction', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => completed() });
     const res = await invoke({ path, backPath: path.replace('123', '124') });
     expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual(extracted);
+    expect(res.body).toEqual({ ...extracted, expiry_status: 'valid' });
     const [endpoint, options] = fetch.mock.calls[2];
     expect(endpoint).toBe('https://ai-gateway.vercel.sh/v1/responses');
     expect(options.headers.Authorization).toBe('Bearer test-oidc');
@@ -103,7 +104,7 @@ describe('Civil ID extraction', () => {
       }) });
     const res = await invoke({ path, backPath: path.replace('.png', '.pdf') });
     expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual(extracted);
+    expect(res.body).toEqual({ ...extracted, expiry_status: 'valid' });
     const [url, options] = fetch.mock.calls[2];
     expect(url).toBe('https://api.anthropic.com/v1/messages');
     expect(options.headers['x-api-key']).toBe('test-anthropic');
@@ -151,6 +152,24 @@ describe('Civil ID extraction', () => {
     vi.stubEnv('VERCEL_OIDC_TOKEN', 'test-oidc');
     fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce({ ok: true, json: async () => completed({ ...extracted, confidence: 'certain', sex: 'guessed' }) });
     const res = await invoke();
-    expect(res.body).toEqual({ full_name: null, civil_id_number: null, address: null, sex: null, confidence: 'low' });
+    expect(res.statusCode).toBe(422);
+    expect(res.body.code).toBe('CIVIL_ID_EXPIRY_UNREADABLE');
+  });
+
+  it.each([
+    ['2000-01-01', 'high', 'CIVIL_ID_EXPIRED'],
+    [null, 'low', 'CIVIL_ID_EXPIRY_UNREADABLE'],
+    ['2099-02-31', 'high', 'CIVIL_ID_EXPIRY_UNREADABLE'],
+    ['2099-12-31', 'low', 'CIVIL_ID_EXPIRY_UNREADABLE']
+  ])('rejects expired or unverified scans without returning identity data', async (expiry_date, confidence, code) => {
+    vi.stubEnv('VERCEL_OIDC_TOKEN', 'test-oidc');
+    fetch.mockResolvedValueOnce(storageFile()).mockResolvedValueOnce({ ok: true, json: async () => completed({
+      ...extracted, expiry_date, field_confidence: { ...extracted.field_confidence, expiry_date: confidence }
+    }) });
+    const res = await invoke();
+    expect(res.statusCode).toBe(422);
+    expect(res.body.code).toBe(code);
+    expect(res.body).not.toHaveProperty('full_name');
+    expect(res.body).not.toHaveProperty('civil_id_number');
   });
 });

@@ -1398,6 +1398,7 @@
 
       <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-light);margin-bottom:10px">Step 1 — Civil IDs (optional but speeds things up)</div>
       <div style="font-size:0.72rem;color:var(--text-light);margin-bottom:10px">Front gives the name + Civil ID number. Back gives the address — upload it too if you have it (a single file with both sides also works, in which case leave "back" empty).</div>
+      <div style="font-size:0.72rem;color:var(--text-light);margin-bottom:10px">The expiry date must be clearly visible. Expired Civil IDs are not accepted.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:10px">
         <div class="form-group">
           <label>Tenant Civil ID — front</label>
@@ -2869,7 +2870,9 @@ async function callFunction(url, body) {
   if (res.status === 401) { clearAdminKey(); forceLogin(); showToast('Session expired — please sign in again'); return null; }
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'The request failed. Please try again.');
+    const error = new Error(data.error || 'The request failed. Please try again.');
+    error.code = data.code;
+    throw error;
   }
   return res.json();
 }
@@ -2936,6 +2939,7 @@ function openNewContractModal() {
 
 function resetContractForm() {
   contractState = { tenantImagePath: null, guarantorImagePath: null };
+  document.getElementById('contractGenerateBtn').disabled = false;
   document.getElementById('contractTenantIdFile').value = '';
   document.getElementById('contractTenantIdBackFile').value = '';
   document.getElementById('contractGuarantorIdFile').value = '';
@@ -2960,6 +2964,7 @@ function resetContractForm() {
 
 async function extractContractIds() {
   const btn = document.getElementById('contractExtractBtn');
+  const generateBtn = document.getElementById('contractGenerateBtn');
   const status = document.getElementById('contractExtractStatus');
   const tenantFile = document.getElementById('contractTenantIdFile').files[0];
   const tenantBackFile = document.getElementById('contractTenantIdBackFile').files[0];
@@ -2968,6 +2973,7 @@ async function extractContractIds() {
   if (!tenantFile && !guarantorFile) { status.textContent = 'Choose at least one Civil ID (photo or PDF) first.'; return; }
 
   btn.disabled = true;
+  generateBtn.disabled = true;
   status.textContent = 'Uploading and reading the Civil ID(s)…';
   try {
     // Read both people concurrently; a failed request must not prevent the
@@ -2990,6 +2996,10 @@ async function extractContractIds() {
     status.textContent = e.message || 'Could not read one or more Civil IDs — please enter the fields manually.';
   } finally {
     btn.disabled = false;
+    generateBtn.disabled = ['tenant', 'guarantor'].some(kind => {
+      const check = contractState[kind + 'IdCheck'];
+      return check && check.status !== 'valid';
+    });
   }
 }
 
@@ -2997,70 +3007,97 @@ async function extractContractIds() {
 // either way the upload always succeeds and the admin can edit the fields.
 // backFile is optional — many admins only have a single combined scan.
 async function extractOne(file, backFile, kind) {
-  const uploadFile = async selectedFile => {
-    const image = await fileToBase64(selectedFile);
-    const uploaded = await callFunction('/api/admin-upload', { image, kind, mimeType: selectedFile.type });
-    if (!uploaded || !uploaded.path) throw new Error('Could not upload the ' + kind + ' ID. Please try again.');
-    return uploaded;
-  };
-  const [uploadData, backUploadData] = await Promise.all([
-    uploadFile(file),
-    backFile ? uploadFile(backFile) : Promise.resolve(null)
-  ]);
-  if (!uploadData || !uploadData.path) throw new Error('upload failed for ' + kind);
-  contractState[kind + 'ImagePath'] = uploadData.path;
+  contractState[kind + 'IdCheck'] = { status: 'pending' };
+  try {
+    const uploadFile = async selectedFile => {
+      const image = await fileToBase64(selectedFile);
+      const uploaded = await callFunction('/api/admin-upload', { image, kind, mimeType: selectedFile.type });
+      if (!uploaded || !uploaded.path) throw new Error('Could not upload the ' + kind + ' ID. Please try again.');
+      return uploaded;
+    };
+    const [uploadData, backUploadData] = await Promise.all([
+      uploadFile(file),
+      backFile ? uploadFile(backFile) : Promise.resolve(null)
+    ]);
+    if (!uploadData || !uploadData.path) throw new Error('upload failed for ' + kind);
+    contractState[kind + 'ImagePath'] = uploadData.path;
 
-  const backPath = backUploadData ? backUploadData.path : null;
+    const backPath = backUploadData ? backUploadData.path : null;
 
-  const ocrData = await callFunction('/api/ocr-civil-id', { path: uploadData.path, backPath });
-  const nameField = document.getElementById(`c-${kind}-name`);
-  const idField = document.getElementById(`c-${kind}-civil-id`);
-  const flag = document.getElementById(`c-${kind}-civil-flag`);
+    const ocrData = await callFunction('/api/ocr-civil-id', { path: uploadData.path, backPath });
+    if (!ocrData || ocrData.expiry_status !== 'valid') {
+      const error = new Error('The Civil ID expiry date could not be verified. Please scan a clear, current ID.');
+      error.code = 'CIVIL_ID_EXPIRY_UNREADABLE';
+      throw error;
+    }
+    contractState[kind + 'IdCheck'] = { status: 'valid' };
+    const nameField = document.getElementById(`c-${kind}-name`);
+    const idField = document.getElementById(`c-${kind}-civil-id`);
+    const flag = document.getElementById(`c-${kind}-civil-flag`);
 
-  // A difficult name must not discard a clearly read ID number (or vice
-  // versa). Only fill fields individually marked as confident.
-  const confident = field => ocrData && (ocrData.field_confidence
-    ? ocrData.field_confidence[field] === 'high'
-    : ocrData.confidence === 'high');
-  const nameReadOk = confident('full_name') && !!ocrData.full_name;
-  const idReadOk = confident('civil_id_number') && !!ocrData.civil_id_number;
-  const readOk = nameReadOk && idReadOk;
-  if (nameReadOk) nameField.value = ocrData.full_name;
-  if (idReadOk) {
-    idField.value = ocrData.civil_id_number;
-    flag.style.display = 'none';
-  } else {
-    flag.style.display = 'inline';
+    // A difficult name must not discard a clearly read ID number (or vice
+    // versa). Only fill fields individually marked as confident.
+    const confident = field => ocrData && (ocrData.field_confidence
+      ? ocrData.field_confidence[field] === 'high'
+      : ocrData.confidence === 'high');
+    const nameReadOk = confident('full_name') && !!ocrData.full_name;
+    const idReadOk = confident('civil_id_number') && !!ocrData.civil_id_number;
+    const readOk = nameReadOk && idReadOk;
+    if (nameReadOk) nameField.value = ocrData.full_name;
+    if (idReadOk) {
+      idField.value = ocrData.civil_id_number;
+      flag.style.display = 'none';
+    } else {
+      flag.style.display = 'inline';
+    }
+
+    // Address and sex both live on the back of the card (address in the
+    // printed fields, sex in the MRZ) — often not visible if only the front
+    // was captured, which is a normal partial case, not necessarily a bad
+    // read — so both are flagged independently of the name/Civil ID confidence.
+    const addressField = document.getElementById(`c-${kind}-address`);
+    const addressFlag = document.getElementById(`c-${kind}-address-flag`);
+    if (confident('address') && ocrData.address) {
+      addressField.value = ocrData.address;
+      addressFlag.style.display = 'none';
+    } else {
+      addressFlag.style.display = 'inline';
+    }
+
+    const sexField = document.getElementById(`c-${kind}-sex`);
+    const sexFlag = document.getElementById(`c-${kind}-sex-flag`);
+    if (confident('sex') && (ocrData.sex === 'male' || ocrData.sex === 'female')) {
+      sexField.value = ocrData.sex;
+      sexFlag.style.display = 'none';
+    } else {
+      sexFlag.style.display = 'inline';
+    }
+
+    return readOk;
+  } catch (error) {
+    const label = kind === 'tenant' ? 'Tenant' : 'Parent';
+    const message = label + ': ' + error.message;
+    contractState[kind + 'IdCheck'] = { status: 'rejected', message };
+    if (error.code === 'CIVIL_ID_EXPIRED' || error.code === 'CIVIL_ID_EXPIRY_UNREADABLE') {
+      for (const field of ['name', 'civil-id', 'address', 'sex']) {
+        document.getElementById(`c-${kind}-${field}`).value = '';
+      }
+      contractState[kind + 'ImagePath'] = null;
+    }
+    throw new Error(message);
   }
-
-  // Address and sex both live on the back of the card (address in the
-  // printed fields, sex in the MRZ) — often not visible if only the front
-  // was captured, which is a normal partial case, not necessarily a bad
-  // read — so both are flagged independently of the name/Civil ID confidence.
-  const addressField = document.getElementById(`c-${kind}-address`);
-  const addressFlag = document.getElementById(`c-${kind}-address-flag`);
-  if (confident('address') && ocrData.address) {
-    addressField.value = ocrData.address;
-    addressFlag.style.display = 'none';
-  } else {
-    addressFlag.style.display = 'inline';
-  }
-
-  const sexField = document.getElementById(`c-${kind}-sex`);
-  const sexFlag = document.getElementById(`c-${kind}-sex-flag`);
-  if (confident('sex') && (ocrData.sex === 'male' || ocrData.sex === 'female')) {
-    sexField.value = ocrData.sex;
-    sexFlag.style.display = 'none';
-  } else {
-    sexFlag.style.display = 'inline';
-  }
-
-  return readOk;
 }
 
 async function submitContract() {
   const alertEl = document.getElementById('contractAlert');
   alertEl.style.display = 'none';
+  const rejectedId = ['tenant', 'guarantor'].map(kind => contractState[kind + 'IdCheck'])
+    .find(check => check && check.status !== 'valid');
+  if (rejectedId) {
+    alertEl.textContent = rejectedId.message || 'Wait for the Civil ID scan to finish before generating.';
+    alertEl.style.display = 'block';
+    return;
+  }
 
   const fields = {
     tenant_name: document.getElementById('c-tenant-name').value.trim(),

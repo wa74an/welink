@@ -22,6 +22,7 @@ function setup(callFunction) {
 }
 
 const reading = {
+  expiry_status: 'valid',
   full_name: 'uncertain name', civil_id_number: '000000000000',
   address: 'uncertain address', sex: 'male', confidence: 'low',
   field_confidence: { full_name: 'low', civil_id_number: 'high', address: 'low', sex: 'high' }
@@ -65,5 +66,22 @@ describe('contract form ID reading', () => {
     await vi.waitFor(() => expect(uploads).toHaveLength(2));
     uploads.forEach(upload => upload.resolve({ path: upload.name }));
     await operation;
+  });
+
+  it('rejects an expired scan, clears stale fields, and blocks generation', async () => {
+    const { context, element } = setup(async url => {
+      if (url.includes('upload')) return { path: 'test-path' };
+      const error = new Error('This Civil ID has expired. Upload a renewed Civil ID.');
+      error.code = 'CIVIL_ID_EXPIRED';
+      throw error;
+    });
+    element('c-tenant-name').value = 'old name';
+    element('c-tenant-civil-id').value = '000000000000';
+    element('contractTenantIdFile').files = [{ name: 'expired.png', type: 'image/png' }];
+    await context.extractContractIds();
+    expect(element('c-tenant-name').value).toBe('');
+    expect(element('c-tenant-civil-id').value).toBe('');
+    expect(element('contractGenerateBtn').disabled).toBe(true);
+    expect(element('contractExtractStatus').textContent).toContain('Tenant: This Civil ID has expired');
   });
 });
